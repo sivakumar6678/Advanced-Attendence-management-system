@@ -1,11 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';  // Import HttpClient
+import { HttpClient } from '@angular/common/http';
+import * as faceapi from 'face-api.js';  // Import face-api.js
+
 @Component({
   selector: 'app-test',
   templateUrl: './test.component.html',
-  styleUrl: './test.component.css'
+  styleUrls: ['./test.component.css']
 })
-export class TestComponent implements OnInit{
+export class TestComponent implements OnInit {
   attendanceMessage: string = '';
   adminLatitude: number | null = null;
   adminLongitude: number | null = null;
@@ -14,28 +16,83 @@ export class TestComponent implements OnInit{
   distance: number | null = null;
   attendanceStatus: string | null = null;
 
-  constructor(private http: HttpClient) {}  // Inject HttpClient
+  // Variables for Face Recognition
+  videoElement: HTMLVideoElement | null = null;
+  canvas: HTMLCanvasElement | null = null;
+  isFaceDetected: boolean = false;
+
+  constructor(private http: HttpClient) {}
 
   ngOnInit() {
+    // Load the face-api.js models when the component initializes
+    this.loadFaceApiModels();
+
     // Make a GET request to your backend API
     this.http.get<any>('http://127.0.0.1:8000/attendanc_test/')
       .subscribe(response => {
-        console.log(response);
-        this.attendanceMessage = response.message; // Update with message from backend
-        // console.log("attendanceMessage",this.attendanceMessage);
+        this.attendanceMessage = response.message;
       }, error => {
         console.error('Error:', error);
       });
   }
-   // Method to calculate distance
+
+  // Method to load face-api.js models
+  async loadFaceApiModels() {
+    await faceapi.nets.ssdMobilenetv1.loadFromUri('/models');
+    await faceapi.nets.faceLandmark68Net.loadFromUri('/models');
+    await faceapi.nets.faceRecognitionNet.loadFromUri('/models');
+  }
+
+  // Method to start the webcam and detect faces
+  startWebcam() {
+    this.videoElement = <HTMLVideoElement>document.getElementById('videoInput');
+    navigator.mediaDevices.getUserMedia({ video: {} })
+      .then((stream) => {
+        this.videoElement!.srcObject = stream;
+        this.videoElement!.play();
+      })
+      .catch((err) => {
+        console.error('Error accessing webcam:', err);
+      });
+  }
+
+  // Method to detect face in the video stream
+  async detectFace() {
+    if (this.videoElement) {
+      const detections = await faceapi.detectAllFaces(this.videoElement)
+        .withFaceLandmarks()
+        .withFaceDescriptors();
+
+      if (detections.length > 0) {
+        this.isFaceDetected = true;
+        console.log('Face Detected');
+      } else {
+        this.isFaceDetected = false;
+        console.log('No Face Detected');
+      }
+
+      // Draw face detection results on canvas
+      const canvas = faceapi.createCanvasFromMedia(this.videoElement);
+      document.body.append(canvas);
+      faceapi.matchDimensions(canvas, this.videoElement);
+      faceapi.draw.drawDetections(canvas, detections);
+      faceapi.draw.drawFaceLandmarks(canvas,detections);
+    }
+  }
+
+  // Method to stop the webcam
+  stopWebcam() {
+    if (this.videoElement && this.videoElement.srcObject) {
+      const stream = <MediaStream>this.videoElement.srcObject;
+      const tracks = stream.getTracks();
+      tracks.forEach(track => track.stop());
+    }
+    this.videoElement = null;
+  }
+
+  // Method to calculate distance between admin and student locations
   calculateDistance() {
-    if (
-      this.adminLatitude !== null &&
-      this.adminLongitude !== null &&
-      this.studentLatitude !== null &&
-      this.studentLongitude !== null
-    ) {
-      // Haversine formula
+    if (this.adminLatitude !== null && this.adminLongitude !== null && this.studentLatitude !== null && this.studentLongitude !== null) {
       const R = 6371000; // Radius of Earth in meters
       const dLat = this.degToRad(this.studentLatitude - this.adminLatitude);
       const dLon = this.degToRad(this.studentLongitude - this.adminLongitude);
@@ -48,31 +105,32 @@ export class TestComponent implements OnInit{
         Math.sin(dLon / 2) * Math.sin(dLon / 2);
       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
       this.distance = R * c; // Distance in meters
+      this.distance = parseFloat(this.distance.toFixed(2)); // Round to two decimal places
 
-      // Round to two decimal places for readability
-      this.distance = parseFloat(this.distance.toFixed(2));
-      console.log('Distance in meters:', this.distance);
-
-      // Determine attendance status
+      // Determine attendance status based on distance
       if (this.distance <= 20) {
         this.attendanceStatus = 'Attended';
       } else {
         this.attendanceStatus = 'Absent';
       }
-      console.log('Attendance Status:', this.attendanceStatus);
     } else {
-      console.error('Coordinates are missing for distance calculation');
-      alert('Please ensure both admin and student coordinates are provided');
+      alert('Coordinates are missing for distance calculation');
     }
   }
 
+  // Helper method to convert degrees to radians
+  degToRad(deg: number): number {
+    return deg * (Math.PI / 180);
+  }
+
+  // Get Admin Location
   getAdminLocation() {
     navigator.geolocation.getCurrentPosition(
       (position) => {
         console.log('Raw Admin Location:', position.coords);
         this.adminLatitude = position.coords.latitude;
         this.adminLongitude = position.coords.longitude;
-  
+
         // Log explicitly for debugging
         console.log('Admin Latitude:', position.coords.latitude);
         console.log('Admin Longitude:', position.coords.longitude);
@@ -81,14 +139,15 @@ export class TestComponent implements OnInit{
       { enableHighAccuracy: true }
     );
   }
-  
+
+  // Get Student Location
   getStudentLocation() {
     navigator.geolocation.getCurrentPosition(
       (position) => {
         // Assign full precision directly
         this.studentLatitude = position.coords.latitude;
         this.studentLongitude = position.coords.longitude;
-  
+
         // Log full precision values
         console.log('Student Full Precision Location:', position.coords.latitude, position.coords.longitude);
       },
@@ -98,10 +157,5 @@ export class TestComponent implements OnInit{
       },
       { enableHighAccuracy: true }
     );
-  }
-
-  // Helper method to convert degrees to radians
-  degToRad(deg: number): number {
-    return deg * (Math.PI / 180);
   }
 }

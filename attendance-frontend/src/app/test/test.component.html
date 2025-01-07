@@ -1,43 +1,47 @@
 <div>
-
-    <p>test works!</p>
-    
-    <p>{{attendanceMessage}}</p>
+  <p>{{attendanceMessage}}</p>
 </div>
 
 <div>
-    <h1>Admin-Student Location Tracker</h1>
-    <!-- Display Admin Location -->
-    <p>Admin Latitude: {{ adminLatitude }}</p>
-    <p>Admin Longitude: {{ adminLongitude }}</p>
-    <button (click)="getAdminLocation()">Get Admin Location</button>
+  <h1>Admin-Student Location Tracker</h1>
+  <p>Admin Latitude: {{ adminLatitude }}</p>
+  <p>Admin Longitude: {{ adminLongitude }}</p>
+  <button (click)="getAdminLocation()">Get Admin Location</button>
+  <hr />
   
-    <hr />
+  <h2>Enter Student Location</h2>
+  <label>
+    Student Latitude:
+    <input type="number" [(ngModel)]="studentLatitude" placeholder="Enter Student Latitude" />
+  </label>
+  <br />
+  <label>
+    Student Longitude:
+    <input type="number" [(ngModel)]="studentLongitude" placeholder="Enter Student Longitude" />
+  </label>
+  <br />
   
-    <!-- Input for Student Location -->
-    <h2>Enter Student Location</h2>
-    <label>
-      Student Latitude:
-      <input type="number" [(ngModel)]="studentLatitude" placeholder="Enter Student Latitude" />
-    </label>
-    <br />
-    <label>
-      Student Longitude:
-      <input type="number" [(ngModel)]="studentLongitude" placeholder="Enter Student Longitude" />
-    </label>
-    <br />
-    <h2>Get Student Location (Mobile)</h2>
+  <h2>Get Student Location (Mobile)</h2>
   <button (click)="getStudentLocation()">Get Student Location</button>
   <p *ngIf="studentLatitude && studentLongitude">
     Student Latitude: {{ studentLatitude }}<br />
     Student Longitude: {{ studentLongitude }}
   </p>
   
-    <button (click)="calculateDistance()">Calculate Distance</button>
+  <button (click)="calculateDistance()">Calculate Distance</button>
+  <hr />
   
-    <hr />
-  
-    <!-- Display Calculated Distance -->
-    <p *ngIf="distance">Distance: {{ distance }} meters</p>
-  </div>
-  
+  <p *ngIf="distance">Distance: {{ distance }} meters</p>
+</div>
+
+<!-- Face Recognition Section -->
+<div>
+  <h2>Face Recognition</h2>
+  <video id="videoInput" width="640" height="480" autoplay></video>
+  <br />
+  <button (click)="startWebcam()">Start Webcam</button>
+  <button (click)="stopWebcam()">Stop Webcam</button>
+  <button (click)="detectFace()">Detect Face</button>
+  <p *ngIf="isFaceDetected">Face Detected!</p>
+  <p *ngIf="!isFaceDetected">No Face Detected</p>
+</div>
