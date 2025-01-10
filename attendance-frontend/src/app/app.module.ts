@@ -6,23 +6,35 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TestComponent } from './test/test.component';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
-import {routes} from './app.routes';
 import { RouterModule } from '@angular/router';
+// Import your components for login and registration
+import { StudentAuthComponent } from './features/student/student-auth/student-auth.component';
+import { TeacherAuthComponent } from './features/teacher/teacher-auth/teacher-auth.component';
+import { CrcAuthComponent } from './features/crc/crc-auth/crc-auth.component';
+import { CoreModule } from './core/core.module';
+import { ComponentsModule } from './shared/components.module';
+import { CrcModule } from './features/crc/crc.module';
+// Import any other necessary modules, e.g., for routing, forms, etc.
+import { routes } from './app.routes';
+
 @NgModule({
     declarations: [
         AppComponent,
-        TestComponent
+        TestComponent,
+                  // Add HomeComponent to Shared components
     ],
     imports: [
         BrowserModule,
         RouterOutlet,
         FormsModule,
         CommonModule,
-        RouterModule.forRoot(routes)
+        RouterModule.forRoot(routes),  // Define routes
+        CoreModule,
+        ComponentsModule,
     ],
     providers: [
-        provideHttpClient(withInterceptorsFromDi()),  // Add the new way to configure HttpClient
-      ],
+        provideHttpClient(withInterceptorsFromDi())  // HTTP client setup
+    ],
     bootstrap: [AppComponent],
     exports: [RouterModule],
 })
