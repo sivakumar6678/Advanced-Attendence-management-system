@@ -13,15 +13,20 @@ import { TeacherAuthComponent } from './features/teacher/teacher-auth/teacher-au
 import { CrcAuthComponent } from './features/crc/crc-auth/crc-auth.component';
 import { CoreModule } from './core/core.module';
 import { ComponentsModule } from './shared/components.module';
-import { CrcModule } from './features/crc/crc.module';
-// Import any other necessary modules, e.g., for routing, forms, etc.
 import { routes } from './app.routes';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatIconModule } from '@angular/material/icon';
+import { MatGridListModule } from '@angular/material/grid-list';
+import { HomeComponent } from './shared/components/home/home.component';
 
 @NgModule({
     declarations: [
         AppComponent,
         TestComponent,
-                  // Add HomeComponent to Shared components
+        HomeComponent,
     ],
     imports: [
         BrowserModule,
@@ -31,6 +36,12 @@ import { routes } from './app.routes';
         RouterModule.forRoot(routes),  // Define routes
         CoreModule,
         ComponentsModule,
+        BrowserAnimationsModule,
+        MatToolbarModule,
+        MatButtonModule,
+        MatCardModule,
+        MatIconModule,
+        MatGridListModule,
     ],
     providers: [
         provideHttpClient(withInterceptorsFromDi())  // HTTP client setup
