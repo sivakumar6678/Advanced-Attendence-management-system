@@ -1,88 +1,83 @@
 <!-- Header -->
 <mat-toolbar color="primary" class="sticky-header">
-    <span>Self Attendance Management System</span>
-    <span class="spacer"></span>
-    <button mat-button routerLink="/">Home</button>
-    <button mat-button routerLink="#about">About</button>
-    <button mat-button routerLink="#features">Features</button>
-    <button mat-button routerLink="#roles">Roles</button>
-    <button mat-raised-button color="accent" routerLink="/login">Login</button>
-  </mat-toolbar>
-  
-  <!-- Hero Section -->
-  <div class="hero-section">
-    <div class="overlay">
-      <h1>Revolutionize Attendance Management</h1>
-      <p>Efficient tracking with GPS and Face Recognition</p>
-      <div class="hero-buttons">
-        <button mat-raised-button color="accent">Get Started</button>
-        <button mat-stroked-button color="primary">Learn More</button>
-      </div>
+  <span>Self Attendance Management System</span>
+  <span class="spacer"></span>
+  <a mat-button routerLink="/" fragment="home">Home</a>
+  <a mat-button href="#about" fragment="about">About</a>
+  <a mat-button href="#features" fragment="features">Features</a>
+  <a mat-button href="#roles" fragment="roles">Roles</a>
+  <button mat-raised-button color="accent" routerLink="/login">Login</button>
+</mat-toolbar>
+
+<!-- Hero Section -->
+<div class="hero-section" id="home">
+  <div class="overlay">
+    <h1>Revolutionize Attendance Management</h1>
+    <p>Efficient tracking with GPS and Face Recognition</p>
+    <div class="hero-buttons">
+      <button mat-raised-button color="accent">Get Started</button>
+      <button mat-stroked-button color="primary">Learn More</button>
     </div>
   </div>
-  
-  <!-- About the Project -->
-  <section id="about" class="about-section">
-    <h2>About the Project</h2>
-    <p>
-      The Self Attendance Management System simplifies attendance tracking using GPS 
-      and face recognition. Designed for educational institutions, it ensures accuracy, 
-      transparency, and security for all stakeholders.
-    </p>
+</div>
+
+<!-- About the Project -->
+<section id="about" class="about-section">
+  <h2>About the Project</h2>
+  <p>
+    The Self Attendance Management System simplifies attendance tracking using GPS
+    and face recognition. Designed for educational institutions, it ensures accuracy,
+    transparency, and security for all stakeholders.
+  </p>
 </section>
-  
-  <!-- Features Section -->
+
 <!-- Features Section -->
 <section id="features" class="features-section">
-    <h2>Key Features</h2>
-    <mat-grid-list cols="3" rowHeight="2:1" >
-      <mat-grid-tile *ngFor="let feature of features">
-        <mat-card class="feature-card">
-          <mat-card-header>
-            <img [src]="' ../../../../assets/icons/' + feature.icon + '.png'" 
-                 
-                 alt="{{ feature.title }}" class="feature-icon">
-          </mat-card-header>
-          <mat-card-content>
-            <p>{{ feature.description }}</p>
-          </mat-card-content>
-        </mat-card>
-      </mat-grid-tile>
-    </mat-grid-list>
+  <h2>Key Features</h2>
+  <div class="features-grid">
+    <div
+      *ngFor="let feature of features"
+      [@fadeIn]="'in'"
+      class="feature-card"
+    >
+      <img
+        [src]="'../../../../assets/icons/' + feature.icon + '.png'"
+        alt="{{ feature.title }}"
+        class="feature-icon"
+      />
+      <p>{{ feature.description }}</p>
+    </div>
+  </div>
 </section>
-    
 
+<!-- Roles Section -->
+<section id="roles" class="roles-section">
+  <h2>User Roles</h2>
+  <div class="roles-container">
+    <div *ngFor="let role of roles" class="role-card">
+      <mat-icon class="role-icon">{{ role.icon }}</mat-icon>
+      <h3>{{ role.name }}</h3>
+      <p>{{ role.description }}</p>
+    </div>
+  </div>
+</section>
 
-  
-  <!-- Roles Section -->
-  <section id="roles" class="roles-section">
-    <h2>User Roles</h2>
-    <div class="roles-container">
-      <div class="role-card" *ngFor="let role of roles">
-        <mat-icon class="role-icon">{{ role.icon }}</mat-icon>
-        <h3>{{ role.name }}</h3>
-        <p>{{ role.description }}</p>
-      </div>
+<!-- Call to Action -->
+<section id="cta" class="cta-section">
+  <h2>Start Managing Attendance Today!</h2>
+  <button mat-raised-button color="accent">Sign Up</button>
+  <button mat-stroked-button color="primary">Contact Us</button>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-content">
+    <span>© 2025 Self Attendance Management System</span>
+    <div class="footer-links">
+      <a href="#about">About</a>
+      <a href="#features">Features</a>
+      <a href="#roles">Roles</a>
+      <a href="#cta">Contact</a>
     </div>
-  </section>
-  
-  <!-- Call to Action -->
-  <section id="cta" class="cta-section">
-    <h2>Start Managing Attendance Today!</h2>
-    <button mat-raised-button color="accent">Sign Up</button>
-    <button mat-stroked-button color="primary">Contact Us</button>
-  </section>
-  
-  <!-- Footer -->
-  <footer class="footer">
-    <div class="footer-content">
-      <span>© 2025 Self Attendance Management System</span>
-      <div class="footer-links">
-        <a href="#about">About</a>
-        <a href="#features">Features</a>
-        <a href="#roles">Roles</a>
-        <a href="#cta">Contact</a>
-      </div>
-    </div>
-  </footer>
-  
+  </div>
+</footer>

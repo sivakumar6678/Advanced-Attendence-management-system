@@ -1,9 +1,18 @@
 import { Component } from '@angular/core';
-
+import { trigger, style, animate, transition, state } from '@angular/animations';
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
+  animations: [
+    trigger('fadeIn', [
+      state('in', style({ opacity: 1, transform: 'translateY(0)' })),
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(20px)' }),
+        animate('0.8s ease-in-out'),
+      ]),
+    ]),
+  ],
 })
 export class HomeComponent {
   features = [
