@@ -14,12 +14,19 @@ body {
     background: #3f51b5;
     color: white;
     box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
+    padding:0.5rem;
 }
 
 .sticky-header button {
     color: white;
-}
+    font-size: 1.25rem;
 
+}
+.sticky-header a{
+    color: white;
+    text-decoration: none;
+    font-size: 1.25rem;
+}
 .spacer {
     flex: 1;
 }
@@ -40,7 +47,7 @@ body {
 }
 
 .overlay {
-    /* background-color: rgba(0, 0, 0, 0.7); */
+    background-color: rgba(0, 0, 0, 0.7);
     padding: 2.5rem;
     border-radius: 0.625rem;
     box-shadow: 0 0.25rem 0.375rem rgba(0, 0, 0, 0.2);
@@ -102,20 +109,45 @@ body {
     color: #3f51b5;
     font-size: 2rem;
 }
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(250px, 1fr));
+    gap: 1rem;
+}
 
-.feature-card {
-    width: 100%;
-    margin: 2rem 0;
+@media (max-width: 1024px) {
+    .features-grid {
+        grid-template-columns: repeat(2, minmax(200px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .features-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 .feature-icon {
-    background: white;
-    border-radius: 1%;
+    font-size: 3rem;
+    margin:0 1rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
+    border-radius: 10%;
     padding: 10px;
-    width: 100%; /* Set a consistent size for icons */
+    width: 75%;
     height: 250px;
 }
-
+.feature-icon:hover {
+    transform: scale(1.01);
+    transition: 0.3s;
+    
+    box-shadow: 0 0.5rem 0.9375rem rgba(218, 8, 8, 0.2);
+}
+.feature-card p {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #3f51b5;
+    margin-top: 1rem;
+}
 
 /* Roles Section */
 .roles-section {
@@ -275,3 +307,5 @@ body {
         width: 90%;
     }
 }
+
+  
