@@ -1,9 +1,6 @@
 /* General Styling */
 body {
     margin: 0;
-    font-family: 'Roboto', Arial, sans-serif;
-    line-height: 1.6;
-    color: #333;
 }
 
 /* Header */
@@ -11,24 +8,16 @@ body {
     position: sticky;
     top: 0;
     z-index: 1000;
-    background: #3f51b5;
+    background: var(--primary-color);
     color: white;
-    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
-    padding:0.5rem;
+    box-shadow: var(--box-shadow);
+    padding: 0.5rem;
 }
 
-.sticky-header button {
+.sticky-header button,
+.sticky-header a {
     color: white;
     font-size: 1.25rem;
-
-}
-.sticky-header a{
-    color: white;
-    text-decoration: none;
-    font-size: 1.25rem;
-}
-.spacer {
-    flex: 1;
 }
 
 /* Hero Section */
@@ -49,13 +38,19 @@ body {
 .overlay {
     background-color: rgba(0, 0, 0, 0.7);
     padding: 2.5rem;
-    border-radius: 0.625rem;
-    box-shadow: 0 0.25rem 0.375rem rgba(0, 0, 0, 0.2);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
     animation: zoomIn 1s ease;
+}
+@media (max-width:768px) {
+    .overlay{
+        margin:0 1rem;
+    }
+
 }
 
 .hero-section h1 {
-    font-size: 3rem;
+    font-size: var(--font-xlarge);
     margin-bottom: 1.25rem;
     animation: slideDown 1s ease;
 }
@@ -67,27 +62,24 @@ body {
 
 .hero-buttons button {
     margin: 0.625rem;
-    padding: 0.625rem 1.25rem;
-    font-size: 1rem;
     animation: fadeInUp 1.5s ease;
 }
 
 .hero-buttons button:hover {
     transform: scale(1.05);
-    transition: 0.3s;
 }
 
 /* About Section */
 .about-section {
     padding: 3.75rem 1.25rem;
-    background-color: #f5f5f5;
+    background-color: var(--background-color);
     text-align: center;
     animation: fadeIn 1s ease;
 }
 
 .about-section h2 {
     font-size: 2.5rem;
-    color: #3f51b5;
+    color: var(--heading-color);
     margin-bottom: 1.25rem;
 }
 
@@ -96,23 +88,28 @@ body {
     margin: 0 auto;
     font-size: 1.1rem;
     line-height: 1.8;
-    color: #555;
+    color: var(--text-color);
 }
+
+
 /* Features Section */
 .features-section {
-    background: #e3f2fd;
-    padding:1rem;
+    background: var(--secondary-color); /* Use root secondary color */
+    padding: var(--base-padding); /* Use root padding */
     text-align: center;
 }
 
 .features-section h2 {
-    color: #3f51b5;
-    font-size: 2rem;
+    /* color: var(--primary-opp-color);  */
+    margin:1rem var( --margin-large);
+    color:black;
+    font-size: var(--font-large-x);
 }
+
 .features-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(250px, 1fr));
-    gap: 1rem;
+    gap: var(--base-margin); /* Use root margin */
 }
 
 @media (max-width: 1024px) {
@@ -128,51 +125,50 @@ body {
 }
 
 .feature-icon {
-    font-size: 3rem;
-    margin:0 1rem;
-    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
-    border-radius: 10%;
-    padding: 10px;
+    font-size: var(--margin-large);
+    margin: 0 var(--base-margin); /* Use root margin */
+    border-radius: var(--border-radius); /* Use root border-radius */
+    box-shadow: 10px 10px 10px 10px rgba(28, 28, 238, 0.603);
     width: 75%;
     height: 250px;
 }
+
 .feature-icon:hover {
     transform: scale(1.01);
-    transition: 0.3s;
-    
-    box-shadow: 0 0.5rem 0.9375rem rgba(218, 8, 8, 0.2);
+    transition: 0.3s ease;
+    box-shadow: 0 0.5rem 0.9375rem rgba(2, 77, 240, 0.925); /* Keep the hover shadow */
 }
+
 .feature-card p {
     font-size: 1.5rem;
     font-weight: bold;
-    color: #3f51b5;
-    margin-top: 1rem;
+    color: var(--secondary-opp-color); 
+    margin-top: var(--base-margin);
 }
-
 /* Roles Section */
 .roles-section {
-    padding: 3.75rem 1.25rem;
-    background-color: #f5f5f5;
+    padding: calc(var(--base-padding) * 3); /* Scale padding using root variable */
+    background-color: var(--background-color); /* Use root background color */
     text-align: center;
 }
 
 .roles-section h2 {
     font-size: 2.5rem;
-    color: #3f51b5;
-    margin-bottom: 1.875rem;
+    color: var(--primary-color); /* Use root primary color */
+    margin-bottom: var(--base-margin);
 }
 
 .roles-container {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    gap: 1.25rem;
+    gap: var(--base-margin); /* Use root margin */
 }
 
 .role-card {
-    background: white;
-    border-radius: 0.625rem;
-    padding: 1.25rem;
+    background: var(--card-background); /* Use root card background color */
+    border-radius: var(--border-radius); /* Use root border-radius */
+    padding: var(--base-padding); /* Use root padding */
     text-align: center;
     width: 15.625rem;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -180,39 +176,29 @@ body {
 
 .role-card:hover {
     transform: translateY(-0.625rem);
-    box-shadow: 0 0.5rem 0.9375rem rgba(0, 0, 0, 0.2);
+    box-shadow: var(--box-shadow); /* Use root box-shadow */
 }
 
-/* Call to Action Section */
+
+/* Other Sections */
+.roles-section,
 .cta-section {
-    padding: 3.125rem 1.25rem;
-    background: linear-gradient(to right, #3f51b5, #5c6bc0);
+    padding: 3.75rem 1.25rem;
     text-align: center;
+}
+
+.roles-section {
+    background-color: var(--background-color);
+}
+
+.cta-section {
+    background: var(--cta-gradient);
     color: white;
     animation: slideUp 1s ease;
 }
 
-.cta-section h2 {
-    font-size: 2.5rem;
-    margin-bottom: 1.25rem;
-}
-
-.cta-section button {
-    margin: 0.625rem;
-    padding: 0.625rem 1.25rem;
-    font-size: 1.1rem;
-    transition: transform 0.3s ease, background-color 0.3s ease;
-}
-
-.cta-section button:hover {
-    transform: scale(1.1);
-    background-color: #ffca28;
-    color: #333;
-}
-
-/* Footer */
 .footer {
-    background-color: #3f51b5;
+    background-color: var(--primary-color);
     color: white;
     text-align: center;
     padding: 1.25rem;
@@ -221,91 +207,4 @@ body {
 .footer-links a {
     color: white;
     margin: 0 0.625rem;
-    text-decoration: none;
-    font-size: 1rem;
-    transition: color 0.3s ease;
 }
-
-.footer-links a:hover {
-    color: #ffca28;
-}
-
-/* Animations */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
-}
-
-@keyframes fadeInUp {
-    from {
-        transform: translateY(1.25rem);
-        opacity: 0;
-    }
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
-}
-
-@keyframes zoomIn {
-    from {
-        transform: scale(0.8);
-        opacity: 0;
-    }
-    to {
-        transform: scale(1);
-        opacity: 1;
-    }
-}
-
-@keyframes slideDown {
-    from {
-        transform: translateY(-1.25rem);
-        opacity: 0;
-    }
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
-}
-
-@keyframes slideUp {
-    from {
-        transform: translateY(1.25rem);
-        opacity: 0;
-    }
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .hero-section h1 {
-        font-size: 2rem;
-    }
-
-    .hero-section p {
-        font-size: 1rem;
-    }
-
-    .features-section {
-        padding: 1.875rem 0.625rem;
-    }
-
-    .roles-container {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .role-card {
-        width: 90%;
-    }
-}
-
-  
