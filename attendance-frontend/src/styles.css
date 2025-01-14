@@ -2,3 +2,159 @@
 html {
     scroll-behavior: smooth;
 }
+/* Root CSS Variables */
+:root {
+    --primary-color: #3f51b5;
+    --primary-opp-color:gold;
+    --secondary-color: #5c6bc0;
+    --secondary-opp-color:white;
+    --background-color: #f5f5f5;
+    --text-color: #333;
+    --heading-color: #3f51b5;
+    --card-background: #ffffff;
+    --cta-gradient: linear-gradient(to right, #3f51b5, #5c6bc0);
+    --highlight-color: #ffca28;
+
+    
+    --font-family: 'Roboto', Arial, sans-serif;
+    /* Font Sizes */
+    --font-small: 0.875rem; /* 14px */
+    --font-medium: 1rem; /* 16px */
+    --font-large: 1.5rem; /* 24px */
+    --font-large-x:2rem;
+    --font-xlarge: 2.5rem; /* 40px */
+    --font-xxlarge: 3rem; /* 48px */
+    --base-padding: 1rem;
+    --base-margin: 1rem;
+ /* Spacing */
+ --padding-small: 0.5rem; /* 8px */
+ --padding-medium: 1rem; /* 16px */
+ --padding-large: 1.5rem; /* 24px */
+ --margin-small: 0.5rem;
+ --margin-medium: 1rem;
+ --margin-large: 1.5rem;
+
+ /* Shadows */
+ --box-shadow-light: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
+ --box-shadow-hover: 0 0.5rem 0.9375rem rgba(0, 0, 0, 0.2);
+    --border-radius: 10px;
+    --box-shadow: 0 0.125rem 0.25rem rgba(233, 221, 221, 0.1);
+}
+
+/* Reset and Global Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-family);
+    line-height: 1.6;
+    color: var(--text-color);
+    background-color: var(--background-color);
+}
+
+/* Utility Classes */
+.text-center {
+    text-align: center;
+}
+
+.padding {
+    padding: var(--base-padding);
+}
+
+.margin {
+    margin: var(--base-margin);
+}
+
+/* Button Styles */
+button {
+    padding: 0.625rem 1.25rem;
+    border: none;
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+button:hover {
+    transform: scale(1.05);
+}
+
+/* Links */
+a {
+    text-decoration: none;
+    color: inherit;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: var(--highlight-color);
+}
+
+/* Global Animation Keyframes */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        transform: translateY(1.25rem);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes zoomIn {
+    from {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-1.25rem);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(1.25rem);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Responsive Utility */
+@media (max-width: 768px) {
+    :root {
+        --base-padding: 0.5rem;
+        --base-margin: 0.5rem;
+    }
+
+    body {
+        font-size: 0.9rem;
+    }
+}

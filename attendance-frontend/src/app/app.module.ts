@@ -20,6 +20,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatGridListModule } from '@angular/material/grid-list';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatListModule } from '@angular/material/list';
+
 import { HomeComponent } from './shared/components/home/home.component';
 
 @NgModule({
@@ -42,6 +45,8 @@ import { HomeComponent } from './shared/components/home/home.component';
         MatCardModule,
         MatIconModule,
         MatGridListModule,
+        MatSidenavModule,
+        MatListModule
     ],
     providers: [
         provideHttpClient(withInterceptorsFromDi())  // HTTP client setup
