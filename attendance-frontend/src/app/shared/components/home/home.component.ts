@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { trigger, style, animate, transition, state } from '@angular/animations';
 @Component({
   selector: 'app-home',
@@ -14,7 +14,16 @@ import { trigger, style, animate, transition, state } from '@angular/animations'
     ]),
   ],
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit{
+  ngOnInit(): void {
+    throw new Error('Method not implemented.');
+  }
+  menuOpen : boolean = false;
+  toggleMenu(): void {
+
+    this.menuOpen = !this.menuOpen;
+
+  }
   features = [
     { icon: 'group', title: 'Role Management', description: 'Dynamic roles for CRC, Teachers, and HODs.' },
     { icon: 'gps_fixed', title: 'GPS Attendance', description: 'Mark attendance using GPS.' },

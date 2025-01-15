@@ -4,16 +4,96 @@ body {
 }
 
 /* Header */
+.sticky-header>span {
+    font-size:1.25rem;
+    font-weight: bold;
+}
+    
 .sticky-header {
     position: sticky;
     top: 0;
     z-index: 1000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 16px;
     background: var(--primary-color);
     color: white;
     box-shadow: var(--box-shadow);
-    padding: 0.5rem;
-}
+    padding:0.5rem 1rem;
+  }
+  
+  /* Spacer for the nav links */
+  .spacer {
+    flex: 1;
+  }
+  
+  /* Mobile menu styles */
+  .mobile-menu {
+    display: none; /* Hide by default */
+    flex-direction: column;
+    background: var(--primary-color);
+    color: white;
+    box-shadow: var(--box-shadow);
+    position: sticky;
+    top: 45px; /* Adjust based on your toolbar height */
+    right: 0;
+    width: 100%;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    animation: slideUp 0.5s ease;
+    padding:0.5rem 1rem;
+        
 
+  }
+  
+  
+    .mobile-menu a{
+        padding: 1rem;
+        text-align: center;
+        color: white;
+        font-size: 1rem;
+        text-decoration: none;
+        transition: background-color 0.3s ease;
+        font-weight: bold;
+    }
+    .mobile-menu button {
+        font-weight: bold;
+    }
+  
+  /* Media query for mobile devices */
+  @media (max-width: 768px) {
+    .nav-links {
+      display: none; /* Hide desktop links */
+
+    }
+    
+    .mobile-menu {
+        display: flex; /* Show mobile menu */
+        box-shadow: 0 2px 50px 50px rgba(0, 0, 0, 0.2);
+        animation: zoomIn 0.5s ease;
+        flex-direction: row;
+        justify-content: space-between;
+        position: sticky;
+        top: 1;
+        z-index: 1000;
+    }
+
+    .mobile-menu-button {
+      display: block; /* Show mobile menu button */
+
+    }
+  }
+  
+  /* Ensure the toolbar is responsive */
+  @media (min-width: 769px) {
+    .mobile-menu-button {
+      display: none; /* Hide mobile menu button on larger screens */
+    }
+  
+    .nav-links {
+      display: flex; /* Show desktop links */
+    }
+  }
 .sticky-header button,
 .sticky-header a {
     color: white;
@@ -46,11 +126,10 @@ body {
     .overlay{
         margin:0 1rem;
     }
-
 }
 
 .hero-section h1 {
-    font-size: var(--font-xlarge);
+    font-size: var(--font-large-x);
     margin-bottom: 1.25rem;
     animation: slideDown 1s ease;
 }
@@ -94,14 +173,14 @@ body {
 
 /* Features Section */
 .features-section {
+    padding:2rem 1rem;
     background: var(--secondary-color); /* Use root secondary color */
-    padding: var(--base-padding); /* Use root padding */
     text-align: center;
 }
 
 .features-section h2 {
     /* color: var(--primary-opp-color);  */
-    margin:1rem var( --margin-large);
+    margin:2rem var( --margin-large);
     color:black;
     font-size: var(--font-large-x);
 }
