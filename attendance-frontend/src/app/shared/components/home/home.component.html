@@ -2,12 +2,25 @@
 <mat-toolbar color="primary" class="sticky-header">
   <span>Self Attendance Management System</span>
   <span class="spacer"></span>
-  <a mat-button routerLink="/" fragment="home">Home</a>
-  <a mat-button href="#about" fragment="about">About</a>
-  <a mat-button href="#features" fragment="features">Features</a>
-  <a mat-button href="#roles" fragment="roles">Roles</a>
-  <button mat-raised-button color="accent" routerLink="/login">Login</button>
+  <div class="nav-links">
+    <a mat-button routerLink="/" fragment="home">Home</a>
+    <a mat-button href="#about" fragment="about">About</a>
+    <a mat-button href="#features" fragment="features">Features</a>
+    <a mat-button href="#roles" fragment="roles">Roles</a>
+    <button mat-raised-button color="accent" routerLink="/login">Login</button>
+  </div>
+  <button mat-icon-button class="mobile-menu-button" (click)="toggleMenu()">
+    <mat-icon>menu</mat-icon>
+  </button>
 </mat-toolbar>
+
+<div class="mobile-menu" *ngIf="menuOpen">
+  <a mat-button routerLink="/" fragment="home" (click)="toggleMenu()">Home</a>
+  <a mat-button href="#about" fragment="about" (click)="toggleMenu()">About</a>
+  <a mat-button href="#features" fragment="features" (click)="toggleMenu()">Features</a>
+  <a mat-button href="#roles" fragment="roles" (click)="toggleMenu()">Roles</a>
+  <button mat-raised-button color="accent" routerLink="/login" (click)="toggleMenu()">Login</button>
+</div>
 
 <!-- Hero Section -->
 <div class="hero-section" id="home">

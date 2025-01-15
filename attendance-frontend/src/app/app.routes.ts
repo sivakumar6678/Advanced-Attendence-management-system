@@ -17,6 +17,7 @@ import { roleGuard } from './core/guards/role.guard';
 
 export const routes: Routes = [
     { path: '', component: HomeComponent }, // Home Page
+    {path: 'home', component: HomeComponent},
     {path: 'test', component: TestComponent},
     {
         path: 'student-auth',
