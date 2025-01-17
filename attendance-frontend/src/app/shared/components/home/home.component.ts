@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { trigger, style, animate, transition, state } from '@angular/animations';
 @Component({
   selector: 'app-home',
@@ -18,11 +19,22 @@ export class HomeComponent implements OnInit{
   ngOnInit(): void {
     throw new Error('Method not implemented.');
   }
+  showLoginSection = false;
   menuOpen : boolean = false;
+  constructor(private router: Router) {}
+  
   toggleMenu(): void {
-
     this.menuOpen = !this.menuOpen;
+  }
+  
+  toggleLoginSection(): void {
+    this.showLoginSection = !this.showLoginSection;
+  }
 
+  navigateToLogin(role: string): void {
+    // Navigate to the respective login page with role as query parameter
+    this.router.navigate(['/login'], { queryParams: { role } });
+    this.toggleLoginSection(); // Close the popup
   }
   features = [
     { icon: 'group', title: 'Role Management', description: 'Dynamic roles for CRC, Teachers, and HODs.' },
