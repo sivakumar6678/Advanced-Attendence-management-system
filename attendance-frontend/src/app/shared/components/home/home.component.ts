@@ -33,7 +33,7 @@ export class HomeComponent implements OnInit{
 
   navigateToLogin(role: string): void {
     // Navigate to the respective login page with role as query parameter
-    this.router.navigate(['/login'], { queryParams: { role } });
+    this.router.navigate([role]);
     this.toggleLoginSection(); // Close the popup
   }
   features = [
