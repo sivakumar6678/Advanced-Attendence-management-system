@@ -7,7 +7,7 @@
     <a mat-button href="#about" fragment="about">About</a>
     <a mat-button href="#features" fragment="features">Features</a>
     <a mat-button href="#roles" fragment="roles">Roles</a>
-    <button mat-raised-button color="accent" routerLink="/login">Login</button>
+    <button mat-raised-button color="accent" (click)="toggleLoginSection()">Login</button>  
   </div>
   <button mat-icon-button class="mobile-menu-button" (click)="toggleMenu()">
     <mat-icon>menu</mat-icon>
@@ -19,11 +19,37 @@
   <a mat-button href="#about" fragment="about" (click)="toggleMenu()">About</a>
   <a mat-button href="#features" fragment="features" (click)="toggleMenu()">Features</a>
   <a mat-button href="#roles" fragment="roles" (click)="toggleMenu()">Roles</a>
-  <button mat-raised-button color="accent" routerLink="/login" (click)="toggleMenu()">Login</button>
+  <button mat-raised-button color="accent" (click)="toggleLoginSection()">Login</button>  
 </div>
 
+<div class="login-overlay" *ngIf="showLoginSection">
+  <div class="login-popup">
+    <h2>Select Your Login Role</h2>
+    <div class="login-cards">
+      <mat-card class="login-card" (click)="navigateToLogin('student')">
+        <mat-icon class="login-icon" color="primary">school</mat-icon>
+        <h3>Student Login</h3>
+        <p>Access your attendance and course materials.</p>
+      </mat-card>
+      <mat-card class="login-card" (click)="navigateToLogin('teacher')">
+        <mat-icon class="login-icon" color="primary">person</mat-icon>
+        <h3>Teacher Login</h3>
+        <p>Manage attendance and class schedules.</p>
+      </mat-card>
+      <mat-card class="login-card" (click)="navigateToLogin('crc')">
+        <mat-icon class="login-icon" color="primary">admin_panel_settings</mat-icon>
+        <h3>CRC Login</h3>
+        <p>Oversee schedules and manage system settings.</p>
+      </mat-card>
+    </div>
+    <button mat-raised-button  class="close-btn" (click)="toggleLoginSection()">Close</button>
+  </div>
+</div>
 <!-- Hero Section -->
 <div class="hero-section" id="home">
+  <div class="overlayheading">
+    <h2>Streamlining Attendance Management with Technology</h2>
+  </div>
   <div class="overlay">
     <h1>Revolutionize Attendance Management</h1>
     <p>Efficient tracking with GPS and Face Recognition</p>

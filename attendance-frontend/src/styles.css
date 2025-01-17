@@ -146,6 +146,16 @@ a:hover {
         opacity: 1;
     }
 }
+@keyframes slideLeft{
+    from{
+        transform:translateX(3.25rem);
+        opacity:0;
+    }
+    to{
+        transform:translateX(0);
+        opacity:1;
+    }
+}
 
 /* Responsive Utility */
 @media (max-width: 768px) {

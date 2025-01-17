@@ -14,7 +14,10 @@ import { CrcAuthComponent } from './features/crc/crc-auth/crc-auth.component';
 import { CoreModule } from './core/core.module';
 import { ComponentsModule } from './shared/components.module';
 import { routes } from './app.routes';
+import { Router } from '@angular/router';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
+
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -22,7 +25,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
-
+import { MatDialogModule } from '@angular/material/dialog';
 import { HomeComponent } from './shared/components/home/home.component';
 
 @NgModule({
@@ -40,13 +43,17 @@ import { HomeComponent } from './shared/components/home/home.component';
         CoreModule,
         ComponentsModule,
         BrowserAnimationsModule,
+
+
         MatToolbarModule,
         MatButtonModule,
         MatCardModule,
         MatIconModule,
         MatGridListModule,
         MatSidenavModule,
-        MatListModule
+        MatListModule,
+        MatDialogModule
+
     ],
     providers: [
         provideHttpClient(withInterceptorsFromDi())  // HTTP client setup
