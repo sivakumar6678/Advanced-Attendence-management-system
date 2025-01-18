@@ -17,7 +17,7 @@ import { trigger, style, animate, transition, state } from '@angular/animations'
 })
 export class HomeComponent implements OnInit{
   ngOnInit(): void {
-    throw new Error('Method not implemented.');
+    // throw new Error('Method not implemented.');
   }
   showLoginSection = false;
   menuOpen : boolean = false;

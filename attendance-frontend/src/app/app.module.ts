@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, viewChild } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { AppComponent } from './app.component';
 import { RouterOutlet } from '@angular/router';
@@ -17,6 +17,8 @@ import { routes } from './app.routes';
 import { Router } from '@angular/router';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
+import { Component, OnInit, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
+import * as faceapi from 'face-api.js';
 
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
@@ -33,6 +35,10 @@ import { HomeComponent } from './shared/components/home/home.component';
         AppComponent,
         TestComponent,
         HomeComponent,
+        StudentAuthComponent,
+        TeacherAuthComponent,
+        CrcAuthComponent,
+        
     ],
     imports: [
         BrowserModule,
