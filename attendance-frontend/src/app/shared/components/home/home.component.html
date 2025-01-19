@@ -26,17 +26,17 @@
   <div class="login-popup">
     <h2>Select Your Login Role</h2>
     <div class="login-cards">
-      <mat-card class="login-card" (click)="navigateToLogin('student')">
+      <mat-card class="login-card" (click)="navigateToLogin('student-auth')">
         <mat-icon class="login-icon" color="primary">school</mat-icon>
         <h3>Student Login</h3>
         <p>Access your attendance and course materials.</p>
       </mat-card>
-      <mat-card class="login-card" (click)="navigateToLogin('teacher')">
+      <mat-card class="login-card" (click)="navigateToLogin('teacher-auth')">
         <mat-icon class="login-icon" color="primary">person</mat-icon>
         <h3>Teacher Login</h3>
         <p>Manage attendance and class schedules.</p>
       </mat-card>
-      <mat-card class="login-card" (click)="navigateToLogin('crc')">
+      <mat-card class="login-card" (click)="navigateToLogin('crc-auth')">
         <mat-icon class="login-icon" color="primary">admin_panel_settings</mat-icon>
         <h3>CRC Login</h3>
         <p>Oversee schedules and manage system settings.</p>
