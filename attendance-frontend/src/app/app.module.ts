@@ -17,8 +17,6 @@ import { routes } from './app.routes';
 import { Router } from '@angular/router';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
-import { Component, OnInit, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
-import * as faceapi from 'face-api.js';
 
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
