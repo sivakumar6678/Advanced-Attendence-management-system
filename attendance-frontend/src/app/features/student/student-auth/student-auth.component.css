@@ -1,73 +1,29 @@
 .auth-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background-color: #f4f4f4;
-  }
+  width: 90%;
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: #fff;
+  border-radius: 8px;
+}
 
-  .auth-form {
-    background-color: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    width: 400px;
-  }
+.full-width {
+  width: 100%;
+}
 
-  h2 {
-    text-align: center;
-    margin-bottom: 20px;
-  }
+.face-recognition {
+  margin: 1.5rem 0;
+  text-align: center;
+}
 
-  label {
-    display: block;
-    margin: 10px 0 5px;
-  }
+.face-recognition video {
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  margin-bottom: 1rem;
+}
 
-  input {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 15px;
-    border-radius: 5px;
-    border: 1px solid #ddd;
-  }
-
-  .video-container {
-    text-align: center;
-    margin-bottom: 20px;
-  }
-
-  video {
-    border: 1px solid #ddd;
-    border-radius: 8px;
-  }
-
-  button {
-    width: 100%;
-    padding: 10px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-
-  button:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-  }
-
-  .toggle-btn {
-    width: 100%;
-    background-color: transparent;
-    color: #007bff;
-    border: none;
-    cursor: pointer;
-    text-align: center;
-    padding: 10px;
-    margin-top: 15px;
-  }
-
-  .toggle-btn:hover {
-    text-decoration: underline;
-  }
+button[mat-button],
+button[mat-raised-button] {
+  margin-top: 1rem;
+  width: 100%;
+}
