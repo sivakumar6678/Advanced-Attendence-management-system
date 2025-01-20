@@ -1,5 +1,7 @@
-import { NgModule, viewChild } from '@angular/core';
+import { NgModule } from '@angular/core';
+
 import { BrowserModule } from '@angular/platform-browser';
+
 import { AppComponent } from './app.component';
 import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -13,6 +15,7 @@ import { TeacherAuthComponent } from './features/teacher/teacher-auth/teacher-au
 import { CrcAuthComponent } from './features/crc/crc-auth/crc-auth.component';
 import { CoreModule } from './core/core.module';
 import { ComponentsModule } from './shared/components.module';
+
 import { routes } from './app.routes';
 import { Router } from '@angular/router';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -33,19 +36,19 @@ import { HomeComponent } from './shared/components/home/home.component';
         AppComponent,
         TestComponent,
         HomeComponent,
-        StudentAuthComponent,
-        TeacherAuthComponent,
-        CrcAuthComponent,
+        StudentAuthComponent
+
         
     ],
     imports: [
+        ComponentsModule,
+        
+        RouterModule.forRoot(routes),  // Define routes
         BrowserModule,
         RouterOutlet,
         FormsModule,
         CommonModule,
-        RouterModule.forRoot(routes),  // Define routes
         CoreModule,
-        ComponentsModule,
         BrowserAnimationsModule,
 
 
