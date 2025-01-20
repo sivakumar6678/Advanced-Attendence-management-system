@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "attendance-frontend": {
+    "attendecne": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/attendance-frontend",
+            "outputPath": "dist/attendecne",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
@@ -21,8 +21,10 @@
             ],
             "tsConfig": "tsconfig.app.json",
             "assets": [
-              "src/favicon.ico",
-              "src/assets"
+              {
+                "glob": "**/*",
+                "input": "public"
+              }
             ],
             "styles": [
               "src/styles.css"
@@ -57,10 +59,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "attendance-frontend:build:production"
+              "buildTarget": "attendecne:build:production"
             },
             "development": {
-              "buildTarget": "attendance-frontend:build:development"
+              "buildTarget": "attendecne:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -77,8 +79,10 @@
             ],
             "tsConfig": "tsconfig.spec.json",
             "assets": [
-              "src/favicon.ico",
-              "src/assets"
+              {
+                "glob": "**/*",
+                "input": "public"
+              }
             ],
             "styles": [
               "src/styles.css"
@@ -90,6 +94,6 @@
     }
   },
   "cli": {
-    "analytics": "b08654f3-7c7d-42f4-93a5-3c3ce805816f"
+    "analytics": "8772aaa9-a208-48de-9947-2fbf397f1382"
   }
 }
