@@ -1,1 +1,57 @@
-<p>student-auth works!</p>
+<div class="auth-container">
+    <div *ngIf="!isLogin" class="login-form">
+      <h2>Login</h2>
+      <label for="loginStudentIdOrEmail">Student ID or Email:</label>
+      <input id="loginStudentIdOrEmail" type="text" [(ngModel)]="loginStudentIdOrEmail" placeholder="Enter your student ID or email" />
+  
+      <label for="loginPassword">Password:</label>
+      <input id="loginPassword" type="password" [(ngModel)]="loginPassword" placeholder="Enter your password" />
+  
+      <button (click)="onLoginSubmit()">Login</button>
+      <p>Dont have an account? <button type="button" (click)="toggleForm()">Register</button></p>
+    </div>
+  
+    <div *ngIf="isLogin" class="register-form">
+      <h2>Register</h2>
+      <label for="studentId">Student ID:</label>
+      <input id="studentId" type="text" [(ngModel)]="studentId" placeholder="Enter your student ID" />
+  
+      <label for="name">Full Name:</label>
+      <input id="name" type="text" [(ngModel)]="name" placeholder="Enter your full name" />
+  
+      <label for="email">Email:</label>
+      <input id="email" type="email" [(ngModel)]="email" placeholder="Enter your email" />
+  
+      <label for="password">Password:</label>
+      <input id="password" type="password" [(ngModel)]="password" placeholder="Enter your password" />
+  
+      <label for="confirmPassword">Confirm Password:</label>
+      <input id="confirmPassword" type="password" [(ngModel)]="confirmPassword" placeholder="Confirm your password" />
+  
+      <label for="branch">Branch:</label>
+      <input id="branch" type="text" [(ngModel)]="branch" placeholder="Enter your branch" />
+  
+      <label for="year">Year:</label>
+      <input id="year" type="text" [(ngModel)]="year" placeholder="Enter your academic year" />
+  
+      <label for="phoneNumber">Phone Number (Optional):</label>
+      <input id="phoneNumber" type="text" [(ngModel)]="phoneNumber" placeholder="Enter your phone number (optional)" />
+  
+      <label for="academicYear">Academic Year:</label>
+      <input id="academicYear" type="text" [(ngModel)]="academicYear" placeholder="Enter your academic year (e.g., 2021-2025)" />
+  
+      <label for="isLateralEntry">
+        <input id="isLateralEntry" type="checkbox" [(ngModel)]="isLateralEntry" />
+        Lateral Entry
+      </label>
+  
+      <div class="face-recognition">
+        <video id="videoElement" width="640" height="480" autoplay></video>
+        <button (click)="handleCapture()">Capture Face</button>
+      </div>
+  
+      <button (click)="onRegisterSubmit()">Register</button>
+      <p>Already have an account? <button type="button" (click)="toggleForm()">Login</button></p>
+    </div>
+  </div>
+  
