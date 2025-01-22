@@ -10,8 +10,10 @@ export class AuthService {
   constructor(private http: HttpClient) {}
 
   // Update the method signature by removing the generic type
-  registerStudent(data: any, faceDescriptor: Float32Array | null): Observable<any> {
-    const body = { ...data, faceDescriptor };
+  registerStudent(data: any): Observable<any> {
+    const body = { ...data };
+    console.log(body);
+    console.log('registering student');
     return this.http.post('/api/register', body);
   }
 

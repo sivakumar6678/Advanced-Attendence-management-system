@@ -38,9 +38,9 @@ export class TestComponent implements OnInit {
 
   // Method to load face-api.js models
   async loadFaceApiModels() {
-    await faceapi.nets.ssdMobilenetv1.loadFromUri('/models');
-    await faceapi.nets.faceLandmark68Net.loadFromUri('/models');
-    await faceapi.nets.faceRecognitionNet.loadFromUri('/models');
+    await faceapi.nets.ssdMobilenetv1.loadFromUri('/assets/models');
+    await faceapi.nets.faceLandmark68Net.loadFromUri('/assets/models');
+    await faceapi.nets.faceRecognitionNet.loadFromUri('assets/models');
   }
 
   // Method to start the webcam and detect faces

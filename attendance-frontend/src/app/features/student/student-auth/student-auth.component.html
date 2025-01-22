@@ -1,79 +1,163 @@
-<div class="auth-container mat-elevation-z8">
+<mat-toolbar color="primary" class="sticky-header">
+  <span >Student Portal</span>
+  <span class="spacer"></span>
+  <div class="nav-links">
+    <a mat-button routerLink="/" fragment="home">Home</a>
+  </div>
+  
+</mat-toolbar>
+
+<div class="auth-container">
   <!-- Login Form -->
-  <div *ngIf="!isLogin" class="login-form">
-    <h2 mat-typography="headline-medium">Login</h2>
+  <div *ngIf="!isLogin" >
+    <h2>Login</h2>
+    <div class="login-form">
 
-    <mat-form-field appearance="fill" class="full-width">
+    <div class="form-field">
+      <mat-form-field appearance="fill" style="width: 100%;">
       <mat-label>Student ID or Email</mat-label>
-      <input matInput id="loginStudentIdOrEmail" type="text" [(ngModel)]="loginStudentIdOrEmail" placeholder="Enter your student ID or email" />
-    </mat-form-field>
+      <input matInput [(ngModel)]="loginStudentIdOrEmail" placeholder="Enter your student ID or email" />
+      </mat-form-field>
+    </div>
 
-    <mat-form-field appearance="fill" class="full-width">
+    <div class="form-field">
+      <mat-form-field appearance="fill" style="width: 100%;">
       <mat-label>Password</mat-label>
-      <input matInput id="loginPassword" type="password" [(ngModel)]="loginPassword" placeholder="Enter your password" />
-    </mat-form-field>
+      <input matInput [(ngModel)]="loginPassword" type="password" placeholder="Enter your password" />
+      </mat-form-field>
+    </div>
 
-    <button mat-raised-button color="primary" (click)="onLoginSubmit()">Login</button>
-    <p>Don’t have an account? <button mat-button color="accent" (click)="toggleForm()">Register</button></p>
+    <button (click)="onLoginSubmit()">Login</button>
+    <p>Don’t have an account? <a (click)="toggleForm()">Register</a></p>
+  </div>
+
   </div>
 
   <!-- Register Form -->
-  <div *ngIf="isLogin" class="register-form">
-    <h2 mat-typography="headline-medium">Register</h2>
+  <div *ngIf="isLogin" >
+    <h2>Student Registration Form</h2>
+    <div class="register-form">
 
-    <mat-form-field appearance="fill" class="full-width">
+    <div class="form-field">
+      <mat-form-field appearance="fill" style="width: 100%;">
       <mat-label>Student ID</mat-label>
-      <input matInput id="studentId" type="text" [(ngModel)]="studentId" placeholder="Enter your student ID" />
-    </mat-form-field>
-
-    <mat-form-field appearance="fill" class="full-width">
-      <mat-label>Full Name</mat-label>
-      <input matInput id="name" type="text" [(ngModel)]="name" placeholder="Enter your full name" />
-    </mat-form-field>
-
-    <mat-form-field appearance="fill" class="full-width">
-      <mat-label>Email</mat-label>
-      <input matInput id="email" type="email" [(ngModel)]="email" placeholder="Enter your email" />
-    </mat-form-field>
-
-    <mat-form-field appearance="fill" class="full-width">
-      <mat-label>Password</mat-label>
-      <input matInput id="password" type="password" [(ngModel)]="password" placeholder="Enter your password" />
-    </mat-form-field>
-
-    <mat-form-field appearance="fill" class="full-width">
-      <mat-label>Confirm Password</mat-label>
-      <input matInput id="confirmPassword" type="password" [(ngModel)]="confirmPassword" placeholder="Confirm your password" />
-    </mat-form-field>
-
-    <mat-form-field appearance="fill" class="full-width">
-      <mat-label>Branch</mat-label>
-      <input matInput id="branch" type="text" [(ngModel)]="branch" placeholder="Enter your branch" />
-    </mat-form-field>
-
-    <mat-form-field appearance="fill" class="full-width">
-      <mat-label>Year</mat-label>
-      <input matInput id="year" type="text" [(ngModel)]="year" placeholder="Enter your academic year" />
-    </mat-form-field>
-
-    <mat-form-field appearance="fill" class="full-width">
-      <mat-label>Phone Number (Optional)</mat-label>
-      <input matInput id="phoneNumber" type="text" [(ngModel)]="phoneNumber" placeholder="Enter your phone number (optional)" />
-    </mat-form-field>
-
-    <mat-form-field appearance="fill" class="full-width">
-      <mat-label>Academic Year</mat-label>
-      <input matInput id="academicYear" type="text" [(ngModel)]="academicYear" placeholder="Enter your academic year (e.g., 2021-2025)" />
-    </mat-form-field>
-
-    <mat-checkbox [(ngModel)]="isLateralEntry">Lateral Entry</mat-checkbox>
-
-    <div class="face-recognition">
-      <video id="videoInput" width="100%" autoplay></video>
-      <button mat-raised-button color="accent" (click)="handleCapture()">Capture Face</button>
+      <input matInput [(ngModel)]="studentId" placeholder="Enter your student ID" />
+      </mat-form-field>
     </div>
 
-    <button mat-raised-button color="primary" (click)="onRegisterSubmit()">Register</button>
-    <p>Already have an account? <button mat-button color="accent" (click)="toggleForm()">Login</button></p>
+    <div class="form-field">
+      <mat-form-field appearance="fill" style="width: 100%;">
+      <mat-label>Full Name</mat-label>
+      <input matInput [(ngModel)]="name" placeholder="Enter your full name" />
+      </mat-form-field>
+    </div>
+
+    <div class="form-field">
+      <mat-form-field appearance="fill" style="width: 100%;">
+      <mat-label>Email</mat-label>
+      <input matInput [(ngModel)]="email" placeholder="Enter your email" />
+      </mat-form-field>
+    </div>
+    <div class="form-field">
+      <mat-form-field appearance="fill" style="width: 100%;">
+      <mat-label>Phone Number</mat-label>
+      <input matInput [(ngModel)]="phoneNumber" placeholder="Enter your phone number (optional)" />
+      </mat-form-field>
+    </div>
+
+    <div class="form-field">
+      <mat-form-field appearance="fill" style="width: 100%;">
+      <mat-label>Password</mat-label>
+      <input matInput [(ngModel)]="password"  [type]="hide() ? 'password' : 'text'" placeholder="Enter your password" />
+      <button
+      mat-icon-button
+      matSuffix
+      (click)="clickEvent($event)"
+      [attr.aria-label]="'Hide password'"
+      [attr.aria-pressed]="hide()"
+    >
+      <mat-icon>{{hide() ? 'visibility_off' : 'visibility'}}</mat-icon>
+    </button>
+      </mat-form-field>
+    </div>
+
+    <div class="form-field">
+      <mat-form-field appearance="fill" style="width: 100%;">
+      <mat-label>Confirm Password</mat-label>
+      <input matInput [(ngModel)]="confirmPassword" [type]="hide() ? 'password' : 'text'" placeholder="Confirm your password" />
+      <button
+      mat-icon-button
+      matSuffix
+      (click)="clickEvent($event)"
+      [attr.aria-label]="'Hide password'"
+      [attr.aria-pressed]="hide()"
+    >
+      <mat-icon>{{hide() ? 'visibility_off' : 'visibility'}}</mat-icon>
+    </button>
+      </mat-form-field>
+    </div>
+    
+
+    <div class="form-field" >
+      <mat-form-field appearance="fill" style="width: 100%;">
+      <mat-label>Branch</mat-label>
+      <mat-select [(ngModel)]="branch">
+        <mat-option *ngFor="let option of branchOptions" [value]="option">{{ option }}</mat-option>
+      </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="form-field">
+      <mat-form-field appearance="fill" style="width: 100%;">
+      <mat-label>Year</mat-label>
+      <mat-select [(ngModel)]="year">
+        <mat-option *ngFor="let option of yearOptions" [value]="option">{{ option }}</mat-option>
+      </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="form-field">
+      <mat-form-field appearance="fill" style="width: 100%;">
+      <mat-label>Semester</mat-label>
+      <mat-select [(ngModel)]="semester">
+        <mat-option *ngFor="let option of semesterOptions" [value]="option">{{ option }}</mat-option>
+      </mat-select>
+      </mat-form-field>
+    </div>
+    
+
+    <div class="form-field">
+        <mat-form-field appearance="fill" style="width: 100%;">
+          <mat-label>Academic Year</mat-label>
+          <mat-select [(ngModel)]="academicYear">
+            <mat-option *ngFor="let year of academicYearOptions" [value]="year">{{ year }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <div class="flex-row">
+          <div>
+            <input type="checkbox" [(ngModel)]="isLateralEntry" (change)="onLateralEntryChange()"   />
+          </div>
+
+          <label class="lateral_entry"> Lateral Entry </label>
+        </div>
+    </div>
+    
+    
+    
+
+    
+
+    <div class="face-recognition">
+      <video id="videoElement" width="100%" autoplay muted></video>
+      <button mat-raised-button color="primary" *ngIf="!registerfaceoption" (click)="RegisterFace()">Register Face</button>
+      <div *ngIf="registerfaceoption">
+        <button mat-raised-button color="primary" (click)="captureFace()">Register Face</button>
+        <button mat-raised-button color="warn" (click)="stopVideo()">Cancel</button>
+      </div>
+    </div>
+
+    <button (click)="onRegisterSubmit()">Register</button>
+    <p>Already have an account? <a (click)="toggleForm()">Login</a></p>
   </div>
+</div>
 </div>

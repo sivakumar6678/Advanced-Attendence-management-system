@@ -121,7 +121,9 @@ body {
 /* Hero Section */
 .hero-section {
     height: 100vh;
+    /* background-image: url('../../../../assets/homebg-3.jpg'); */
     background-image: url('../../../../assets/homebg.png');
+    /* background-image: url('../../../../assets/homebg-2.webp'); */
     background-size: cover;
     background-position: center;
     display: flex;
@@ -168,7 +170,11 @@ body {
     margin: 0.625rem;
     animation: fadeInUp 1.5s ease;
 }
-
+.hero-buttons button:last-child {
+    background-color: var(--secondary-color);
+    color: white;
+    border: 1px solid var(--secondary-color);
+}
 .hero-buttons button:hover {
     transform: scale(1.05);
 }
@@ -299,6 +305,13 @@ body {
     background: var(--cta-gradient);
     color: white;
     animation: slideUp 1s ease;
+    
+}
+.cta-section button:last-child{
+    margin-left: var(--base-margin);
+    background-color: var(--primary-color);
+    color: white;
+    border: 10px solid var(--primary-color);
 }
 
 .footer {
