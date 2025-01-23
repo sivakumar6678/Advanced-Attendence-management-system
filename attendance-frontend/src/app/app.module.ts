@@ -23,10 +23,14 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
-
+import {MatCheckboxModule} from '@angular/material/checkbox';
 import { MatOptionModule } from '@angular/material/core';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import {StepperOrientation, MatStepperModule} from '@angular/material/stepper';
 
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { CrcAuthComponent } from './features/crc/crc-auth/crc-auth.component';
+import { TeacherAuthComponent } from './features/teacher/teacher-auth/teacher-auth.component';
 
 
 
@@ -36,6 +40,8 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
         HomeComponent,
         StudentAuthComponent,
         TestComponent,
+        CrcAuthComponent,
+        TeacherAuthComponent
     ],
     imports: [
         RouterModule.forRoot(routes),  // Define routes
@@ -60,9 +66,13 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
         MatInputModule,
         MatSelectModule,
         MatOptionModule,
+        MatCheckboxModule,
+        MatProgressSpinnerModule,
 
         // snackbar
-        MatSnackBarModule
+        MatSnackBarModule,
+        MatStepperModule,
+
         
     ],
     providers: [

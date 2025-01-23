@@ -1,6 +1,14 @@
+.sticky-header .nav-links a{
+  padding:0 1rem;
+  margin: 0 1rem;
+  font-weight: bold;
+  box-shadow: 0 0 10px 10px #5c6bc0;
+  font-size: var(--font-medium);
+}
+
 .auth-container {
-  max-width: 800px;
-  margin: 0 auto;
+  max-width: 700px;
+  margin:1rem auto;
   padding: 20px;
   border: 1px solid #ccc;
   border-radius: 10px;
@@ -13,61 +21,46 @@
   margin-bottom: 20px;
 }
 
-.form-field {
-  width: 100%;
-  margin-bottom: 15px;
-}
-.login-form{
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  justify-content: center;
-  align-items: flex-start;
-}
-.login-form .form-field, .login-form button {
-  width: 60%;
 
-}
-
-.register-form {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  justify-content: center;
-  align-items: flex-start;
-}
-
-.register-form .form-field {
-  width: calc(50% - 10px); /* Two fields per row with spacing */
-}
-
-.form-field label {
-  display: block;
-  margin-bottom: 5px;
-  font-weight: bold;
-}
-
-.form-field input,
-.form-field select {
-  width: 100%;
-  border-radius: 50px;
-  box-sizing: border-box;
-}
-
-button {
-  width: 100%;
+.login_button {
+  width: 20%;
   padding: 10px;
-  background-color: #007bff;
-  color: white;
   border: none;
   border-radius: 5px;
+  background-color: var(--background-color-success);
+  color: white;
+  cursor: pointer;
+  font-size: 16px;
+
+}
+
+.matStepperNext{
+  float: right;
+  background-color: var(--secondary-opp-color);
+  border: 2px solid rgb(16, 74, 233);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 50px;
   cursor: pointer;
   font-size: 16px;
 }
-
-button:hover {
-  background-color: #0056b3;
+.matStepperNext:hover{
+  box-shadow: 0 2px 10px 1px blue;
+  transition: box-shadow 0.3s ease;
 }
+.matStepperPrevious{
+  float: left;
+  background-color: var(--secondary-opp-color);
+  border: 2px solid rgb(16, 74, 233);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 50px;
+  cursor: pointer;
+  font-size: 16px;
+}
+.matStepperPrevious:hover{
+  box-shadow: 0 2px 10px 1px blue;
+  transition: box-shadow 0.3s ease;
+}
+
 
 .face-recognition {
   text-align: center;
@@ -85,13 +78,20 @@ button:hover {
   margin: 5px;
 }
 
-.flex-row {
+
+
+.loading-spinner{
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
 }
-.flex-row .lateral_entry{
-margin-top:10px;
-  width: 92%;
+.auth-footer{
+  text-align: center;
+  margin-top: 20px;
 }
-
+.auth-footer a{
+  font-size: var(--font-medium);
+  font-weight: bold;
+  color: var(--primary-color);
+  text-decoration: none;
+}

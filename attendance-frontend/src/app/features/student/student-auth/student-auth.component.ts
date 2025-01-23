@@ -3,12 +3,23 @@ import { AuthService } from '../../../core/services/auth.service';
 import * as faceapi from 'face-api.js';
 import * as tf from '@tensorflow/tfjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import {ChangeDetectionStrategy,  signal} from '@angular/core';
-
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { trigger, transition, style, animate } from '@angular/animations';
 @Component({
   selector: 'app-student-auth',
   templateUrl: './student-auth.component.html',
-  styleUrls: ['./student-auth.component.css']
+  styleUrls: ['./student-auth.component.css'],
+  animations: [
+    trigger('formTransition', [
+      transition(':enter', [
+        style({ opacity: 0 }),
+        animate('300ms ease-out', style({ opacity: 1 })),
+      ]),
+      transition(':leave', [
+        animate('300ms ease-in', style({ opacity: 0 })),
+      ]),
+    ]),
+  ],
 })
 export class StudentAuthComponent implements OnInit {
   videoElement!: HTMLVideoElement;
@@ -17,7 +28,6 @@ export class StudentAuthComponent implements OnInit {
   registerfaceoption = false;
 
   // Registration fields
-  studentId = '';
   name = '';
   email = '';
   password = '';
@@ -35,6 +45,7 @@ export class StudentAuthComponent implements OnInit {
 
   isLogin: boolean = false; // Track if we are on the Login form
   faceRegistered: boolean = false; // Track if face is registered
+  loading: boolean = false;
 
   // Options for dropdowns
   branchOptions = ['CSE', 'ECE', 'MECH', 'EEE', 'CIV', 'FDT'];
@@ -42,16 +53,48 @@ export class StudentAuthComponent implements OnInit {
   semesterOptions = [1, 2];
   academicYearOptions = ['2021-2025', '2022-2026', '2023-2027', '2024-2028'];
 
-  hide = signal(true);
-  clickEvent(event: MouseEvent) {
-    this.hide.set(!this.hide());
-    event.stopPropagation();
+  firstFormGroup: FormGroup;
+  secondFormGroup: FormGroup;
+  thirdFormGroup: FormGroup;
+
+  hide: boolean = true;
+
+  constructor(private authService: AuthService,
+              private snackBar: MatSnackBar,
+              private _formBuilder: FormBuilder) {
+    this.firstFormGroup = this._formBuilder.group({
+      // studentId: ['', Validators.required],
+      // name : ['', Validators.required],
+      // email: ['', [Validators.required, Validators.email]],
+      // phoneNumber: [''],
+      // password: ['', Validators.required],
+      // confirmPassword: ['', Validators.required],
+      // branch: ['', Validators.required],
+      // year: ['', Validators.required],
+      // semester: ['', Validators.required],
+      // academicYear: ['', Validators.required],
+      // isLateralEntry: [false],
+      studentId: [''],
+      name : [''],
+      email: [''],
+      phoneNumber: [''],
+      password: [''],
+      confirmPassword: [''],
+      branch: ['',],
+      year: [''],
+      semester: [''],
+      academicYear: [''],
+      isLateralEntry: [false],
+    });
+
+    this.secondFormGroup = this._formBuilder.group({});
+    this.thirdFormGroup = this._formBuilder.group({
+      deviceId: ['', Validators.required],
+    });
   }
-  constructor(private authService: AuthService,private snackBar: MatSnackBar) {}
 
   async ngOnInit() {
     await tf.setBackend('webgl'); // Set the backend to WebGL
-    // this.isLogin = true;
     await this.loadFaceApiModels();
   }
 
@@ -97,31 +140,43 @@ export class StudentAuthComponent implements OnInit {
       alert('Camera is not enabled.');
       return;
     }
-    
+    this.loading = true;
+
     try {
       const detection = await faceapi
-      .detectSingleFace(this.videoElement)
-      .withFaceLandmarks()
-      .withFaceDescriptor();
-      
+        .detectSingleFace(this.videoElement)
+        .withFaceLandmarks()
+        .withFaceDescriptor();
+
       if (detection) {
         this.faceDescriptor = detection.descriptor;
         this.faceRegistered = true; // Set this to true after successful face capture
-        alert('Face captured successfully!');
+        this.snackBar.open('Registered face...', 'Close', {
+          duration: 3000,
+        });
+        
+        // alert('Face captured successfully!');
         this.registerfaceoption = false;
         this.stopVideo();
       } else {
-        alert('No face detected. Please try again.');
+        this.snackBar.open('Error capturing face. Please try again.', 'Close', {
+          duration: 3000,
+        });
       }
     } catch (error) {
       console.error('Error capturing face:', error);
       alert('Error capturing face. Please try again.');
+    } finally {
+      this.loading = false;
     }
   }
-RegisterFace() {
-  this.registerfaceoption = true;
+
+  RegisterFace() {
+    this.registerfaceoption = true;
+
     this.startVideo();
   }
+
   onRegisterSubmit() {
     if (!this.faceRegistered || !this.faceDescriptor) {
       alert('Face is not registered. Please register your face before submitting.');
@@ -134,16 +189,16 @@ RegisterFace() {
     }
 
     const data = {
-      studentId: this.studentId,
-      name: this.name,
-      email: this.email,
-      password: this.password,
-      branch: this.branch,
-      year: this.year,
-      semester: this.semester,
-      phoneNumber: this.phoneNumber,
-      academicYear: this.academicYear,
-      isLateralEntry: this.isLateralEntry,
+      studentId: this.firstFormGroup.value.studentId,
+      name: this.firstFormGroup.value.name,
+      email: this.firstFormGroup.value.email,
+      password: this.firstFormGroup.value.password,
+      branch: this.firstFormGroup.value.branch,
+      year: this.firstFormGroup.value.year,
+      semester: this.firstFormGroup.value.semester,
+      phoneNumber: this.firstFormGroup.value.phoneNumber,
+      academicYear: this.firstFormGroup.value.academicYear,
+      isLateralEntry: this.firstFormGroup.value.isLateralEntry,
       faceDescriptor: this.faceDescriptor,
     };
 
@@ -184,38 +239,26 @@ RegisterFace() {
   }
 
   clearForm() {
-    this.studentId = '';
-    this.name = '';
-    this.email = '';
-    this.password = '';
-    this.confirmPassword = '';
-    this.branch = '';
-    this.year = '';
-    this.semester = '';
-    this.phoneNumber = '';
-    this.academicYear = '';
-    this.isLateralEntry = false;
-    this.faceDescriptor = null;
-    this.faceRegistered = false;
+    this.firstFormGroup.reset();
     this.loginStudentIdOrEmail = '';
     this.loginPassword = '';
+    this.faceDescriptor = null;
+    this.faceRegistered = false;
   }
 
   onLateralEntryChange() {
-    if (this.isLateralEntry) {
-      this.snackBar.open('You are registering as a Lateral Entry student. You will join the original batch and complete 3 years.', 'Close', {
-        duration: 4000, // Duration in milliseconds
-        horizontalPosition: 'center', // Position on the x-axis
-        verticalPosition: 'top', // Position on the y-axis
-      });
-    } else {
-      this.snackBar.open('You are registering as a regular 4-year student.', 'Close', {
-        duration: 4000, // Duration in milliseconds
-        horizontalPosition: 'center', // Position on the x-axis
-        verticalPosition: 'top', // Position on the y-axis
-      });
-    }
+    const message = this.isLateralEntry 
+      ? 'You are registering as a Lateral Entry student. You will join the original batch and complete 3 years.' 
+      : 'You are registering as a regular 4-year student.';
+    
+    this.snackBar.open(message, 'Close', {
+      duration: 4000,
+      horizontalPosition: 'center',
+      verticalPosition: 'top',
+    });
   }
-  
-  
+
+  togglePasswordVisibility() {
+    this.hide = !this.hide;
+  }
 }
