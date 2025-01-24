@@ -39,6 +39,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'attendanc_test',
     'corsheaders',
+    'rest_framework',
+    'student',
+    'core',
+    'crc',
+    'teacher',
     ]
 
 MIDDLEWARE = [
@@ -80,14 +85,20 @@ WSGI_APPLICATION = 'attendance_system.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'attendance_system_db',
+        'USER' : 'attendance_user',
+        'PASSWORD' : 'CSKsiva@66',
+        'HOST' : 'localhost',
+        
     }
 }
 
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
+
+AUTH_USER_MODEL = 'core.User'
 
 AUTH_PASSWORD_VALIDATORS = [
     {
