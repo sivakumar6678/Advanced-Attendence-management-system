@@ -39,6 +39,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'attendanc_test',
     'corsheaders',
+    'core',
+    'student',
+    'crc',
+    'teacher',
     ]
 
 MIDDLEWARE = [
