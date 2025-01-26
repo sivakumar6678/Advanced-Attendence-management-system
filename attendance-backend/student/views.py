@@ -6,37 +6,39 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from .models import Student
 from core.models import Branch, AcademicYear
-# Move the import inside the function to avoid circular imports
+from django.db import IntegrityError
+
+from django.db import IntegrityError
 
 class RegisterStudent(APIView):
-    def post(self, request):
-        student_data = request.data
-        
-        # Fetch Branch and AcademicYear instances
+    def post(self, request, *args, **kwargs):
         try:
-            branch_instance = Branch.objects.get(pk=student_data['branch'])  # Get the branch instance
-            academic_year_instance = AcademicYear.objects.get(pk=student_data['academicYear'])  # Get the academic year instance
-        except Branch.DoesNotExist:
-            return Response({"error": "Branch not found"}, status=404)
-        except AcademicYear.DoesNotExist:
-            return Response({"error": "Academic Year not found"}, status=404)
-        
-        # Create the student
-        student = Student.objects.create(
-            student_id=student_data['studentId'],
-            name=student_data['name'],
-            email=student_data['email'],
-            password=student_data['password'],
-            branch=branch_instance,  # Pass the Branch instance
-            year=student_data['year'],
-            semester=student_data['semester'],
-            phone_number=student_data['phoneNumber'],
-            academic_year=academic_year_instance,  # Pass the AcademicYear instance
-            is_lateral_entry=student_data['isLateralEntry'],
-            face_descriptor=student_data['faceDescriptor']
-        )
-        
-        return Response({"message": "Student registered successfully"}, status=201)
+            student_data = request.data
+            # Convert face_descriptor to bytes if provided
+            face_descriptor = (
+                student_data['faceDescriptor'].encode('utf-8')
+                if 'faceDescriptor' in student_data and student_data['faceDescriptor']
+                else None
+            )
+            student = Student.objects.create(
+                student_id=student_data['studentId'],
+                name=student_data['name'],
+                email=student_data['email'],
+                password=student_data['password'],
+                branch_id=student_data['branch'],  # Use branch_id for FK
+                year=student_data['year'],
+                semester=student_data['semester'],
+                phone_number=student_data['phoneNumber'],
+                academic_year_id=student_data['academicYear'],  # Use academic_year_id for FK
+                is_lateral_entry=student_data['isLateralEntry'],
+                face_descriptor=face_descriptor
+            )
+            return Response({"message": "Student registered successfully!"}, status=201)
+        except IntegrityError as e:
+            return Response({"error": str(e)}, status=400)
+        except Exception as e:
+            return Response({"error": str(e)}, status=500)
+
 
 # Other views
 
