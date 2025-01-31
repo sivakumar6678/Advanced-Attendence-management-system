@@ -5,6 +5,7 @@ from rest_framework.decorators import api_view
 from .models import Student
 from core.models import Branch, AcademicYear
 from django.db import IntegrityError
+from django.contrib.auth import authenticate
 
 class RegisterStudent(APIView):
     def post(self, request, *args, **kwargs):
@@ -34,5 +35,17 @@ class RegisterStudent(APIView):
 
 class LoginStudent(APIView):
     def post(self, request):
-        # Your login logic here
-        return Response({"message": "Login successful"}, status=status.HTTP_200_OK)
+        student_data = request.data
+        identifier = student_data.get('studentIdOrEmail', '').strip()
+        password = student_data.get('password', '').strip()
+
+        if not identifier or not password:
+            return Response({"error": "Student ID/Email and password are required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Check if input is an email or student ID
+        student = Student.objects.filter(email=identifier).first() or Student.objects.filter(student_id=identifier).first()
+
+        if student and student.check_password(password):
+            return Response({"message": "Login successful"}, status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "Invalid student ID, email, or password"}, status=status.HTTP_401_UNAUTHORIZED)
