@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.core.validators import RegexValidator
 from core.models import Branch, AcademicYear
 
 class StudentManager(BaseUserManager):
@@ -19,7 +20,13 @@ class Student(AbstractBaseUser):
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE)  # Dynamic branch
     year = models.PositiveIntegerField(choices=[(i, f"Year {i}") for i in range(1, 5)])  # Static choices
     semester = models.PositiveIntegerField(choices=[(i, f"Semester {i}") for i in range(1, 3)])  # Static choices
-    phone_number = models.CharField(max_length=15)
+    # phone_number = models.CharField(max_length=15)
+    phone_number = models.CharField(
+        max_length=15, validators=[RegexValidator(regex=r'^\+?\d{10,15}$', message="Enter a valid phone number")]
+    )
+    parent_phone_number = models.CharField(
+        max_length=15, validators=[RegexValidator(regex=r'^\+?\d{10,15}$', message="Enter a valid phone number")]
+    )
     academic_year = models.ForeignKey(AcademicYear, on_delete=models.CASCADE)  # Dynamic academic year
     is_lateral_entry = models.BooleanField(default=False)
     face_descriptor = models.BinaryField()  # For face embeddings
