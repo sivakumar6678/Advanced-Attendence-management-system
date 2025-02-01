@@ -1,37 +1,39 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.decorators import api_view
+from django.db import IntegrityError
 from .models import Student
 from core.models import Branch, AcademicYear
-from django.db import IntegrityError
-from django.contrib.auth import authenticate
 
 class RegisterStudent(APIView):
     def post(self, request, *args, **kwargs):
         try:
             student_data = request.data
-            # Ensure face_descriptor is a valid JSON array or object
             face_descriptor = student_data.get('faceDescriptor', None)
 
-            student = Student.objects.create(
+            student = Student(
                 student_id=student_data['studentId'],
                 name=student_data['name'],
                 email=student_data['email'],
-                password=student_data['password'],
-                branch_id=student_data['branch'],  # Use branch_id for FK
+                branch_id=student_data['branch'],
                 year=student_data['year'],
                 semester=student_data['semester'],
                 phone_number=student_data['phoneNumber'],
-                academic_year_id=student_data['academicYear'],  # Use academic_year_id for FK
+                parent_phone_number=student_data['phoneNumber1'],
+                academic_year_id=student_data['academicYear'],
                 is_lateral_entry=student_data['isLateralEntry'],
-                face_descriptor=face_descriptor  # Store as JSON
+                face_descriptor=face_descriptor
             )
-            return Response({"message": "Student registered successfully!"}, status=201)
+
+            # Hash the password before saving
+            student.set_password(student_data['password'])
+            student.save()
+
+            return Response({"message": "Student registered successfully!"}, status=status.HTTP_201_CREATED)
         except IntegrityError as e:
-            return Response({"error": str(e)}, status=400)
+            return Response({"error": "Student ID or Email already exists"}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
-            return Response({"error": str(e)}, status=500)
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class LoginStudent(APIView):
     def post(self, request):
@@ -42,7 +44,7 @@ class LoginStudent(APIView):
         if not identifier or not password:
             return Response({"error": "Student ID/Email and password are required"}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Check if input is an email or student ID
+        # Fetch student using email or student ID
         student = Student.objects.filter(email=identifier).first() or Student.objects.filter(student_id=identifier).first()
 
         if student and student.check_password(password):
