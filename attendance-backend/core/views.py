@@ -19,14 +19,13 @@ class SuperAdminLogin(APIView):
         try:
             superadmin = SuperAdmin.objects.get(email=email)
 
-            if superadmin.password == password:  # Simple password check, you may want to hash it later
+            if superadmin.password == password:  # Consider hashing passwords for security
                 return Response({"message": "SuperAdmin login successful"}, status=status.HTTP_200_OK)
             else:
                 return Response({"error": "Invalid email or password"}, status=status.HTTP_401_UNAUTHORIZED)
 
         except SuperAdmin.DoesNotExist:
             return Response({"error": "SuperAdmin not found"}, status=status.HTTP_404_NOT_FOUND)
-
 
 class FacultyListView(APIView):
     def get(self, request):
@@ -37,28 +36,23 @@ class FacultyListView(APIView):
             'employee_id': faculty.employee_id,
             'registered': faculty.registered
         } for faculty in faculties]
-
         return Response(data, status=status.HTTP_200_OK)
 
-
-class RegisterFaculty(APIView):
+class AddFaculty(APIView):  # SuperAdmin adds faculty details only
     def post(self, request):
         data = request.data
+        name = data.get("name")
         email = data.get("email")
         employee_id = data.get("employee_id")
 
-        try:
-            faculty = Faculty.objects.get(email=email, employee_id=employee_id)
+        if not name or not email or not employee_id:
+            return Response({"error": "All fields are required"}, status=status.HTTP_400_BAD_REQUEST)
 
-            if faculty.registered:
-                return Response({"message": "Faculty already registered."}, status=status.HTTP_400_BAD_REQUEST)
-            else:
-                # Proceed with faculty registration logic
-                faculty.registered = True  # Mark as registered
-                faculty.save()
-                return Response({"message": "Faculty successfully registered."}, status=status.HTTP_201_CREATED)
-        except Faculty.DoesNotExist:
-            return Response({"error": "Faculty not found or not added by SuperAdmin."}, status=status.HTTP_404_NOT_FOUND)
+        if Faculty.objects.filter(email=email).exists():
+            return Response({"error": "Faculty with this email already exists"}, status=status.HTTP_400_BAD_REQUEST)
+
+        faculty = Faculty.objects.create(name=name, email=email, employee_id=employee_id)
+        return Response({"message": "Faculty details added successfully"}, status=status.HTTP_201_CREATED)
 
 class BranchListCreate(APIView):
     def get(self, request):
