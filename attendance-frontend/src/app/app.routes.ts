@@ -5,7 +5,6 @@ import { TeacherAuthComponent } from './features/teacher/teacher-auth/teacher-au
 import { CrcAuthComponent } from './features/crc/crc-auth/crc-auth.component';
 import { HomeComponent } from './shared/components/home/home.component';
 import { TeacherDashboardComponent } from './features/teacher/teacher-dashboard/teacher-dashboard.component';
-
 import { StudentDashboardComponent } from './features/student/student-dashboard/student-dashboard.component';
 import { StudentAttendanceComponent } from './features/student/student-attendance/student-attendance.component';
 import { TeacherAttendanceComponent } from './features/teacher/teacher-attendance/teacher-attendance.component';
@@ -13,6 +12,7 @@ import { CrcDashboardComponent } from './features/crc/crc-dashboard/crc-dashboar
 import { CrcTimetableComponent } from './features/crc/crc-timetable/crc-timetable.component';
 import { authGuard } from './core/guards/auth.guard';
 import { roleGuard } from './core/guards/role.guard';
+import { SuperadminComponent } from './features/superadmin/superadmin.component';
 
 
 export const routes: Routes = [
@@ -61,5 +61,8 @@ export const routes: Routes = [
         { path: 'timetable', component: CrcTimetableComponent }, // CRC Timetable Management
       ],
     },
+    {
+      path: 'superadmin', component: SuperadminComponent
+    }
   ];
   

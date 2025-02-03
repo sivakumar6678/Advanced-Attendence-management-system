@@ -5,6 +5,8 @@ import * as tf from '@tensorflow/tfjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { trigger, transition, style, animate } from '@angular/animations';
+import { UserService } from '../../../core/services/user.service';
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-student-auth',
   templateUrl: './student-auth.component.html',
@@ -33,9 +35,12 @@ export class StudentAuthComponent implements OnInit {
   password = '';
   confirmPassword = '';
   branch = '';
+
   year = '';
   semester = '';
   phoneNumber = '';
+  phoneNumber1 = '';
+  parentsPhoneNumber = '';
   academicYear = '';
   isLateralEntry = false;
 
@@ -48,10 +53,12 @@ export class StudentAuthComponent implements OnInit {
   loading: boolean = false;
 
   // Options for dropdowns
-  branchOptions = ['CSE', 'ECE', 'MECH', 'EEE', 'CIV', 'FDT'];
+  academicYearOptions: any[] = [];
+  branchOptions: any[] = [];
+  // branchOptions = ['CSE', 'ECE', 'MECH', 'EEE', 'CIV', 'FDT'];
   yearOptions = [1, 2, 3, 4];
   semesterOptions = [1, 2];
-  academicYearOptions = ['2021-2025', '2022-2026', '2023-2027', '2024-2028'];
+  // academicYearOptions = ['2021-2025', '2022-2026', '2023-2027', '2024-2028'];
 
   firstFormGroup: FormGroup;
   secondFormGroup: FormGroup;
@@ -60,6 +67,8 @@ export class StudentAuthComponent implements OnInit {
   hide: boolean = true;
 
   constructor(private authService: AuthService,
+              private userService: UserService,
+              private router: Router,
               private snackBar: MatSnackBar,
               private _formBuilder: FormBuilder) {
     this.firstFormGroup = this._formBuilder.group({
@@ -67,6 +76,7 @@ export class StudentAuthComponent implements OnInit {
       // name : ['', Validators.required],
       // email: ['', [Validators.required, Validators.email]],
       // phoneNumber: [''],
+      // phoneNumber1: [''],
       // password: ['', Validators.required],
       // confirmPassword: ['', Validators.required],
       // branch: ['', Validators.required],
@@ -78,6 +88,7 @@ export class StudentAuthComponent implements OnInit {
       name : [''],
       email: [''],
       phoneNumber: [''],
+      phoneNumber1: [''],
       password: [''],
       confirmPassword: [''],
       branch: ['',],
@@ -92,8 +103,32 @@ export class StudentAuthComponent implements OnInit {
       deviceId: ['', Validators.required],
     });
   }
-
   async ngOnInit() {
+
+    this.firstFormGroup = this._formBuilder.group({
+      studentId: [''],
+      name: [''],
+      email: [''],
+      phoneNumber: [''],
+      phoneNumber1: [''],
+      password: [''],
+      confirmPassword: [''],
+      year: [''],
+      semester: [''],
+      academicYear: [''],
+      branch: [''],
+      isLateralEntry: [false],
+    });
+    // console.log('form is lateral enry', this.firstFormGroup.value.isLateralEntry);
+    // Fetch branches
+    this.userService.getBranches().subscribe((data: any) => {
+      this.branchOptions = data;
+    });
+
+    // Fetch academic years
+    this.userService.getAcademicYears().subscribe((data: any) => {
+      this.academicYearOptions = data;
+    });
     await tf.setBackend('webgl'); // Set the backend to WebGL
     await this.loadFaceApiModels();
   }
@@ -197,6 +232,7 @@ export class StudentAuthComponent implements OnInit {
       year: this.firstFormGroup.value.year,
       semester: this.firstFormGroup.value.semester,
       phoneNumber: this.firstFormGroup.value.phoneNumber,
+      phoneNumber1: this.firstFormGroup.value.phoneNumber1,
       academicYear: this.firstFormGroup.value.academicYear,
       isLateralEntry: this.firstFormGroup.value.isLateralEntry,
       faceDescriptor: this.faceDescriptor,
@@ -206,6 +242,7 @@ export class StudentAuthComponent implements OnInit {
       (res) => {
         alert('Registration successful!');
         this.clearForm();
+        this.toggleForm();
       },
       (err) => {
         alert('Registration failed.');
@@ -223,6 +260,9 @@ export class StudentAuthComponent implements OnInit {
       (res) => {
         alert('Login successful!');
         this.clearForm();
+        setTimeout(() => {
+          this.router.navigate(['/student/dashboard']);
+        }, 1000);
       },
       (err) => {
         alert('Login failed.');
@@ -240,6 +280,7 @@ export class StudentAuthComponent implements OnInit {
 
   clearForm() {
     this.firstFormGroup.reset();
+    this.thirdFormGroup.reset();
     this.loginStudentIdOrEmail = '';
     this.loginPassword = '';
     this.faceDescriptor = null;
@@ -247,6 +288,10 @@ export class StudentAuthComponent implements OnInit {
   }
 
   onLateralEntryChange() {
+    this.isLateralEntry = !this.isLateralEntry;
+    this.firstFormGroup.patchValue({ isLateralEntry: this.isLateralEntry });
+    // console.log('Lateral Entry:', this.isLateralEntry);
+
     const message = this.isLateralEntry 
       ? 'You are registering as a Lateral Entry student. You will join the original batch and complete 3 years.' 
       : 'You are registering as a regular 4-year student.';

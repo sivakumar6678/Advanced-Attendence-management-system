@@ -36,7 +36,7 @@
   <!-- Register Form -->
   <div *ngIf="isLogin" @formTransition>
     <h2>Student Registration Form</h2>
-    <mat-horizontal-stepper linear>
+    <mat-vertical-stepper linear>
       <!-- Step 1: Basic Details -->
       <mat-step label="Basic Details" [stepControl]="firstFormGroup">
         <form [formGroup]="firstFormGroup">
@@ -59,7 +59,12 @@
             <mat-label>Phone Number</mat-label>
             <input matInput formControlName="phoneNumber" placeholder="Enter your phone number (optional)">
           </mat-form-field>
+          <mat-form-field appearance="fill" style="width: 100%;">
+            <mat-label>Parents Phone Number</mat-label>
+            <input matInput formControlName="phoneNumber1" placeholder="Enter your phone number (optional)">
+          </mat-form-field>
 
+          
           <mat-form-field appearance="fill" style="width: 100%;">
             <mat-label>Password</mat-label>
             <input matInput formControlName="password" [type]="hide ? 'password' : 'text'" placeholder="Enter your password" >
@@ -91,14 +96,20 @@
           <mat-form-field appearance="fill" style="width: 50%;">
             <mat-label>Academic Year</mat-label>
             <mat-select formControlName="academicYear" >
-              <mat-option *ngFor="let year of academicYearOptions" [value]="year">{{ year }}</mat-option>
+              <!-- <mat-option *ngFor="let year of academicYearOptions" [value]="year">{{ year }}</mat-option> -->
+              <mat-option *ngFor="let year of academicYearOptions" [value]="year.id">
+                {{ year.start_year }} - {{ year.end_year }}
+              </mat-option>
             </mat-select>
 
           </mat-form-field>
           <mat-form-field appearance="fill" style="width: 50%;">
             <mat-label>Branch</mat-label>
             <mat-select formControlName="branch" >
-              <mat-option *ngFor="let option of branchOptions" [value]="option">{{ option }}</mat-option>
+              <!-- <mat-option *ngFor="let option of branchOptions" [value]="option">{{ option }}</mat-option> -->
+              <mat-option *ngFor="let branch of branchOptions" [value]="branch.id">
+                {{ branch.name }}
+              </mat-option>
             </mat-select>
           </mat-form-field>
           <div>    
@@ -167,7 +178,7 @@
           <button mat-button (click)="onRegisterSubmit()">Finish</button>
         </div>
       </mat-step>
-    </mat-horizontal-stepper>
+    </mat-vertical-stepper>
 
   </div>
   <div class="auth-footer">

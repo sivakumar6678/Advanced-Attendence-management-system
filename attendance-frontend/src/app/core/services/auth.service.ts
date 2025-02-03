@@ -6,6 +6,7 @@ import { HttpClient } from '@angular/common/http';
   providedIn: 'root'
 })
 export class AuthService {
+  private baseUrl = 'http://127.0.0.1:8000/api/students'; // Adjust if needed
 
   constructor(private http: HttpClient) {}
 
@@ -14,11 +15,15 @@ export class AuthService {
     const body = { ...data };
     console.log(body);
     console.log('registering student');
-    return this.http.post('/api/register', body);
+    return this.http.post(`${this.baseUrl}/register/`, body);
+
+    // return this.http.post('/api/students/register', body);
   }
 
   loginStudent(data: any): Observable<any> {
     const body = { ...data };
-    return this.http.post('/api/login', body);
+    console.log("login student",body);
+    return this.http.post(`${this.baseUrl}/login/`,body);
+    // return this.http.post('/api/students/login', body);
   }
 }

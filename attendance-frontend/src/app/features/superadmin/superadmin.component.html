@@ -1,0 +1,67 @@
+<div class="superadmin-container">
+    <div *ngIf="!isLoggedIn">
+      <h2>Super Admin Login</h2>
+      <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
+        <div>
+          <label>Email</label>
+          <input type="email" formControlName="email" placeholder="Enter your email" />
+        </div>
+        <div>
+          <label>Password</label>
+          <input type="password" formControlName="password" placeholder="Enter your password" />
+        </div>
+        <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
+        <div *ngIf="successMessage" class="success">{{ successMessage }}</div>
+        <button type="submit" [disabled]="loginForm.invalid">Login</button>
+      </form>
+    </div>
+  
+    <div *ngIf="isLoggedIn">
+      <h2>Faculty Management</h2>
+      <button (click)="onLogout()">Logout</button>
+  
+      <div class="faculty-list">
+        <h3>Registered Faculties</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Employee ID</th>
+              <th>Registered</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let faculty of faculties">
+              <td>{{ faculty.name }}</td>
+              <td>{{ faculty.email }}</td>
+              <td>{{ faculty.employee_id }}</td>
+              <td>{{ faculty.registered ? 'Yes' : 'No' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+  
+      <div class="add-faculty">
+        <h3>Add New Faculty</h3>
+        <form [formGroup]="facultyForm" (ngSubmit)="onRegisterFaculty()">
+          <div>
+            <label>Name</label>
+            <input type="text" formControlName="name" placeholder="Faculty Name" />
+          </div>
+          <div>
+            <label>Email</label>
+            <input type="email" formControlName="email" placeholder="Faculty Email" />
+          </div>
+          <div>
+            <label>Employee ID</label>
+            <input type="text" formControlName="employee_id" placeholder="Employee ID" />
+          </div>
+          <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
+          <div *ngIf="successMessage" class="success">{{ successMessage }}</div>
+          <button type="submit" [disabled]="facultyForm.invalid">Register Faculty</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  

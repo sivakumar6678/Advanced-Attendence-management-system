@@ -31,6 +31,7 @@ import {StepperOrientation, MatStepperModule} from '@angular/material/stepper';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { CrcAuthComponent } from './features/crc/crc-auth/crc-auth.component';
 import { TeacherAuthComponent } from './features/teacher/teacher-auth/teacher-auth.component';
+import { SuperadminComponent } from './features/superadmin/superadmin.component';
 
 
 
@@ -41,7 +42,8 @@ import { TeacherAuthComponent } from './features/teacher/teacher-auth/teacher-au
         StudentAuthComponent,
         TestComponent,
         CrcAuthComponent,
-        TeacherAuthComponent
+        TeacherAuthComponent,
+        SuperadminComponent
     ],
     imports: [
         RouterModule.forRoot(routes),  // Define routes
