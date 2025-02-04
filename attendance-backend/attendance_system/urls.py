@@ -22,6 +22,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/students/', include('student.urls')),  # Include student app URLs
     path('api/core/', include('core.urls')),  # Include core app URLs
-    path('api/teacher/', include('teacher.urls')),  # Include teacher app URLs
+    path('api/faculty/', include('teacher.urls')),  # Include teacher app URLs
     path('attendanc_test/', include('attendanc_test.urls'))
 ]
