@@ -1,54 +1,42 @@
-.superadmin-container {
-    max-width: 800px;
+.container {
+    max-width: 600px;
     margin: auto;
-    padding: 20px;
-  }
-  
-  h2, h3 {
     text-align: center;
   }
   
-  form {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 20px;
-  }
-  
   input {
+    display: block;
+    width: 100%;
     margin-bottom: 10px;
-    padding: 10px;
-    border-radius: 5px;
+    padding: 8px;
   }
   
   button {
-    padding: 10px;
     background-color: #007bff;
     color: white;
     border: none;
+    padding: 10px;
     cursor: pointer;
   }
   
-  button:disabled {
-    background-color: #ccc;
+  button:hover {
+    background-color: #0056b3;
   }
   
   table {
     width: 100%;
     border-collapse: collapse;
+    margin-top: 20px;
   }
   
   th, td {
-    padding: 10px;
-    border: 1px solid #ccc;
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
   }
   
   .error {
     color: red;
-    text-align: center;
-  }
-  
-  .success {
-    color: green;
-    text-align: center;
+    font-size: 14px;
   }
   

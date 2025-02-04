@@ -5,6 +5,7 @@ from django.contrib.auth import authenticate
 from core.models import Faculty as CoreFaculty  # Reference faculty added by SuperAdmin
 from .models import Faculty
 from .serializers import FacultyRegisterSerializer, FacultyLoginSerializer
+from django.contrib.auth.hashers import check_password
 
 class FacultyRegisterView(APIView):
     def post(self, request):
@@ -50,15 +51,21 @@ class FacultyRegisterView(APIView):
         return Response({"message": "Registration successful"}, status=status.HTTP_201_CREATED)
 class FacultyLoginView(APIView):
     def post(self, request):
-        serializer = FacultyLoginSerializer(data=request.data)
-        if serializer.is_valid():
-            email = serializer.validated_data['email']
-            password = serializer.validated_data['password']
-            
-            faculty = authenticate(email=email, password=password)
-            if faculty:
+        data = request.data
+        email = data.get('email')
+        password = data.get('password')
+
+        if not email or not password:
+            return Response({"error": "Email and password are required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            faculty = Faculty.objects.get(email=email)
+
+            # Check password using Django's password checking function
+            if check_password(password, faculty.password):
                 return Response({"message": "Login successful"}, status=status.HTTP_200_OK)
             else:
-                return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
-        
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"error": "Invalid password"}, status=status.HTTP_401_UNAUTHORIZED)
+
+        except Faculty.DoesNotExist:
+            return Response({"error": "Faculty not found"}, status=status.HTTP_404_NOT_FOUND)

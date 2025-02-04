@@ -1,8 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-superadmin',
@@ -10,99 +7,63 @@ import { Observable } from 'rxjs';
   styleUrls: ['./superadmin.component.css']
 })
 export class SuperadminComponent implements OnInit {
-  loginForm: FormGroup;
-  facultyForm: FormGroup;
-  faculties: any[] = [];
-  isLoggedIn: boolean = false;
-  errorMessage: string = '';
-  successMessage: string = '';
+  isLoggedIn = false;
+  email = '';
+  password = '';
+  facultyList: any[] = [];
+  newFaculty = { name: '', email: '', employee_id: '' };
+  errorMessage = '';
 
-  constructor(
-    private fb: FormBuilder,
-    private router: Router,
-    private http: HttpClient
-  ) {
-    this.loginForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required]]
-    });
+  constructor(private http: HttpClient) {}
 
-    this.facultyForm = this.fb.group({
-      name: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
-      employee_id: ['', Validators.required]
-    });
-  }
-
-  ngOnInit() {
-    // If already logged in, fetch faculties
-    const token = localStorage.getItem('superadmin-token');
-    if (token) {
+  ngOnInit(): void {
+    if (localStorage.getItem('superadmin')) {
       this.isLoggedIn = true;
-      this.loadFaculties(token);
+      this.getFacultyList();
     }
   }
 
-  onLogin() {
-    if (this.loginForm.valid) {
-      const loginData = this.loginForm.value;
-      this.login(loginData).subscribe(
-        (response: any) => {
-          localStorage.setItem('superadmin-token', response.token);
+  login() {
+    this.http.post('http://127.0.0.1:8000/api/core/superadmin/login/', { email: this.email, password: this.password })
+      .subscribe(
+        (res: any) => {
           this.isLoggedIn = true;
-          this.loadFaculties(response.token);
-          this.successMessage = 'Login successful!';
-          this.errorMessage = '';
+          localStorage.setItem('superadmin', this.email);
+          this.getFacultyList();
         },
-        (error) => {
-          this.errorMessage = error.error.error || 'Login failed!';
-          this.successMessage = '';
+        err => {
+          this.errorMessage = err.error.error || 'Login failed';
         }
       );
-    }
   }
 
-  login(data: any): Observable<any> {
-    return this.http.post('http://localhost:8000/api/core/superadmin/login/', data);  // Replace with correct URL
+  getFacultyList() {
+    this.http.get('http://127.0.0.1:8000/api/core/superadmin/faculty-list/')
+      .subscribe(
+        (res: any) => {
+          this.facultyList = res;
+        },
+        err => {
+          this.errorMessage = 'Failed to load faculty list';
+        }
+      );
   }
 
-  loadFaculties(token: string) {
-    this.http.get('http://localhost:8000/api/core/faculty/list/', {
-      headers: { 'Authorization': `Bearer ${token}` }
-    }).subscribe(
-      (response: any) => {
-        this.faculties = response;
-      },
-      (error) => {
-        this.errorMessage = error.error.error || 'Failed to load faculty list!';
-      }
-    );
+  addFaculty() {
+    this.http.post('http://127.0.0.1:8000/api/core/superadmin/add-faculty/', this.newFaculty)
+      .subscribe(
+        res => {
+          this.getFacultyList();
+          this.newFaculty = { name: '', email: '', employee_id: '' };
+        },
+        err => {
+          this.errorMessage = err.error.error || 'Failed to add faculty';
+        }
+      );
   }
 
-  onRegisterFaculty() {
-    if (this.facultyForm.valid) {
-      const newFaculty = this.facultyForm.value;
-      const token = localStorage.getItem('superadmin-token');
-      if (token) {
-        this.http.post('http://localhost:8000/api/core/faculty/register/', newFaculty, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        }).subscribe(
-          (response: any) => {
-            this.successMessage = 'Faculty registered successfully!';
-            this.errorMessage = '';
-            this.loadFaculties(token);  // Reload the faculty list
-          },
-          (error) => {
-            this.errorMessage = error.error.error || 'Failed to register faculty!';
-            this.successMessage = '';
-          }
-        );
-      }
-    }
-  }
-
-  onLogout() {
-    localStorage.removeItem('superadmin-token');
+  logout() {
     this.isLoggedIn = false;
+    localStorage.removeItem('superadmin');
   }
 }

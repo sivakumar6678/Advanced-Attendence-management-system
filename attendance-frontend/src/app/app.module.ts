@@ -41,7 +41,6 @@ import { SuperadminComponent } from './features/superadmin/superadmin.component'
         HomeComponent,
         StudentAuthComponent,
         TestComponent,
-        CrcAuthComponent,
         TeacherAuthComponent,
         SuperadminComponent
     ],

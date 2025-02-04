@@ -6,19 +6,19 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class UserService {
-  private baseUrl = 'http://127.0.0.1:8000/api/core'; // Adjust if needed
+  private baseUrl = 'http://127.0.0.1:8000/api'; // Adjust if needed
 
   constructor(private http: HttpClient) {}
 
   // Fetch Branches from backend
   getBranches(): Observable<any> {
     console.log('Fetching branches');
-    console.log(`${this.baseUrl}/branches/`);
-    return this.http.get(`${this.baseUrl}/branches/`);
+    console.log(`${this.baseUrl}/core/branches/`);
+    return this.http.get(`${this.baseUrl}/core/branches/`);
   }
 
   // Fetch Academic Years from backend
   getAcademicYears(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/academic-years/`);
+    return this.http.get(`${this.baseUrl}/core/academic-years/`);
   }
 }
