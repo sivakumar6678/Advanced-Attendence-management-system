@@ -1,58 +1,63 @@
 <div class="auth-container">
-    <h2>{{ isLoginMode ? 'Faculty Login' : 'Faculty Registration' }}</h2>
-    
-    <form [formGroup]="authForm" (ngSubmit)="onSubmit()">
-      <!-- Full Name (Only for Registration) -->
-      <div *ngIf="!isLoginMode">
-        <label>Full Name</label>
-        <input type="text" formControlName="fullName" />
-      </div>
-  
-      <!-- Email -->
-      <div>
-        <label>Email</label>
-        <input type="email" formControlName="email" />
-      </div>
-  
-      <!-- Branch (Only for Registration) -->
-      <div *ngIf="!isLoginMode">
-        <label>Branch</label>
-        <select formControlName="branch">
-          <option *ngFor="let branch of branchOptions" [value]="branch.id">{{ branch.name }}</option>
-        </select>
-      </div>
-  
-      <!-- Phone Number (Optional) -->
-      <div *ngIf="!isLoginMode">
-        <label>Phone Number (Optional)</label>
-        <input type="text" formControlName="phoneNumber" />
-      </div>
-  
-      <!-- Password -->
-      <div>
-        <label>Password</label>
-        <input type="password" formControlName="password" />
-      </div>
-  
-      <!-- Employee ID (Only for Registration) -->
-      <div *ngIf="!isLoginMode">
-        <label>Employee ID</label>
-        <input type="text" formControlName="employeeId" />
-      </div>
-  
-      <!-- Joined Date (Only for Registration) -->
-      <div *ngIf="!isLoginMode">
-        <label>Joined Date</label>
-        <input type="date" formControlName="joinedDate" />
-      </div>
-  
-      <!-- Submit Button -->
-      <button type="submit">{{ isLoginMode ? 'Login' : 'Register' }}</button>
-    </form>
-  
-    <!-- Toggle between Login & Registration -->
-    <p (click)="switchMode()">
-      {{ isLoginMode ? 'New faculty? Register here' : 'Already registered? Login here' }}
-    </p>
+  <h2>{{ isLoginMode ? 'Faculty Login' : 'Faculty Registration' }}</h2>
+
+  <!-- Alerts -->
+  <div *ngIf="alertMessage" class="alert" [ngClass]="alertType">
+    {{ alertMessage }}
   </div>
-  
+
+  <!-- Login Form -->
+  <form *ngIf="isLoginMode" [formGroup]="loginForm" (ngSubmit)="onLogin()">
+    <div>
+      <label>Email</label>
+      <input type="email" formControlName="email" required />
+    </div>
+    <div>
+      <label>Password</label>
+      <input type="password" formControlName="password" required />
+    </div>
+    <button type="submit" [disabled]="loginForm.invalid">Login</button>
+  </form>
+
+  <!-- Registration Form -->
+  <form *ngIf="!isLoginMode" [formGroup]="registerForm" (ngSubmit)="onRegister()">
+    <div>
+      <label>Full Name</label>
+      <input type="text" formControlName="fullName" required />
+    </div>
+    <div>
+      <label>Email</label>
+      <input type="email" formControlName="email" required />
+    </div>
+    <div>
+      <label>Branch</label>
+      <select formControlName="branch" required>
+        <option *ngFor="let branch of branchOptions" [value]="branch.id">
+          {{ branch.name }}
+        </option>
+      </select>
+    </div>
+    <div>
+      <label>Phone Number (Optional)</label>
+      <input type="text" formControlName="phoneNumber" />
+    </div>
+    <div>
+      <label>Password</label>
+      <input type="password" formControlName="password" required />
+    </div>
+    <div>
+      <label>Employee ID</label>
+      <input type="text" formControlName="employeeId" required />
+    </div>
+    <div>
+      <label>Joined Date</label>
+      <input type="date" formControlName="joinedDate" required />
+    </div>
+    <button type="submit" [disabled]="registerForm.invalid">Register</button>
+  </form>
+
+  <!-- Toggle between Login & Registration -->
+  <p (click)="switchMode()">
+    {{ isLoginMode ? 'New faculty? Register here' : 'Already registered? Login here' }}
+  </p>
+</div>

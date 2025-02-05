@@ -1,11 +1,10 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from django.contrib.auth import authenticate
+from django.contrib.auth.hashers import check_password
 from core.models import Faculty as CoreFaculty  # Reference faculty added by SuperAdmin
 from .models import Faculty
-from .serializers import FacultyRegisterSerializer, FacultyLoginSerializer
-from django.contrib.auth.hashers import check_password
+
 
 class FacultyRegisterView(APIView):
     def post(self, request):
@@ -18,7 +17,7 @@ class FacultyRegisterView(APIView):
         password = data.get('password')
         joined_date = data.get('joinedDate')
 
-        # Validate input
+        # Validate required fields
         if not email or not employee_id or not full_name or not branch or not password or not joined_date:
             return Response({"error": "All required fields must be provided"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -28,11 +27,11 @@ class FacultyRegisterView(APIView):
         except CoreFaculty.DoesNotExist:
             return Response({"error": "Faculty details not found. Contact SuperAdmin."}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Check if already registered
+        # Check if faculty is already registered
         if Faculty.objects.filter(email=email).exists():
             return Response({"error": "Faculty already registered"}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Register the faculty in teacher app
+        # Register faculty
         faculty = Faculty.objects.create(
             full_name=full_name,
             email=email,
@@ -49,6 +48,8 @@ class FacultyRegisterView(APIView):
         core_faculty.save()
 
         return Response({"message": "Registration successful"}, status=status.HTTP_201_CREATED)
+
+
 class FacultyLoginView(APIView):
     def post(self, request):
         data = request.data

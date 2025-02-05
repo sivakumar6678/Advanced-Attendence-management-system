@@ -28,11 +28,12 @@ export class AuthService {
   }
 
   login(email: string, password: string): Observable<any> {
-    console.log("email and passwrod",email,password);
+    // console.log("email and passwrod",email,password);
     return this.http.post(`${this.baseUrl}/faculty/login/`, { email, password });
   }
 
   register(data: any): Observable<any> {
+    // console.log("registering faculty",data);
     return this.http.post(`${this.baseUrl}/faculty/register/`, data);
   }
 }

@@ -9,65 +9,94 @@ import { UserService } from '../../../core/services/user.service';
   styleUrls: ['./teacher-auth.component.css']
 })
 export class TeacherAuthComponent implements OnInit {
-  isLoginMode = true; // Toggle between login & registration
-  authForm!: FormGroup;
+  isLoginMode = true;
+  loginForm: FormGroup;
+  registerForm: FormGroup;
   branchOptions: any[] = [];
+
+  alertMessage: string = '';
+  alertType: string = '';
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
     private userService: UserService
-  ) {}
+  ) {
+    // Initialize Login Form
+    this.loginForm = this.fb.group({
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(6)]]
+    });
+
+    // Initialize Registration Form
+    this.registerForm = this.fb.group({
+      fullName: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      branch: ['', Validators.required],
+      phoneNumber: [''],
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      employeeId: ['', Validators.required],
+      joinedDate: ['', Validators.required]
+    });
+  }
 
   ngOnInit() {
-    this.loadForm();
     this.userService.getBranches().subscribe((data: any) => {
       this.branchOptions = data;
     });
   }
 
-  loadForm() {
-    if (this.isLoginMode) {
-      // Login form
-      this.authForm = this.fb.group({
-        email: ['', [Validators.required, Validators.email]],
-        password: ['', [Validators.required, Validators.minLength(6)]]
-      });
-    } else {
-      // Registration form
-      this.authForm = this.fb.group({
-        fullName: ['', Validators.required],
-        email: ['', [Validators.required, Validators.email]],
-        branch: ['', Validators.required],
-        phoneNumber: [''],
-        password: ['', [Validators.required, Validators.minLength(6)]],
-        employeeId: ['', Validators.required],
-        joinedDate: ['', Validators.required]
-      });
-    }
-  }
-
   switchMode() {
     this.isLoginMode = !this.isLoginMode;
-    this.loadForm(); // Reload form based on mode
+    this.clearAlert();
   }
 
-  onSubmit() {
-    if (this.authForm.invalid) return;
+  showAlert(message: string, type: string) {
+    this.alertMessage = message;
+    this.alertType = type;
+    setTimeout(() => this.clearAlert(), 3000); // Alert disappears after 3 seconds
+  }
 
-    if (this.isLoginMode) {
-      // Login API
-      const { email, password } = this.authForm.value;
-      this.authService.login(email, password).subscribe(
-        response => console.log('Login successful', response),
-        error => console.log('Login failed', error)
-      );
-    } else {
-      // Registration API
-      this.authService.register(this.authForm.value).subscribe(
-        response => console.log('Registration successful', response),
-        error => console.log('Registration failed', error)
-      );
-    }
+  clearAlert() {
+    this.alertMessage = '';
+    this.alertType = '';
+  }
+
+  onLogin() {
+    if (this.loginForm.invalid) return;
+
+    const { email, password } = this.loginForm.value;
+    this.authService.login(email, password).subscribe(
+      response => {
+        this.showAlert('Login successful!', 'success');
+        this.loginForm.reset();
+      },
+      error => {
+        if (error.status === 401) {
+          this.showAlert('Invalid email or password!', 'error');
+        } else {
+          this.showAlert('Login failed! Try again.', 'error');
+        }
+      }
+    );
+  }
+
+  onRegister() {
+    if (this.registerForm.invalid) return;
+
+    this.authService.register(this.registerForm.value).subscribe(
+      response => {
+        this.showAlert('Registration successful! Please log in.', 'success');
+        this.registerForm.reset();
+        this.switchMode(); // Switch to login mode after registration
+      },
+      error => {
+        if (error.status === 400) {
+          this.showAlert('Faculty already registered!', 'error');
+        } else {
+          this.showAlert('Registration failed! Try again.', 'error');
+        }
+      }
+    );
   }
 }
