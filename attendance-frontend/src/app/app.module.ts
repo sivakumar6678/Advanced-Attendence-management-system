@@ -28,6 +28,11 @@ import { MatOptionModule } from '@angular/material/core';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {StepperOrientation, MatStepperModule} from '@angular/material/stepper';
 
+import { ButtonModule } from 'primeng/button';
+import { InputGroupModule } from 'primeng/inputgroup';
+import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
+import { InputTextModule } from 'primeng/inputtext';
+
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { CrcAuthComponent } from './features/crc/crc-auth/crc-auth.component';
 import { TeacherAuthComponent } from './features/teacher/teacher-auth/teacher-auth.component';
@@ -53,6 +58,13 @@ import { SuperadminComponent } from './features/superadmin/superadmin.component'
         ReactiveFormsModule,
 
         BrowserAnimationsModule,  // Animations
+
+
+        // PrimeNG Modules
+        ButtonModule,
+        InputGroupModule,
+        InputGroupAddonModule,
+        InputTextModule,
 
         // Material Modules 
         MatToolbarModule,

@@ -24,6 +24,8 @@
     "@tensorflow/tfjs-backend-webgl": "^4.22.0",
     "@tensorflow/tfjs-core": "^4.22.0",
     "face-api.js": "^0.20.0",
+    "primeicons": "^7.0.0",
+    "primeng": "^17.18.15",
     "rxjs": "~7.8.0",
     "tfjs-image-recognition-base": "^0.6.2",
     "tslib": "^2.3.0",
