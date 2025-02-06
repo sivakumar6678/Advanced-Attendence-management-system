@@ -12,8 +12,6 @@
   <div *ngIf="!isLogin" @formTransition>
     <h2>Login</h2>
     <div class="login-form">
-  
-
       <div class="form-field">
         <mat-form-field appearance="fill" style="width: 100%;">
           <mat-label>Student ID or Email</mat-label>
@@ -31,7 +29,9 @@
         </mat-form-field>
       </div>
 
-      <button class="login_button" (click)="onLoginSubmit()">Login</button>
+        <p-button  (click)="onLoginSubmit()">Login</p-button>
+    
+      
     </div>
   </div>
 
