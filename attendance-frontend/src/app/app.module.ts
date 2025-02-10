@@ -29,6 +29,22 @@ import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {StepperOrientation, MatStepperModule} from '@angular/material/stepper';
 
 import { ButtonModule } from "primeng/button";
+import { InputGroupModule } from 'primeng/inputgroup';
+import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
+import { InputTextModule } from 'primeng/inputtext';
+import { FloatLabelModule } from 'primeng/floatlabel';
+import { StepperModule } from 'primeng/stepper';
+import { PasswordModule } from 'primeng/password';
+import { DropdownModule } from 'primeng/dropdown';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
+import { CheckboxModule } from 'primeng/checkbox';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { ToolbarModule } from 'primeng/toolbar';
+import { FieldsetModule } from 'primeng/fieldset';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
+import { CardModule } from 'primeng/card';
 
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { CrcAuthComponent } from './features/crc/crc-auth/crc-auth.component';
@@ -58,6 +74,21 @@ import { SuperadminComponent } from './features/superadmin/superadmin.component'
 
         // PrimeNG Modules
         ButtonModule,
+        InputGroupModule,
+        InputGroupAddonModule,
+        InputTextModule,
+        FloatLabelModule,
+        StepperModule,
+        PasswordModule,
+        DropdownModule,
+        IconFieldModule,
+        InputIconModule,
+        CheckboxModule,
+        ProgressSpinnerModule,
+        ToolbarModule,
+        FieldsetModule,
+        ToastModule,
+        CardModule,
 
         // Material Modules 
         MatToolbarModule,
@@ -82,6 +113,7 @@ import { SuperadminComponent } from './features/superadmin/superadmin.component'
         
     ],
     providers: [
+        MessageService,
         provideHttpClient(withInterceptorsFromDi())  // HTTP client setup
     ],
     bootstrap: [AppComponent],

@@ -1,50 +1,58 @@
 <!-- Header -->
-<mat-toolbar color="primary" class="sticky-header">
-  <span>Self Attendance Management System</span>
-  <span class="spacer"></span>
-  <div class="nav-links">
-    <a mat-button routerLink="/" fragment="home">Home</a>
-    <a mat-button href="#about" fragment="about">About</a>
-    <a mat-button href="#features" fragment="features">Features</a>
-    <a mat-button href="#roles" fragment="roles">Roles</a>
-    <button mat-raised-button color="accent" (click)="toggleLoginSection()">Login</button>  
+<p-toolbar class="sticky-header">
+  <div class="p-toolbar-group-left">
+    <span>Self Attendance Management System</span>
   </div>
-  <button mat-icon-button class="mobile-menu-button" (click)="toggleMenu()">
-    <mat-icon>menu</mat-icon>
-  </button>
-</mat-toolbar>
+  <div class="p-toolbar-group-right">
+    <div class="nav-links">
+      <a pButton label="Home" routerLink="/" fragment="home"></a>
+      <a pButton label="About" href="#about" fragment="about"></a>
+      <a pButton label="Features" href="#features" fragment="features"></a>
+      <a pButton label="Roles" href="#roles" fragment="roles"></a>
+      <button pButton label="Login" icon="pi pi-sign-in" class="p-button-raised p-button-rounded p-button-accent" (click)="toggleLoginSection()"></button>
+    </div>
+    <button pButton icon="pi pi-bars" class="p-button-rounded p-button-text mobile-menu-button" (click)="toggleMenu()"></button>
+  </div>
+</p-toolbar>
 
 <div class="mobile-menu" *ngIf="menuOpen">
-  <a mat-button routerLink="/" fragment="home" (click)="toggleMenu()">Home</a>
-  <a mat-button href="#about" fragment="about" (click)="toggleMenu()">About</a>
-  <a mat-button href="#features" fragment="features" (click)="toggleMenu()">Features</a>
-  <a mat-button href="#roles" fragment="roles" (click)="toggleMenu()">Roles</a>
-  <button mat-raised-button color="accent" (click)="toggleLoginSection()">Login</button>  
+  <a pButton label="Home" routerLink="/" fragment="home" (click)="toggleMenu()"></a>
+  <a pButton label="About" href="#about" fragment="about" (click)="toggleMenu()"></a>
+  <a pButton label="Features" href="#features" fragment="features" (click)="toggleMenu()"></a>
+  <a pButton label="Roles" href="#roles" fragment="roles" (click)="toggleMenu()"></a>
+  <button pButton label="Login" icon="pi pi-sign-in" class="p-button-raised p-button-rounded p-button-accent" (click)="toggleLoginSection()"></button>
 </div>
 
 <div class="login-overlay" *ngIf="showLoginSection">
   <div class="login-popup">
     <h2>Select Your Login Role</h2>
     <div class="login-cards">
-      <mat-card class="login-card" (click)="navigateToLogin('student-auth')">
-        <mat-icon class="login-icon" color="primary">school</mat-icon>
+      <p-card class="login-card" (click)="navigateToLogin('student-auth')">
+        <p-header>
+          <i class="fas fa-user" style="font-size: 2em; color: var(--primary-color);"></i>
+        </p-header>
         <h3>Student Login</h3>
         <p>Access your attendance and course materials.</p>
-      </mat-card>
-      <mat-card class="login-card" (click)="navigateToLogin('teacher-auth')">
-        <mat-icon class="login-icon" color="primary">person</mat-icon>
+      </p-card>
+      <p-card class="login-card" (click)="navigateToLogin('teacher-auth')">
+        <p-header>
+          <i class="fas fa-user-edit" style="font-size: 2em; color: var(--primary-color);"></i>
+        </p-header>
         <h3>Teacher Login</h3>
         <p>Manage attendance and class schedules.</p>
-      </mat-card>
-      <mat-card class="login-card" (click)="navigateToLogin('crc-auth')">
-        <mat-icon class="login-icon" color="primary">admin_panel_settings</mat-icon>
+      </p-card>
+      <p-card class="login-card" (click)="navigateToLogin('crc-auth')">
+        <p-header>
+          <i class="fas fa-shield" style="font-size: 2em; color: var(--primary-color);"></i>
+        </p-header>
         <h3>CRC Login</h3>
         <p>Oversee schedules and manage system settings.</p>
-      </mat-card>
+      </p-card>
     </div>
-    <button mat-raised-button  class="close-btn" (click)="toggleLoginSection()">Close</button>
+    <button pButton label="Close" class="p-button-raised p-button-rounded close-btn" (click)="toggleLoginSection()"></button>
   </div>
 </div>
+
 <!-- Hero Section -->
 <div class="hero-section" id="home">
   <div class="overlayheading">
@@ -54,8 +62,8 @@
     <h1>Revolutionize Attendance Management</h1>
     <p>Efficient tracking with GPS and Face Recognition</p>
     <div class="hero-buttons">
-      <button mat-raised-button color="accent">Get Started</button>
-      <button mat-stroked-button color="primary" >Learn More</button>
+      <button pButton label="Get Started" class="p-button-raised p-button-accent"></button>
+      <button pButton label="Learn More" class="p-button-outlined p-button-primary"></button>
     </div>
   </div>
 </div>
@@ -70,21 +78,12 @@
   </p>
 </section>
 
-
 <!-- Features Section -->
 <section id="features" class="features-section">
   <h2>Key Features</h2>
   <div class="features-grid">
-    <div
-      *ngFor="let feature of features"
-      [@fadeIn]="'in'"
-      class="feature-card"
-    >
-      <img
-        [src]="'../../../../assets/icons/' + feature.icon + '.png'"
-        alt="{{ feature.title }}"
-        class="feature-icon"
-      />
+    <div *ngFor="let feature of features" class="feature-card">
+      <img [src]="'../../../../assets/icons/' + feature.icon + '.png'" alt="{{ feature.title }}" class="feature-icon" />
       <p>{{ feature.description }}</p>
     </div>
   </div>
@@ -95,7 +94,7 @@
   <h2>User Roles</h2>
   <div class="roles-container">
     <div *ngFor="let role of roles" class="role-card">
-      <mat-icon class="role-icon">{{ role.icon }}</mat-icon>
+      <i class="fas fa-{{ role.icon }}" style="font-size: 2em;"></i>
       <h3>{{ role.name }}</h3>
       <p>{{ role.description }}</p>
     </div>
@@ -105,8 +104,8 @@
 <!-- Call to Action -->
 <section id="cta" class="cta-section">
   <h2>Start Managing Attendance Today!</h2>
-  <button mat-raised-button color="accent">Sign Up</button>
-  <button mat-stroked-button color="primary">Contact Us</button>
+  <button pButton label="Sign Up" class="p-button-raised p-button-accent"></button>
+  <button pButton label="Contact Us" class="p-button-outlined p-button-primary"></button>
 </section>
 
 <!-- Footer -->
@@ -120,4 +119,4 @@
       <a href="#cta">Contact</a>
     </div>
   </div>
-</footer> 
+</footer>

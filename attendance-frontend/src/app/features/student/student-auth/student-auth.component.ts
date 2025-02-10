@@ -7,6 +7,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { UserService } from '../../../core/services/user.service';
 import { Router } from '@angular/router';
+import { MessageService } from 'primeng/api';
 @Component({
   selector: 'app-student-auth',
   templateUrl: './student-auth.component.html',
@@ -28,7 +29,8 @@ export class StudentAuthComponent implements OnInit {
   faceDescriptor: Float32Array | null = null;
   cameraEnabled = false;
   registerfaceoption = false;
-
+  active: number | undefined = 0;
+  
   // Registration fields
   name = '';
   email = '';
@@ -48,7 +50,7 @@ export class StudentAuthComponent implements OnInit {
   loginStudentIdOrEmail = '';
   loginPassword = '';
 
-  isLogin: boolean = false; // Track if we are on the Login form
+  isLogin: boolean = true; // Track if we are on the Login form
   faceRegistered: boolean = false; // Track if face is registered
   loading: boolean = false;
 
@@ -70,6 +72,7 @@ export class StudentAuthComponent implements OnInit {
               private userService: UserService,
               private router: Router,
               private snackBar: MatSnackBar,
+              private messageService:MessageService,
               private _formBuilder: FormBuilder) {
     this.firstFormGroup = this._formBuilder.group({
       // studentId: ['', Validators.required],
@@ -123,11 +126,13 @@ export class StudentAuthComponent implements OnInit {
     // Fetch branches
     this.userService.getBranches().subscribe((data: any) => {
       this.branchOptions = data;
+      console.log('Branches:', this.branchOptions);
     });
 
     // Fetch academic years
     this.userService.getAcademicYears().subscribe((data: any) => {
       this.academicYearOptions = data;
+      console.log('Academic years:', this.academicYearOptions);
     });
     await tf.setBackend('webgl'); // Set the backend to WebGL
     await this.loadFaceApiModels();
@@ -170,12 +175,13 @@ export class StudentAuthComponent implements OnInit {
   }
 
   async captureFace() {
+    this.loading = true;
+    console.log("loading",this.loading);
     console.log('Capturing face...');
     if (!this.videoElement) {
       alert('Camera is not enabled.');
       return;
     }
-    this.loading = true;
 
     try {
       const detection = await faceapi
@@ -186,21 +192,20 @@ export class StudentAuthComponent implements OnInit {
       if (detection) {
         this.faceDescriptor = detection.descriptor;
         this.faceRegistered = true; // Set this to true after successful face capture
-        this.snackBar.open('Registered face...', 'Close', {
-          duration: 3000,
-        });
         
-        // alert('Face captured successfully!');
+        alert('Face captured successfully!');
         this.registerfaceoption = false;
         this.stopVideo();
       } else {
+        this.messageService.add({key:'toast1', severity:'error', summary:'Error', detail:'Error capturing face. Please try again.'});
         this.snackBar.open('Error capturing face. Please try again.', 'Close', {
           duration: 3000,
         });
       }
     } catch (error) {
       console.error('Error capturing face:', error);
-      alert('Error capturing face. Please try again.');
+      this.messageService.add({key:'toast1', severity:'error', summary:'Error', detail:'Error capturing face. Please try again.'});
+      // alert('Error capturing face. Please try again.');
     } finally {
       this.loading = false;
     }
@@ -209,11 +214,13 @@ export class StudentAuthComponent implements OnInit {
   RegisterFace() {
     this.registerfaceoption = true;
 
+
     this.startVideo();
   }
 
   onRegisterSubmit() {
     if (!this.faceRegistered || !this.faceDescriptor) {
+
       alert('Face is not registered. Please register your face before submitting.');
       return;
     }
@@ -240,6 +247,7 @@ export class StudentAuthComponent implements OnInit {
 
     this.authService.registerStudent(data).subscribe(
       (res) => {
+        this.messageService.add({key:'toast1',  severity:'success', summary:'Success', detail:'Registration successful!'});
         alert('Registration successful!');
         this.clearForm();
         this.toggleForm();
@@ -258,7 +266,8 @@ export class StudentAuthComponent implements OnInit {
 
     this.authService.loginStudent(data).subscribe(
       (res) => {
-        alert('Login successful!');
+        this.messageService.add({key:'toast1', severity:'success', summary:'Success', detail:'Login successful!'});
+
         this.clearForm();
         setTimeout(() => {
           this.router.navigate(['/student/dashboard']);

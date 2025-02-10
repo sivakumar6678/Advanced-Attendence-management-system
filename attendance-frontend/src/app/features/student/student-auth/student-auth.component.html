@@ -1,35 +1,37 @@
-<mat-toolbar color="primary" class="sticky-header">
+<p-toolbar color="primary" class="sticky-header">
   <span>Student Portal</span>
   <span class="spacer"></span>
   <div class="nav-links" >
-    <a mat-button routerLink="/" fragment="home">Home</a>
-    <a mat-button (click)="toggleForm()">{{ isLogin ? 'Login' : 'Register' }}</a>
+    <a  routerLink="/" fragment="home">Home</a>
+    <a  (click)="toggleForm()">{{ isLogin ? 'Login' : 'Register' }}</a>
   </div>
-</mat-toolbar>
-
+</p-toolbar>
+<p-toast key="toast1"></p-toast>
 <div class="auth-container">
   <!-- Login Form -->
   <div *ngIf="!isLogin" @formTransition>
     <h2>Login</h2>
     <div class="login-form">
-      <div class="form-field">
-        <mat-form-field appearance="fill" style="width: 100%;">
-          <mat-label>Student ID or Email</mat-label>
-          <input matInput [(ngModel)]="loginStudentIdOrEmail" placeholder="Enter your student ID or email" />
-        </mat-form-field>
-      </div>
+      <div class="card flex flex-column md:flex-row gap-3">
 
-      <div class="form-field">
-        <mat-form-field appearance="fill" style="width: 100%;">
-          <mat-label>Password</mat-label>
-          <input matInput [(ngModel)]="loginPassword" [type]="hide ? 'password' : 'text'" placeholder="Enter your password" />
-          <button mat-icon-button matSuffix (click)="togglePasswordVisibility()">
-            <mat-icon>{{ hide ? 'visibility_off' : 'visibility' }}</mat-icon>
+        <p-inputGroup>
+          <p-inputGroupAddon>
+            <i class="fas fa-user"></i>
+          </p-inputGroupAddon>
+          <input pInputText [(ngModel)]="loginStudentIdOrEmail" placeholder="Enter your student ID or email" />
+        </p-inputGroup>
+        
+        <p-inputGroup>
+          <p-inputGroupAddon>
+            <i class="fas fa-lock"></i>
+          </p-inputGroupAddon>
+          <input pInputText [(ngModel)]="loginPassword" [type]="hide ? 'password' : 'text'" placeholder="Enter your password" />
+          <button pButton pButtonIcon (click)="togglePasswordVisibility()">
+            <i class="fas" [ngClass]="hide ? 'fa-eye-slash' : 'fa-eye'"></i>
           </button>
-        </mat-form-field>
+        </p-inputGroup>
       </div>
-
-        <p-button  (click)="onLoginSubmit()">Login</p-button>
+      <p-button  (click)="onLoginSubmit()">Login</p-button>
     
       
     </div>
@@ -38,153 +40,230 @@
   <!-- Register Form -->
   <div *ngIf="isLogin" @formTransition>
     <h2>Student Registration Form</h2>
-    <mat-vertical-stepper linear>
-      <!-- Step 1: Basic Details -->
-      <mat-step label="Basic Details" [stepControl]="firstFormGroup">
-        <form [formGroup]="firstFormGroup">
-          <mat-form-field appearance="fill" style="width: 100%;">
-            <mat-label>Student ID</mat-label>
-            <input matInput formControlName="studentId" placeholder="Enter your student ID" >
-          </mat-form-field>
+    <p-stepper [(activeStep)]="active">
+       <p-stepperPanel>
+         <ng-template pTemplate="header" let-onClick="onClick" let-index="index">
+          <button class="bg-transparent border-none inline-flex flex-column gap-2" (click)="onClick.emit()">
+            <span
+                class="border-round border-2 w-3rem h-3rem inline-flex align-items-center justify-content-center"
+                [ngClass]="{
+                    'bg-primary border-primary': index <= active!,
+                    'surface-border': index > active!
+                }"
+            >
+                <i class="fas fa-info"></i>
+            </span>
+        </button>
 
-          <mat-form-field appearance="fill" style="width: 100%;">
-            <mat-label>Full Name</mat-label>
-            <input matInput formControlName="name" placeholder="Enter your full name" >
-          </mat-form-field>
+         </ng-template>
+         <ng-template pTemplate="content" let-nextCallback="nextCallback" >
+          <div class="flex flex-column gap-2 mx-auto" >
+              <div class="text-center mt-3 mb-3 text-xl font-semibold">Create your account</div>
+              <form [formGroup]="firstFormGroup">
+                <div class="p-field p-grid">
+                  <label for="studentId" class="p-col-12 p-md-2">Student ID</label>
+                  <div class="p-col-12 p-md-10">
+                    <input id="studentId" pInputText formControlName="studentId" placeholder="Enter your student ID" />
+                  </div>
+                </div>
+    
+                <div class="p-field p-grid">
+                  <label for="name" class="p-col-12 p-md-2">Full Name</label>
+                  <div class="p-col-12 p-md-10">
+                    <input id="name" pInputText formControlName="name" placeholder="Enter your full name" />
+                  </div>
+                </div>
+                <div class="p-field p-grid">
+                  <label for="email" class="p-col-12 p-md-2">Email</label>
+                  <div class="p-col-12 p-md-10">
+                    <input id="email" pInputText formControlName="email" placeholder="Enter your email" />
+                  </div>
+                </div>
+                <div class="p-field p-grid">
+                  <label for="phoneNumber" class="p-col-12 p-md-2">Phone Number</label>
+                  <div class="p-col-12 p-md-10">
+                    <input id="phoneNumber" pInputText formControlName="phoneNumber" placeholder="Enter your phone number" />
+                  </div>
+                </div>
+                <div class="p-field p-grid">
+                  <label for="phoneNumber1" class="p-col-12 p-md-2">Phone Number</label>
+                  <div class="p-col-12 p-md-10">
+                    <input id="phoneNumber1" pInputText formControlName="phoneNumber1" placeholder="Enter your parents phone number" />
+                  </div>
+                </div>
+                <div class="p-field p-grid">
+                  <label for="password" class="p-col-12 p-md-2">Password</label>
+                  <div class="p-col-12 p-md-10">
+                    <p-password id="password" formControlName="password" toggleMask="true" placeholder="Enter your password" > </p-password>
+                  </div>
+                </div>
+                <div class="p-field p-grid">
+                  <label for="confirmPassword" class="p-col-12 p-md-2">Confirm Password</label>
+                  <div class="p-col-12 p-md-10">
+                    <p-password id="confirmPassword" formControlName="confirmPassword" placeholder="Confirm your password" [toggleMask]="true" ></p-password>
+                    <!-- <input id="confirmPassword" pInputText formControlName="confirmPassword" placeholder="Confirm your password" /> -->
+                  </div>
+                </div>
+                <div class="p-field p-grid">
+                  <label for="year">Year</label>
+                  <div>
+                    <p-dropdown formControlName="year" [options]="yearOptions" placeholder="Select Year"></p-dropdown>
+                  </div>
+                </div>
+                <div class="p-field p-grid">
+                  <label for="semester">Semester</label>
+                  <div>
+                    <p-dropdown formControlName="semester"  [options]="semesterOptions" placeholder="Select Semester"></p-dropdown>
+                  </div>
+                </div>
+                <div class="p-field p-grid">
+                  <label for="academicYear">Academic Year</label>
+                  <div>
+                    <p-dropdown formControlName="academicYear" [options]="academicYearOptions" optionLabel="start_year" optionValue="id" placeholder="Select Academic Year" [filter]="true">
+                      <ng-template let-option pTemplate="selectedItem">
+                        {{ option.start_year }} - {{ option.end_year }}
+                      </ng-template>
+                      <ng-template let-option pTemplate="item">
+                        {{ option.start_year }} - {{ option.end_year }}
+                      </ng-template>
+                    </p-dropdown>
+                  </div>
+                </div>
+                <div class="p-field p-grid">
+                  <label for="branch">Branch</label>
+                  <div>
+                    <p-dropdown formControlName="branch" [options]="branchOptions" optionLabel="name" optionValue="id" placeholder="Select Branch"></p-dropdown>
+                  </div>
+                </div>
+                <div class="p-field p-grid">
+                  <label for="isLateralEntry">Lateral Entry</label>
+                  <div>
+                    <p-checkbox formControlName="isLateralEntry" binary="true"></p-checkbox>
+                  </div>
+                </div>
 
-          <mat-form-field appearance="fill" style="width: 100%;">
-            <mat-label>Email</mat-label>
-            <input matInput formControlName="email" placeholder="Enter your email" >
-          </mat-form-field>
-
-          <mat-form-field appearance="fill" style="width: 100%;">
-            <mat-label>Phone Number</mat-label>
-            <input matInput formControlName="phoneNumber" placeholder="Enter your phone number (optional)">
-          </mat-form-field>
-          <mat-form-field appearance="fill" style="width: 100%;">
-            <mat-label>Parents Phone Number</mat-label>
-            <input matInput formControlName="phoneNumber1" placeholder="Enter your phone number (optional)">
-          </mat-form-field>
-
-          
-          <mat-form-field appearance="fill" style="width: 100%;">
-            <mat-label>Password</mat-label>
-            <input matInput formControlName="password" [type]="hide ? 'password' : 'text'" placeholder="Enter your password" >
-            <button mat-icon-button matSuffix (click)="togglePasswordVisibility()">
-              <mat-icon>{{ hide ? 'visibility_off' : 'visibility' }}</mat-icon>
-            </button>
-          </mat-form-field>
-
-          <mat-form-field appearance="fill" style="width: 100%;">
-            <mat-label>Confirm Password</mat-label>
-            <input matInput formControlName="confirmPassword" [type]="hide ? 'password' : 'text'" placeholder="Confirm your password" >
-            <button mat-icon-button matSuffix (click)="togglePasswordVisibility()">
-              <mat-icon>{{ hide ? 'visibility_off' : 'visibility' }}</mat-icon>
-            </button>
-          </mat-form-field>
-          <mat-form-field appearance="fill" style="width: 50%;">
-            <mat-label>Year</mat-label>
-            <mat-select formControlName="year" >
-              <mat-option *ngFor="let option of yearOptions" [value]="option">{{ option }}</mat-option>
-            </mat-select>
-          </mat-form-field>
-
-          <mat-form-field appearance="fill" style="width: 50%;">
-            <mat-label>Semester</mat-label>
-            <mat-select formControlName="semester" >
-              <mat-option *ngFor ="let option of semesterOptions" [value]="option">{{ option }}</mat-option>
-            </mat-select>
-          </mat-form-field>
-          <mat-form-field appearance="fill" style="width: 50%;">
-            <mat-label>Academic Year</mat-label>
-            <mat-select formControlName="academicYear" >
-              <!-- <mat-option *ngFor="let year of academicYearOptions" [value]="year">{{ year }}</mat-option> -->
-              <mat-option *ngFor="let year of academicYearOptions" [value]="year.id">
-                {{ year.start_year }} - {{ year.end_year }}
-              </mat-option>
-            </mat-select>
-
-          </mat-form-field>
-          <mat-form-field appearance="fill" style="width: 50%;">
-            <mat-label>Branch</mat-label>
-            <mat-select formControlName="branch" >
-              <!-- <mat-option *ngFor="let option of branchOptions" [value]="option">{{ option }}</mat-option> -->
-              <mat-option *ngFor="let branch of branchOptions" [value]="branch.id">
-                {{ branch.name }}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-          <div>    
-            <mat-checkbox class="le_checkbox" 
-            formControlName="isLateralEntry"
-            (change)="onLateralEntryChange()"
-            >Lateral Entry</mat-checkbox>
+              </form>
+              
           </div>
-          <div >
-            <button mat-button matStepperNext class="matStepperNext" >Next</button>
+          <div class="flex pt-4 justify-content-end">
+              <p-button (onClick)="nextCallback.emit()" label="Next" icon="pi pi-arrow-right" iconPos="right" />
           </div>
-        </form>
-      </mat-step>
+      </ng-template>
 
-      <!-- Step 2: Face Recognition -->
-      <mat-step label="Face Recognition" [stepControl]="secondFormGroup">
-        <div class="face-recognition">
-          <div *ngIf="loading" class="loading-spinner">
-            <!-- <div  class="loading-spinner"> -->
-              <mat-spinner></mat-spinner>
+      </p-stepperPanel>
+
+      <p-stepperPanel>
+        <ng-template pTemplate="header" let-onClick="onClick" let-index="index">
+          <button class="bg-transparent border-none inline-flex flex-column gap-2" (click)="onClick.emit()">
+            <span
+                class="border-round border-2 w-3rem h-3rem inline-flex align-items-center justify-content-center"
+                [ngClass]="{
+                    'bg-primary border-primary': index <= active!,
+                    'surface-border': index > active!
+                }"
+            >
+                <i class="fas fa-user"></i>
+            </span>
+        </button>
+
+         </ng-template>
+         <ng-template pTemplate="content" let-prevCallback="prevCallback" let-nextCallback="nextCallback" >
+           <div *ngIf="loading"  class="loading">
+            <p-progressSpinner></p-progressSpinner>
+           </div>
+
+          <div class="face-recognition">
+            <video id="videoElement" width="100%" autoplay muted></video>
+            <p-button  *ngIf="!registerfaceoption" (click)="RegisterFace()">
+                  <span *ngIf="faceRegistered">
+                    Face Registered
+                  </span>  
+                  <span *ngIf="!faceRegistered">
+                    Register Face
+                  </span>
+            </p-button>
+            <div *ngIf="registerfaceoption">
+              <p-button  (click)="captureFace()">Capture Face</p-button>
+              <p-button  (click)="stopVideo()">Cancel</p-button>
             </div>
-          <video id="videoElement" width="100%" autoplay muted>
-          </video>
-          <button mat-raised-button color="primary" *ngIf="!registerfaceoption" (click)="RegisterFace()">
-                <span *ngIf="faceRegistered">
-                  Face Registered
-
-                </span>  
-                <span *ngIf="!faceRegistered">
-                  Register Face
-
-                </span>
-          </button>
-          <div *ngIf="registerfaceoption">
-
-          <button mat-raised-button color="primary" (click)="captureFace()">Capture Face</button>
-          <button mat-raised-button color="warn" (click)="stopVideo()">Cancel</button>
           </div>
+          <div class="flex pt-4 justify-content-between">
+            <p-button (onClick)="prevCallback.emit()" label="Back" severity="secondary" icon="pi pi-arrow-left" />
+            <p-button (onClick)="nextCallback.emit()" label="Next" icon="pi pi-arrow-right" iconPos="right" />
         </div>
-        <div>
-          <button mat-button matStepperPrevious class="matStepperPrevious">Back</button>
-          <button mat-button matStepperNext class="matStepperNext">Next</button>
-        </div>
-      </mat-step>
 
-      <!-- Step 3: Device Binding -->
-      <mat-step label="Device Binding" [stepControl]="thirdFormGroup">
-        <form [formGroup]="thirdFormGroup">
-          <mat-form-field appearance="fill" style="width: 100%;">
-            <mat-label>Device ID</mat-label>
-            <input matInput formControlName="deviceId" placeholder="Enter your device ID" required>
-          </mat-form-field>
-          <div>
-            <button mat-button matStepperPrevious class="matStepperPrevious">Back</button>
-            <button mat-button matStepperNext class="matStepperNext">Next</button>
+
+        </ng-template>
+      </p-stepperPanel>
+
+      <p-stepperPanel>
+        <ng-template pTemplate="header" let-onClick="onClick" let-index="index">
+          <button class="bg-transparent border-none inline-flex flex-column gap-2" (click)="onClick.emit()">
+            <span
+                class="border-round border-2 w-3rem h-3rem inline-flex align-items-center justify-content-center"
+                [ngClass]="{
+                    'bg-primary border-primary': index <= active!,
+                    'surface-border': index > active!
+                }"
+            >
+                <i class="fas fa-mobile"></i>
+            </span>
+        </button>
+
+         </ng-template>
+         <ng-template pTemplate="content" let-prevCallback="prevCallback" let-nextCallback="nextCallback" >
+          <div class="flex flex-column gap-2 mx-auto">
+              <div class="text-center mt-3 mb-3 text-xl font-semibold">Register your Device</div>
+              <form [formGroup]="thirdFormGroup" >
+                <div class="p-field p-grid">
+                  <label for="deviceId" class="p-col-12 p-md-2">Device ID</label>
+                  <div class="p-col-12 p-md-10">
+                    <input id="deviceId" pInputText formControlName="deviceId" placeholder="Enter your device ID" />
+                  </div>
+                </div>
+              </form>
           </div>
-        </form>
-      </mat-step>
 
-      <!-- Step 4: Completion -->
-      <mat-step>
-        <ng-template matStepLabel>Done</ng-template>
-        <p>You have successfully registered!</p>
-        <div>
-          <button mat-button matStepperPrevious class="matStepperPrevious">Back</button>
-          <button mat-button (click)="onRegisterSubmit()">Finish</button>
-        </div>
-      </mat-step>
-    </mat-vertical-stepper>
+          <div class="flex pt-4 justify-content-end">
+            <p-button (onClick)="prevCallback.emit()" label="Back" severity="secondary" icon="pi pi-arrow-left" />
+              <p-button (onClick)="nextCallback.emit()" label="Next" icon="pi pi-arrow-right" iconPos="right" />
+          </div>
+      </ng-template>
+      </p-stepperPanel>
+      <p-stepperPanel>
+        <ng-template pTemplate="header" let-onClick="onClick" let-index="index">
+          <button class="bg-transparent border-none inline-flex flex-column gap-2" (click)="onClick.emit()">
+            <span
+                class="border-round border-2 w-3rem h-3rem inline-flex align-items-center justify-content-center"
+                [ngClass]="{
+                    'bg-primary border-primary': index <= active!,
+                    'surface-border': index > active!
+                }"
+            >
+                <i class="fas fa-check"></i>
+            </span>
+        </button>
+
+         </ng-template>
+         <ng-template pTemplate="content" let-prevCallback="prevCallback" let-nextCallback="nextCallback">
+          <div class="flex flex-column gap-2 mx-auto" >
+              <div class="text-center mt-3 mb-3 text-xl font-semibold">Submit your account Registration</div>
+              <div class="p-field p-grid">
+                <p-button  (click)="onRegisterSubmit()">onRegisterSubmit</p-button>              
+              </div>
+          </div>
+          <div class="flex pt-4 justify-content-end">
+            <p-button (onClick)="prevCallback.emit()" label="Back" severity="secondary" icon="pi pi-arrow-left" />
+              
+          </div>
+      </ng-template>
+      </p-stepperPanel>
+    </p-stepper>
+   
 
   </div>
   <div class="auth-footer">
-    <a mat-button (click)="toggleForm()">{{ isLogin ? 
+    <a p-button (click)="toggleForm()">{{ isLogin ? 
                                           'Already have an account? Login ' : ' Dont have an Account Register' 
                                           }}
     </a>
