@@ -11,22 +11,7 @@ import { routes } from './app.routes';
 import { StudentAuthComponent } from './features/student/student-auth/student-auth.component';
 import { TestComponent } from './test/test.component';
 import { HomeComponent } from './shared/components/home/home.component';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
-import { MatIconModule } from '@angular/material/icon';
-import { MatGridListModule } from '@angular/material/grid-list';
-import { MatSidenavModule } from '@angular/material/sidenav';
-import { MatListModule } from '@angular/material/list';
-import { MatDialogModule } from '@angular/material/dialog';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
-import {MatCheckboxModule} from '@angular/material/checkbox';
-import { MatOptionModule } from '@angular/material/core';
-import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
-import {StepperOrientation, MatStepperModule} from '@angular/material/stepper';
+
 
 import { ButtonModule } from "primeng/button";
 import { InputGroupModule } from 'primeng/inputgroup';
@@ -90,25 +75,7 @@ import { SuperadminComponent } from './features/superadmin/superadmin.component'
         ToastModule,
         CardModule,
 
-        // Material Modules 
-        MatToolbarModule,
-        MatButtonModule,
-        MatCardModule,
-        MatIconModule,
-        MatGridListModule,
-        MatSidenavModule,
-        MatListModule,
-        MatDialogModule,
-        MatFormFieldModule,
-        MatInputModule,
-        MatSelectModule,
-        MatOptionModule,
-        MatCheckboxModule,
-        MatProgressSpinnerModule,
-
-        // snackbar
-        MatSnackBarModule,
-        MatStepperModule,
+      
 
         
     ],

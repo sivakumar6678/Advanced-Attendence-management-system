@@ -1,17 +1,16 @@
-<!-- Header -->
-<p-toolbar class="sticky-header">
-  <div class="p-toolbar-group-left">
+<p-toolbar class="home-sticky-header" >
+  <div class="p-toolbar-group-start proj-title">
     <span>Self Attendance Management System</span>
   </div>
-  <div class="p-toolbar-group-right">
+  <div class="p-toolbar-group-end navbar-links">
     <div class="nav-links">
       <a pButton label="Home" routerLink="/" fragment="home"></a>
       <a pButton label="About" href="#about" fragment="about"></a>
       <a pButton label="Features" href="#features" fragment="features"></a>
       <a pButton label="Roles" href="#roles" fragment="roles"></a>
-      <button pButton label="Login" icon="pi pi-sign-in" class="p-button-raised p-button-rounded p-button-accent" (click)="toggleLoginSection()"></button>
+      <a pButton label="Login" (click)="toggleLoginSection()"></a>
     </div>
-    <button pButton icon="pi pi-bars" class="p-button-rounded p-button-text mobile-menu-button" (click)="toggleMenu()"></button>
+    <button pButton class="p-button-rounded p-button-text mobile-menu-button" (click)="toggleMenu()"> <i class="fas fa-bars"></i> </button>
   </div>
 </p-toolbar>
 
@@ -20,7 +19,7 @@
   <a pButton label="About" href="#about" fragment="about" (click)="toggleMenu()"></a>
   <a pButton label="Features" href="#features" fragment="features" (click)="toggleMenu()"></a>
   <a pButton label="Roles" href="#roles" fragment="roles" (click)="toggleMenu()"></a>
-  <button pButton label="Login" icon="pi pi-sign-in" class="p-button-raised p-button-rounded p-button-accent" (click)="toggleLoginSection()"></button>
+  <a pButton  label="Login" (click)="toggleLoginSection()" ></a>
 </div>
 
 <div class="login-overlay" *ngIf="showLoginSection">
@@ -29,24 +28,30 @@
     <div class="login-cards">
       <p-card class="login-card" (click)="navigateToLogin('student-auth')">
         <p-header>
-          <i class="fas fa-user" style="font-size: 2em; color: var(--primary-color);"></i>
+          <i class="fas fa-user" ></i>
         </p-header>
-        <h3>Student Login</h3>
-        <p>Access your attendance and course materials.</p>
+        <div class="login-card-content">
+          <h3>Student Login</h3>
+          <p>Access your attendance and course materials.</p>
+        </div>
       </p-card>
       <p-card class="login-card" (click)="navigateToLogin('teacher-auth')">
         <p-header>
-          <i class="fas fa-user-edit" style="font-size: 2em; color: var(--primary-color);"></i>
+          <i class="fas fa-user-edit" ></i>
         </p-header>
-        <h3>Teacher Login</h3>
-        <p>Manage attendance and class schedules.</p>
+        <div class="login-card-content">
+          <h3>Teacher Login</h3>
+          <p>Manage attendance and class schedules.</p>
+        </div>
       </p-card>
       <p-card class="login-card" (click)="navigateToLogin('crc-auth')">
         <p-header>
-          <i class="fas fa-shield" style="font-size: 2em; color: var(--primary-color);"></i>
+          <i class="fas fa-shield" ></i>
         </p-header>
-        <h3>CRC Login</h3>
-        <p>Oversee schedules and manage system settings.</p>
+        <div class="login-card-content">
+          <h3>CRC Login</h3>
+          <p>Oversee schedules and manage system settings.</p>                    
+        </div>
       </p-card>
     </div>
     <button pButton label="Close" class="p-button-raised p-button-rounded close-btn" (click)="toggleLoginSection()"></button>
