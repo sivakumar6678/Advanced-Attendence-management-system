@@ -1,15 +1,39 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
-
+import * as FingerprintJS from '@fingerprintjs/fingerprintjs';
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   private baseUrl = 'http://127.0.0.1:8000/api'; // Adjust if needed
+  private deviceId: string | null = null;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+    this.generateDeviceId();
+  }
 
+  private async generateDeviceId() {
+    const fp = await FingerprintJS.load();
+    const result = await fp.get();
+    this.deviceId = result.visitorId;  // Unique device ID
+  }
+
+  async getDeviceId(): Promise<string> {
+
+    if (!this.deviceId) {
+      await this.generateDeviceId();
+    }
+    console.log('device id',this.deviceId);
+    return this.deviceId!;
+  }
+
+  registerDevice(data: any): Observable<any> {
+    const body = { ...data };
+    console.log(body);
+    console.log('registering device');
+    return this.http.post(`${this.baseUrl}/students/register-device/`, body);
+  }
   // Update the method signature by removing the generic type
   registerStudent(data: any): Observable<any> {
     const body = { ...data };
@@ -36,4 +60,6 @@ export class AuthService {
     // console.log("registering faculty",data);
     return this.http.post(`${this.baseUrl}/faculty/register/`, data);
   }
+
+  
 }

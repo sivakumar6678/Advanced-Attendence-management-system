@@ -17,19 +17,19 @@ class Student(AbstractBaseUser):
     student_id = models.CharField(max_length=20, unique=True)
     name = models.CharField(max_length=100)
     email = models.EmailField(unique=True)
-    branch = models.ForeignKey(Branch, on_delete=models.CASCADE)  # Dynamic branch
-    year = models.PositiveIntegerField(choices=[(i, f"Year {i}") for i in range(1, 5)])  # Static choices
-    semester = models.PositiveIntegerField(choices=[(i, f"Semester {i}") for i in range(1, 3)])  # Static choices
+    branch = models.ForeignKey(Branch, on_delete=models.CASCADE)
+    year = models.PositiveIntegerField(choices=[(i, f"Year {i}") for i in range(1, 5)])
+    semester = models.PositiveIntegerField(choices=[(i, f"Semester {i}") for i in range(1, 3)])
     phone_number = models.CharField(
         max_length=15, validators=[RegexValidator(regex=r'^\+?\d{10,15}$', message="Enter a valid phone number")]
     )
     parent_phone_number = models.CharField(
         max_length=15, validators=[RegexValidator(regex=r'^\+?\d{10,15}$', message="Enter a valid phone number")]
     )
-    academic_year = models.ForeignKey(AcademicYear, on_delete=models.CASCADE)  # Dynamic academic year
+    academic_year = models.ForeignKey(AcademicYear, on_delete=models.CASCADE)
     is_lateral_entry = models.BooleanField(default=False)
-    # Store face_descriptor as a JSON field
-    face_descriptor = models.JSONField()  # Store as JSON Array
+    face_descriptor = models.JSONField()
+    device_id = models.CharField(max_length=255, unique=True, null=True, blank=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['student_id', 'name', 'year', 'semester']
@@ -38,3 +38,14 @@ class Student(AbstractBaseUser):
 
     def __str__(self):
         return self.name
+
+
+class Device(models.Model):
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name="devices")
+    fingerprint = models.CharField(max_length=255, unique=True)  # Unique device identifier
+    user_agent = models.TextField()
+    ip_address = models.GenericIPAddressField()
+    registered_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Device for {self.student.name} - {self.fingerprint}"

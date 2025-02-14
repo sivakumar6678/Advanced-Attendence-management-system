@@ -58,6 +58,7 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:4200",  # Angular app URL
+    
 ]
 ROOT_URLCONF = 'attendance_system.urls'
 

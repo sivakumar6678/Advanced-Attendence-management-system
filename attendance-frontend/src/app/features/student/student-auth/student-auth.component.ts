@@ -8,6 +8,7 @@ import { trigger, transition, style, animate } from '@angular/animations';
 import { UserService } from '../../../core/services/user.service';
 import { Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
+import FingerprintJS from '@fingerprintjs/fingerprintjs';
 @Component({
   selector: 'app-student-auth',
   templateUrl: './student-auth.component.html',
@@ -25,6 +26,7 @@ import { MessageService } from 'primeng/api';
   ],
 })
 export class StudentAuthComponent implements OnInit {
+  // viedeo elemets 
   videoElement!: HTMLVideoElement;
   faceDescriptor: Float32Array | null = null;
   cameraEnabled = false;
@@ -37,7 +39,6 @@ export class StudentAuthComponent implements OnInit {
   password = '';
   confirmPassword = '';
   branch = '';
-
   year = '';
   semester = '';
   phoneNumber = '';
@@ -67,6 +68,13 @@ export class StudentAuthComponent implements OnInit {
   thirdFormGroup: FormGroup;
 
   hide: boolean = true;
+
+  // Device registration 
+  // deviceFingerprint: string = '';
+  // userAgent: string = navigator.userAgent;
+  // ipAddress: string = '';
+  deviceId: string | null = null;
+  deviceRegistered: boolean = false;  // To track device registration
 
   constructor(private authService: AuthService,
               private userService: UserService,
@@ -136,6 +144,9 @@ export class StudentAuthComponent implements OnInit {
     });
     await tf.setBackend('webgl'); // Set the backend to WebGL
     await this.loadFaceApiModels();
+    this.deviceId = await this.authService.getDeviceId();
+
+
   }
 
   async loadFaceApiModels() {
@@ -213,12 +224,26 @@ export class StudentAuthComponent implements OnInit {
 
   RegisterFace() {
     this.registerfaceoption = true;
-
-
     this.startVideo();
   }
-
+  async registerDevice() {
+    this.deviceId = await this.authService.getDeviceId();
+    
+    if (this.deviceId) {
+      this.authService.registerDevice({ deviceId: this.deviceId }).subscribe({
+      // this.http.post('http://localhost:8000/api/register-device/', { deviceId: this.deviceId }).subscribe({
+        next: (response) => {
+          this.deviceRegistered = true;  // Mark device as registered
+          alert('Device registered successfully!');
+        },
+        error: (error) => {
+          alert(error.error.error || 'Device registration failed');
+        }
+      });
+    }
+  }
   onRegisterSubmit() {
+    // this.deviceId = await this.authService.getDeviceId();
     if (!this.faceRegistered || !this.faceDescriptor) {
 
       alert('Face is not registered. Please register your face before submitting.');
@@ -243,8 +268,10 @@ export class StudentAuthComponent implements OnInit {
       academicYear: this.firstFormGroup.value.academicYear,
       isLateralEntry: this.firstFormGroup.value.isLateralEntry,
       faceDescriptor: this.faceDescriptor,
+      deviceId: this.deviceId,
     };
 
+    console.log("device id ",this.deviceId);
     this.authService.registerStudent(data).subscribe(
       (res) => {
         this.messageService.add({key:'toast1',  severity:'success', summary:'Success', detail:'Registration successful!'});
@@ -261,7 +288,8 @@ export class StudentAuthComponent implements OnInit {
   onLoginSubmit() {
     const data = {
       studentIdOrEmail: this.loginStudentIdOrEmail,
-      password: this.loginPassword
+      password: this.loginPassword,
+      deviceId: this.deviceId,
     };
 
     this.authService.loginStudent(data).subscribe(
@@ -315,4 +343,6 @@ export class StudentAuthComponent implements OnInit {
   togglePasswordVisibility() {
     this.hide = !this.hide;
   }
+
+
 }
