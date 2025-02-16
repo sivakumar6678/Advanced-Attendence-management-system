@@ -1,9 +1,16 @@
-<p-toolbar color="primary" class="sticky-header">
-  <span>Student Portal</span>
-  <span class="spacer"></span>
-  <div class="nav-links" >
-    <a  routerLink="/" fragment="home">Home</a>
-    <a  (click)="toggleForm()">{{ isLogin ? 'Login' : 'Register' }}</a>
+<p-toolbar class="home-sticky-header" 
+           [style]="{'background-color': 'var(--primary-color)', 'padding' : '0.2rem 2rem'}"
+
+>                
+  <div class="p-toolbar-group-start proj-title">
+    <span>Student Portal</span>
+  </div>
+  <div class="p-toolbar-group-end navbar-links">
+    <div class="nav-links">
+      <a pButton label="Home" routerLink="/" fragment="home"></a>
+      <a pButton (click)="toggleForm()" > {{ isLogin ? 'Login' : 'Register '}} </a>
+
+    </div>
   </div>
 </p-toolbar>
 <p-toast key="toast1"></p-toast>
@@ -25,13 +32,15 @@
           <p-inputGroupAddon>
             <i class="fas fa-lock"></i>
           </p-inputGroupAddon>
-          <input pInputText [(ngModel)]="loginPassword" [type]="hide ? 'password' : 'text'" placeholder="Enter your password" />
-          <button pButton pButtonIcon (click)="togglePasswordVisibility()">
+          
+          
+          <input pInputText [(ngModel)]="loginPassword" [type]="hide ? 'password' : 'text'" placeholder="Enter your password"  />
+          <p-button class="login-pass" pButtonIcon (click)="togglePasswordVisibility()">
             <i class="fas" [ngClass]="hide ? 'fa-eye-slash' : 'fa-eye'"></i>
-          </button>
+          </p-button>
         </p-inputGroup>
       </div>
-      <p-button  (click)="onLoginSubmit()">Login</p-button>
+      <p-button class="login-button" (click)="onLoginSubmit()">Login</p-button>
     
       
     </div>
@@ -57,69 +66,68 @@
 
          </ng-template>
          <ng-template pTemplate="content" let-nextCallback="nextCallback" >
-          <div class="flex flex-column gap-2 mx-auto" >
-              <div class="text-center mt-3 mb-3 text-xl font-semibold">Create your account</div>
+          <div class="register-form-1 flex flex-column gap-2 mx-auto" >
+              <div class="stpeer-headings text-center mt-3 mb-3 text-xl font-bold">Create your account</div>
               <form [formGroup]="firstFormGroup">
                 <div class="p-field p-grid">
                   <label for="studentId" class="p-col-12 p-md-2">Student ID</label>
-                  <div class="p-col-12 p-md-10">
+                  <div class="form1input p-col-12 p-md-10">
                     <input id="studentId" pInputText formControlName="studentId" placeholder="Enter your student ID" />
                   </div>
                 </div>
-    
                 <div class="p-field p-grid">
                   <label for="name" class="p-col-12 p-md-2">Full Name</label>
-                  <div class="p-col-12 p-md-10">
+                  <div class="form1input p-col-12 p-md-10">
                     <input id="name" pInputText formControlName="name" placeholder="Enter your full name" />
                   </div>
                 </div>
                 <div class="p-field p-grid">
                   <label for="email" class="p-col-12 p-md-2">Email</label>
-                  <div class="p-col-12 p-md-10">
+                  <div class=" form1input p-col-12 p-md-10">
                     <input id="email" pInputText formControlName="email" placeholder="Enter your email" />
                   </div>
                 </div>
                 <div class="p-field p-grid">
                   <label for="phoneNumber" class="p-col-12 p-md-2">Phone Number</label>
-                  <div class="p-col-12 p-md-10">
+                  <div class="form1input p-col-12 p-md-10">
                     <input id="phoneNumber" pInputText formControlName="phoneNumber" placeholder="Enter your phone number" />
                   </div>
                 </div>
                 <div class="p-field p-grid">
                   <label for="phoneNumber1" class="p-col-12 p-md-2">Phone Number</label>
-                  <div class="p-col-12 p-md-10">
+                  <div class="form1input p-col-12 p-md-10">
                     <input id="phoneNumber1" pInputText formControlName="phoneNumber1" placeholder="Enter your parents phone number" />
                   </div>
                 </div>
                 <div class="p-field p-grid">
                   <label for="password" class="p-col-12 p-md-2">Password</label>
-                  <div class="p-col-12 p-md-10">
+                  <div class="form1input p-col-12 p-md-10">
                     <p-password id="password" formControlName="password" toggleMask="true" placeholder="Enter your password" > </p-password>
                   </div>
                 </div>
                 <div class="p-field p-grid">
                   <label for="confirmPassword" class="p-col-12 p-md-2">Confirm Password</label>
-                  <div class="p-col-12 p-md-10">
-                    <p-password id="confirmPassword" formControlName="confirmPassword" placeholder="Confirm your password" [toggleMask]="true" ></p-password>
+                  <div  class="form1input p-col-12 p-md-10   ">
+                    <p-password   id="confirmPassword" formControlName="confirmPassword" placeholder="Confirm your password" [toggleMask]="true" ></p-password>
                     <!-- <input id="confirmPassword" pInputText formControlName="confirmPassword" placeholder="Confirm your password" /> -->
                   </div>
                 </div>
                 <div class="p-field p-grid">
                   <label for="year">Year</label>
-                  <div>
-                    <p-dropdown formControlName="year" [options]="yearOptions" placeholder="Select Year"></p-dropdown>
+                  <div >
+                    <p-dropdown [style]="{ 'width':'100%'}" id="dropdown" formControlName="year" [options]="yearOptions" placeholder="Select Year"></p-dropdown>
                   </div>
                 </div>
                 <div class="p-field p-grid">
                   <label for="semester">Semester</label>
-                  <div>
-                    <p-dropdown formControlName="semester"  [options]="semesterOptions" placeholder="Select Semester"></p-dropdown>
+                  <div >
+                    <p-dropdown [style]="{ 'width':'100%'}" id="dropdown" formControlName="semester"  [options]="semesterOptions" placeholder="Select Semester"></p-dropdown>
                   </div>
                 </div>
                 <div class="p-field p-grid">
                   <label for="academicYear">Academic Year</label>
                   <div>
-                    <p-dropdown formControlName="academicYear" [options]="academicYearOptions" optionLabel="start_year" optionValue="id" placeholder="Select Academic Year" [filter]="true">
+                    <p-dropdown [style]="{ 'width':'100%'}" formControlName="academicYear" [options]="academicYearOptions" optionLabel="start_year" optionValue="id" placeholder="Select Academic Year" [filter]="true">
                       <ng-template let-option pTemplate="selectedItem">
                         {{ option.start_year }} - {{ option.end_year }}
                       </ng-template>
@@ -132,20 +140,21 @@
                 <div class="p-field p-grid">
                   <label for="branch">Branch</label>
                   <div>
-                    <p-dropdown formControlName="branch" [options]="branchOptions" optionLabel="name" optionValue="id" placeholder="Select Branch"></p-dropdown>
+                    <p-dropdown [style]="{ 'width':'100%'}" formControlName="branch" [options]="branchOptions" optionLabel="name" optionValue="id" placeholder="Select Branch"></p-dropdown>
                   </div>
                 </div>
                 <div class="p-field p-grid">
-                  <label for="isLateralEntry">Lateral Entry</label>
                   <div>
-                    <p-checkbox formControlName="isLateralEntry" binary="true"></p-checkbox>
+                    <p-checkbox formControlName="isLateralEntry" binary="true" (onChange)="toggleLateralEntry()"></p-checkbox>
+                    <label for="isLateralEntry">Lateral Entry</label>
+                    <!-- <p-message *ngIf="!isLateralEntry" severity="info" text="Lateral Entry selected"></p-message> -->
                   </div>
                 </div>
 
               </form>
               
           </div>
-          <div class="flex pt-4 justify-content-end">
+          <div class="stepper-navigation-btn flex pt-4 justify-content-end">
               <p-button (onClick)="nextCallback.emit()" label="Next" icon="pi pi-arrow-right" iconPos="right" />
           </div>
       </ng-template>
@@ -168,6 +177,10 @@
 
          </ng-template>
          <ng-template pTemplate="content" let-prevCallback="prevCallback" let-nextCallback="nextCallback" >
+          <div class="stpeer-headings text-center mt-3 mb-3 text-xl font-bold">Register your Face</div>
+
+
+
            <div *ngIf="loading"  class="loading">
             <p-progressSpinner></p-progressSpinner>
            </div>
@@ -187,7 +200,7 @@
               <p-button  (click)="stopVideo()">Cancel</p-button>
             </div>
           </div>
-          <div class="flex pt-4 justify-content-between">
+          <div class="stepper-navigation-btn flex pt-4 justify-content-between">
             <p-button (onClick)="prevCallback.emit()" label="Back" severity="secondary" icon="pi pi-arrow-left" />
             <p-button (onClick)="nextCallback.emit()" label="Next" icon="pi pi-arrow-right" iconPos="right" />
         </div>
@@ -213,19 +226,44 @@
          </ng-template>
          <ng-template pTemplate="content" let-prevCallback="prevCallback" let-nextCallback="nextCallback" >
           <div class="flex flex-column gap-2 mx-auto">
-              <div class="text-center mt-3 mb-3 text-xl font-semibold">Register your Device</div>
-              <form [formGroup]="thirdFormGroup" >
+            <div class="stpeer-headings text-center mt-3 mb-3 text-xl font-semibold">Register your Device</div>
+        
+            <!-- Step 1: Get Device Details -->
+            <form *ngIf="!deviceDetailsFetched">
                 <div class="p-field p-grid">
-                  <label for="deviceId" class="p-col-12 p-md-2">Device ID</label>
-                  <div class="p-col-12 p-md-10">
-                    <input id="deviceId" pInputText formControlName="deviceId" placeholder="Enter your device ID" />
-                    <button type="button" (click)="registerDevice()">Register Device</button>
-                  </div>
+                    <!-- <label for="deviceDetails" class="p-col-12 p-md-2">Device Information</label> -->
+                    <div class="p-col-12 p-md-10">
+                        <p-button class="submitbutton" type="button" (click)="fetchDeviceDetails()">Get Device Details</p-button>
+                    </div>
                 </div>
-              </form>
-          </div>
-
-          <div class="flex pt-4 justify-content-end">
+            </form>
+        
+            <!-- ✅ Show Device Details -->
+            <div *ngIf="deviceDetailsFetched" class="p-card p-3 mt-3">
+                <div class="text-lg font-semibold text-blue-600">📋 Device Information</div>
+                <div class="text-sm text-gray-600 mt-2">
+                    <p><strong>📱 Device Name:</strong> {{ deviceName }}</p>
+                    <p><strong>📂 Device Type:</strong> {{ deviceType }}</p>
+                    <p><strong>🖥 Platform:</strong> {{ platform }}</p>
+                    <p><strong>🌐 Browser:</strong> {{ browser }}</p>
+                    <p><strong>💻 OS Version:</strong> {{ osVersion }}</p>
+                    <p><strong>🔲 Screen Resolution:</strong> {{ screenResolution }}</p>
+                    <p><strong>🌎 IP Address:</strong> {{ ipAddress }}</p>
+                </div>
+                <!-- ✅ Confirm Registration Button -->
+                <p-button type="button" class="submitbutton" (click)="confirmRegistration()">Confirm Registration</p-button>
+        
+                <!-- ❌ Show Error if Registration Fails -->
+                <p *ngIf="registrationError" class="text-red-600 mt-2">{{ registrationError }}</p>
+            </div>
+        
+            <!-- ✅ Show Success Message After Registration -->
+            <div *ngIf="deviceRegistered" class="p-card p-3 mt-3">
+                <div class="text-lg font-semibold text-green-600">✅ Device Registered Successfully</div>
+            </div>
+        </div>
+        
+          <div class="stepper-navigation-btn flex pt-4 justify-content-end">
             <p-button (onClick)="prevCallback.emit()" label="Back" severity="secondary" icon="pi pi-arrow-left" />
               <p-button (onClick)="nextCallback.emit()" label="Next" icon="pi pi-arrow-right" iconPos="right" />
           </div>
@@ -248,12 +286,12 @@
          </ng-template>
          <ng-template pTemplate="content" let-prevCallback="prevCallback" let-nextCallback="nextCallback">
           <div class="flex flex-column gap-2 mx-auto" >
-              <div class="text-center mt-3 mb-3 text-xl font-semibold">Submit your account Registration</div>
+              <div class="stpeer-headings text-center mt-3 mb-3 text-xl font-semibold">Submit your account Registration</div>
               <div class="p-field p-grid">
-                <p-button  (click)="onRegisterSubmit()">onRegisterSubmit</p-button>              
+                <p-button class="submitbutton" (click)="onRegisterSubmit()">onRegisterSubmit</p-button>              
               </div>
           </div>
-          <div class="flex pt-4 justify-content-end">
+          <div class="stepper-navigation-btn flex pt-4 justify-content-end">
             <p-button (onClick)="prevCallback.emit()" label="Back" severity="secondary" icon="pi pi-arrow-left" />
               
           </div>

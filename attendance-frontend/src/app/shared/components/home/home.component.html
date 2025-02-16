@@ -1,4 +1,5 @@
 <p-toolbar class="home-sticky-header" 
+[style] = "{'background-color':  'var(--primary-color)', 'padding' : 'var(--padding-small)' }"
 
 >                
   <div class="p-toolbar-group-start proj-title">
@@ -28,34 +29,34 @@
   <div class="login-popup">
     <h2>Select Your Login Role</h2>
     <div class="login-cards">
-      <p-card class="login-card" (click)="navigateToLogin('student-auth')">
-        <p-header>
-          <i class="fas fa-user" ></i>
-        </p-header>
-        <div class="login-card-content">
-          <h3>Student Login</h3>
-          <p>Access your attendance and course materials.</p>
-        </div>
-      </p-card>
-      <p-card class="login-card" (click)="navigateToLogin('teacher-auth')">
-        <p-header>
-          <i class="fas fa-user-edit" ></i>
-        </p-header>
-        <div class="login-card-content">
-          <h3>Teacher Login</h3>
-          <p>Manage attendance and class schedules.</p>
-        </div>
-      </p-card>
-      <p-card class="login-card" (click)="navigateToLogin('crc-auth')">
-        <p-header>
-          <i class="fas fa-shield" ></i>
-        </p-header>
-        <div class="login-card-content">
-          <h3>CRC Login</h3>
-          <p>Oversee schedules and manage system settings.</p>                    
-        </div>
-      </p-card>
+
+      <div class="card flex justify-content-center">
+        <p-card header="Student Login"  (click)="navigateToLogin('student-auth')">
+          <div class="p-card-content">
+            <i class="fas fa-user" ></i>
+            <p> Access your Attendance and course Material </p>
+          </div>
+        </p-card>
+      </div>
+      <div class="card flex justify-content-center">
+        <p-card header="Teacher Login" (click)="navigateToLogin('teacher-auth')"> 
+          <div class="p-card-content">
+            <i class="fas fa-user-edit" ></i>
+            <p>Managa Attendance and class schedules.</p>
+          </div>
+        </p-card>
+      </div>
+      <div class="card flex justify-content-center">
+        <p-card header="CRC Login" (click)="navigateToLogin('crc-auth')">
+          <div class="p-card-content">
+            <i class="fas fa-shield" ></i>
+            <p>Oversee schedules and manage system settings.</p>
+          </div>
+        </p-card>
+      </div>
     </div>
+   
+    
     <button pButton label="Close" class="p-button-raised p-button-rounded close-btn" (click)="toggleLoginSection()"></button>
   </div>
 </div>

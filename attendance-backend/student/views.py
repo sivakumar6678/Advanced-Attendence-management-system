@@ -10,7 +10,13 @@ class RegisterStudent(APIView):
         try:
             student_data = request.data
             face_descriptor = student_data.get('faceDescriptor', None)
-            # device_id = student_data.get('deviceId', None)  # Get device ID
+            device_id = student_data.get('deviceId', None)  # Get device ID
+
+            if not device_id:
+                return Response({"error": "Device ID is required"}, status=status.HTTP_400_BAD_REQUEST)
+            if Student.objects.filter(device_id=device_id).exists():
+                return Response({"error": "This device is already registered with another student"}, status=status.HTTP_400_BAD_REQUEST)
+
 
             student = Student(
                 student_id=student_data['studentId'],
@@ -24,8 +30,8 @@ class RegisterStudent(APIView):
                 academic_year_id=student_data['academicYear'],
                 is_lateral_entry=student_data['isLateralEntry'],
                 face_descriptor=face_descriptor,
-                device_id = student_data['deviceId']
-                # device_id=device_id  # Store device ID
+                # device_id = student_data['deviceId']
+                device_id=device_id  # Store device ID
 
             )
 
@@ -41,13 +47,40 @@ class RegisterDevice(APIView):
     def post(self, request):
         try:
             device_id = request.data.get('deviceId', None)
+            device_name = request.data.get('deviceName', 'Unknown Device')  # Example: "Samsung Galaxy S21"
+            device_type = request.data.get('deviceType', 'Mobile')  # Example: "Mobile", "Tablet"
+            platform = request.data.get('platform', 'Android')  # Example: "Android", "iOS"
+            browser = request.data.get('browser', 'Unknown Browser')
+            os_version = request.data.get('osVersion', 'Unknown OS')
+            screen_resolution = request.data.get('screenResolution', 'Unknown Resolution')
+            ip_address = request.data.get('ipAddress', request.META.get('REMOTE_ADDR', 'Unknown IP'))  # Get IP
             if not device_id:
                 return Response({"error": "Device ID is required"}, status=status.HTTP_400_BAD_REQUEST)
+            
 
             # Here, you can store the device ID in the session or database
             request.session['device_id'] = device_id  # Store in session
+            request.session['device_info'] = {
+                "deviceName": device_name,
+                "deviceType": device_type,
+                "platform": platform,
+                "browser": browser,
+                "osVersion": os_version,
+                "screenResolution": screen_resolution,
+                "ipAddress": ip_address
+            }
 
-            return Response({"message": "Device registered successfully!"}, status=status.HTTP_201_CREATED)
+            return Response({"message": "Device registered successfully!",
+                            "deviceInfo": {
+                                        "deviceName": device_name,
+                                        "deviceType": device_type,
+                                        "platform": platform,
+                                        "browser": browser,
+                                        "osVersion": os_version,
+                                        "screenResolution": screen_resolution,
+                                        "ipAddress": ip_address
+                                    }
+                            }, status=status.HTTP_201_CREATED)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -56,7 +89,7 @@ class LoginStudent(APIView):
         student_data = request.data
         identifier = student_data.get('studentIdOrEmail', '').strip()
         password = student_data.get('password', '').strip()
-        device_id = student_data.get('deviceId', '')  # Get device ID
+        device_id = student_data.get('deviceId', '').strip()  # Get device ID
 
         if not identifier or not password:
             return Response({"error": "Student ID/Email and password are required"}, status=status.HTTP_400_BAD_REQUEST)
@@ -65,15 +98,15 @@ class LoginStudent(APIView):
         student = Student.objects.filter(email=identifier).first() or Student.objects.filter(student_id=identifier).first()
 
         if student:
-            if not student.device_id:
-                # First-time login on a new device - register this device
-                student.device_id = device_id
-                student.save()
-                return Response({"message": "Device registered. Login successful."}, status=status.HTTP_200_OK)
-
+            
             if student.check_password(password):
                 if student.device_id == device_id:
                     return Response({"message": "Login successful"}, status=status.HTTP_200_OK)
                 else:
                     return Response({"error": "Unauthorized device. Please use your registered device or contact admin."}, status=status.HTTP_401_UNAUTHORIZED)
+            else:
+                return Response({"error": "Incorrect password"}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({"error": "Student not found"}, status=status.HTTP_404_NOT_FOUND)
+
         

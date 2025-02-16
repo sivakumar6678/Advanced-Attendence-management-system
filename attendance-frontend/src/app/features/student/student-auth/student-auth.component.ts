@@ -9,6 +9,7 @@ import { UserService } from '../../../core/services/user.service';
 import { Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import FingerprintJS from '@fingerprintjs/fingerprintjs';
+import { isPlatformBrowser } from '@angular/common';
 @Component({
   selector: 'app-student-auth',
   templateUrl: './student-auth.component.html',
@@ -69,12 +70,22 @@ export class StudentAuthComponent implements OnInit {
 
   hide: boolean = true;
 
-  // Device registration 
-  // deviceFingerprint: string = '';
-  // userAgent: string = navigator.userAgent;
-  // ipAddress: string = '';
   deviceId: string | null = null;
+  deviceName: string = '';
+  deviceType: string = '';
+  platform: string = '';
+  browser: string = '';
+  osVersion: string = '';
+  screenResolution: string = '';
+  ipAddress: string = '';
+  
+
   deviceRegistered: boolean = false;  // To track device registration
+  deviceInfo: string = '';
+  isDeviceMobile: boolean = true;
+  deviceDetailsFetched: boolean = false;
+  isSupportedDevice: boolean = false;
+  registrationError: string = '';
 
   constructor(private authService: AuthService,
               private userService: UserService,
@@ -111,7 +122,7 @@ export class StudentAuthComponent implements OnInit {
 
     this.secondFormGroup = this._formBuilder.group({});
     this.thirdFormGroup = this._formBuilder.group({
-      deviceId: ['', Validators.required],
+      // deviceId: ['', Validators.required],
     });
   }
   async ngOnInit() {
@@ -128,7 +139,7 @@ export class StudentAuthComponent implements OnInit {
       semester: [''],
       academicYear: [''],
       branch: [''],
-      isLateralEntry: [false],
+      isLateralEntry: [this.isLateralEntry]
     });
     // console.log('form is lateral enry', this.firstFormGroup.value.isLateralEntry);
     // Fetch branches
@@ -226,31 +237,66 @@ export class StudentAuthComponent implements OnInit {
     this.registerfaceoption = true;
     this.startVideo();
   }
-  async registerDevice() {
-    this.deviceId = await this.authService.getDeviceId();
-    
-    if (this.deviceId) {
-      this.authService.registerDevice({ deviceId: this.deviceId }).subscribe({
-      // this.http.post('http://localhost:8000/api/register-device/', { deviceId: this.deviceId }).subscribe({
+  async fetchDeviceDetails() {
+    try {
+        this.deviceId = await this.authService.getDeviceId();
+        this.deviceName = await this.authService.getDeviceName();
+        this.deviceType = await this.authService.getDeviceType();
+        this.platform = await this.authService.getPlatform();
+        this.browser = await this.authService.getBrowserInfo();
+        this.osVersion = await this.authService.getOSVersion();
+        this.screenResolution = `${window.screen.width}x${window.screen.height}`;
+        this.ipAddress = await this.authService.getIpAddress();
+
+        this.deviceDetailsFetched = true;
+        this.registrationError = ''; // Reset error message
+
+    } catch (error) {
+        console.error('Error fetching device details:', error);
+        this.messageService.add({ key: 'toast1', severity: 'error', summary: 'Error', detail: 'Failed to fetch device details' });
+    }
+}
+
+confirmRegistration() {
+    // ✅ Allow registration only for Android & iOS
+    // if (this.deviceType !== 'Android' && this.deviceType !== 'iPhone') {
+    //     this.registrationError = '❌ Unsupported Device. Only Android and iOS devices can be registered.';
+    //     return;
+    // }
+
+    this.authService.registerDevice({
+        deviceId: this.deviceId,
+        deviceName: this.deviceName,
+        deviceType: this.deviceType,
+        platform: this.platform,
+        browser: this.browser,
+        osVersion: this.osVersion,
+        screenResolution: this.screenResolution,
+        ipAddress: this.ipAddress
+    }).subscribe({
         next: (response) => {
-          this.deviceRegistered = true;  // Mark device as registered
-          alert('Device registered successfully!');
+            this.deviceRegistered = true;
+            this.registrationError = ''; // Clear error message
+            this.messageService.add({ key: 'toast1', severity: 'success', summary: 'Success', detail: 'Device registered successfully!' });
         },
         error: (error) => {
-          alert(error.error.error || 'Device registration failed');
+            console.error('Device registration failed:', error);
+            this.messageService.add({ key: 'toast1', severity: 'error', summary: 'Error', detail: 'Device registration failed' });
         }
-      });
-    }
-  }
+    });
+}
+
+
   onRegisterSubmit() {
     // this.deviceId = await this.authService.getDeviceId();
     if (!this.faceRegistered || !this.faceDescriptor) {
-
-      alert('Face is not registered. Please register your face before submitting.');
+      this.messageService.add({key:'toast1', severity:'error', summary:'Error', detail:'Face is not registered. Please register your face before submitting.'});
+      // alert('Face is not registered. Please register your face before submitting.');
       return;
     }
 
     if (this.password !== this.confirmPassword) {
+      this.messageService.add({key:'toast1', severity:'error', summary:'Error', detail:'Passwords do not match!'});
       alert('Passwords do not match!');
       return;
     }
@@ -275,9 +321,11 @@ export class StudentAuthComponent implements OnInit {
     this.authService.registerStudent(data).subscribe(
       (res) => {
         this.messageService.add({key:'toast1',  severity:'success', summary:'Success', detail:'Registration successful!'});
-        alert('Registration successful!');
+        // alert('Registration successful!');
         this.clearForm();
+        setTimeout(() => {
         this.toggleForm();
+        }, 1000);
       },
       (err) => {
         alert('Registration failed.');
@@ -302,7 +350,9 @@ export class StudentAuthComponent implements OnInit {
         }, 1000);
       },
       (err) => {
-        alert('Login failed.');
+        this.messageService.add({key:'toast1', severity:'error' , summary:'Login Failed' , detail:'Error details ' })
+        // alert('Login failed.');
+        
       }
     );
   }
@@ -323,21 +373,14 @@ export class StudentAuthComponent implements OnInit {
     this.faceDescriptor = null;
     this.faceRegistered = false;
   }
-
-  onLateralEntryChange() {
+  toggleLateralEntry(): void {
     this.isLateralEntry = !this.isLateralEntry;
     this.firstFormGroup.patchValue({ isLateralEntry: this.isLateralEntry });
-    // console.log('Lateral Entry:', this.isLateralEntry);
-
     const message = this.isLateralEntry 
       ? 'You are registering as a Lateral Entry student. You will join the original batch and complete 3 years.' 
       : 'You are registering as a regular 4-year student.';
     
-    this.snackBar.open(message, 'Close', {
-      duration: 4000,
-      horizontalPosition: 'center',
-      verticalPosition: 'top',
-    });
+    this.messageService.add({key:'toast1', severity:'info', summary:'Info', detail:message});
   }
 
   togglePasswordVisibility() {

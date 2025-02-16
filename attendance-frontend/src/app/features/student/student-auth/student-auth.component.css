@@ -1,38 +1,50 @@
 /* Toolbar styles */
-p-toolbar {
-  padding: 1rem;
-  font-size: 1.25rem;
+
+.home-sticky-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.navbar-links {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  gap: 15px;
+}
+.proj-title span {
+  font-size: var(--font-large);
+  font-weight: bold;
+  color: var(--secondary-opp-color);
 }
 
-p-toolbar .spacer {
+.spacer {
   flex-grow: 1;
 }
-p-toolbar .nav-links {
+
+.nav-links {
   display: flex;
-  gap: 1rem;
-  background: red;
-}
-p-toolbar .nav-links a {
-  background: red;
-  text-decoration: none;
-  margin: 0 1rem;
-  font-weight: bold;
-  transition: color 0.3s ease;
+  gap: 15px;
 }
 
-p-toolbar .nav-links a:hover {
-  color: #ffeb3b; /* Hover color */
+.nav-links a {
+  background: none;
+  text-decoration: none;
+  border:none;
+  font-weight: bold;
+  padding:var(--padding-small);
+  color: var(--secondary-opp-color);
+  font-size: var(--font-medium);
+  transition: color 0.3s;
+}
+
+.nav-links a:hover {
+  box-shadow: 0 0 10px 1px gray;
 }
 
 /* Auth container */
 .auth-container {
   margin: 3rem auto;
   max-width: 600px;
-  padding: 2rem;
+  padding: 1rem;
   border-radius: 8px;
   background-color: #f5f5f5;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -44,7 +56,18 @@ p-toolbar .nav-links a:hover {
   color: #333;
   font-size: 1.75rem;
 }
-
+.login-form .login-button{
+  display: flex;
+  justify-content: center;
+  background: none;
+  font-weight: bold;
+}
+.login-form .login-pass{
+  display: flex;
+  justify-content: center;
+  background: none;
+  font-weight: bold;
+}
 /* Form sections */
 .login-form, .register-form {
   display: flex;
@@ -74,7 +97,7 @@ p-inputGroupAddon {
 }
 
 input, p-password {
-  padding: 0.75rem;
+  /* padding: 0.75rem; */
   border-radius: 4px;
   border: 1px solid #ddd;
   font-size: 1rem;
@@ -93,55 +116,108 @@ button i {
   font-size: 1.5rem;
 }
 
-p-button {
-  margin-top: 1rem;
-  background-color: #1976d2;
-  color: #fff;
-  font-size: 1.25rem;
-}
-
-p-button:hover {
-  background-color: #1565c0; /* Darker shade on hover */
-}
 
 /* Stepper styles */
-.p-stepper-panel {
-  padding: 2rem;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  margin-bottom: 2rem;
+.register-form-1 {
+  max-width: 600px;
+  background: #ffffff;
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  /* margin: auto; */
 }
-
-.p-stepper-header {
+.stpeer-headings {
   display: flex;
-  justify-content: space-between;
-}
-
-.p-stepper-header button {
-  background-color: transparent;
-  border: none;
-  cursor: pointer;
-}
-
-.p-stepper-header .border-round {
-  display: inline-flex;
   justify-content: center;
+  background: none;
+  font-weight: bold;
+  font-size: var(--font-large);
+}
+.text-center {
+  color: #333;
+}
+
+.p-field {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
+}
+
+.p-field label {
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.form1input {
+  display: flex;
   align-items: center;
-  width: 3rem;
-  height: 3rem;
-  border-radius: 50%;
-  background-color: #1976d2;
-  color: #fff;
 }
 
-.p-stepper-header .border-round:hover {
-  background-color: #1565c0;
+.form1input input,
+.form1input p-password {
+  width: 100%;
+  /* padding: 10px; */
+  /* border: 1px solid #ccc; */
+  border-radius: 5px;
+  transition: all 0.3s ease-in-out;
 }
 
-.p-stepper-content {
-  padding: 2rem;
+.form1input input:focus,
+.form1input p-password:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
 }
+
+p-dropdown {
+  width: 100%;
+  background: red;
+}
+
+p-checkbox {
+  margin-right: 8px;
+}
+
+button {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  /* background: #007bff; */
+  font-size: 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+.submitbutton{
+  background: red;
+  display: flex;
+  justify-content: center;
+  background: none;
+  font-weight: bold;
+}
+
+.stepper-navigation-btn{
+  margin:1rem;
+}
+.p-card{
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.5rem;
+  border-radius: 8px;
+  background-color: #fff;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+/* Responsive Design */
+@media (max-width: 768px) {
+  .register-form-1 {
+    padding: 15px;
+  }
+
+  .p-field {
+    flex-direction: column;
+  }
+}
+
 
 .face-recognition {
   text-align: center;

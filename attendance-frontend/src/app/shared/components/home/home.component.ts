@@ -47,6 +47,6 @@ export class HomeComponent implements OnInit{
   roles = [
     { icon: 'person', name: 'CRC', description: 'Class Responsibility Coordinator for timetables.' },
     { icon: 'school', name: 'Teacher', description: 'Mark attendance and manage classes.' },
-    { icon: 'supervisor_account', name: 'HOD', description: 'Oversee department operations.' },
+    { icon: 'users-cog', name: 'HOD', description: 'Oversee department operations.' },
   ];
 }

@@ -13,6 +13,58 @@ export class AuthService {
     this.generateDeviceId();
   }
 
+  async getDeviceName(): Promise<string> {
+    const userAgent = navigator.userAgent;
+    if (/Android/i.test(userAgent)) return "Android Device";
+    if (/iPhone|iPad|iPod/i.test(userAgent)) return "iOS Device";
+    return "Unknown Device";
+  }
+  // Get Device Type
+  async getDeviceType(): Promise<string> {
+    const width = window.innerWidth;
+    return width <= 768 ? "Mobile" : "Desktop";
+  }
+
+  // Get Platform (OS)
+  async getPlatform(): Promise<string> {
+      return navigator.platform || "Unknown";
+  }
+  // Get Browser Info
+  async getBrowserInfo() {
+      const userAgent = navigator.userAgent;
+      if (userAgent.includes("Firefox")) return "Firefox";
+      if (userAgent.includes("Chrome")) return "Chrome";
+      if (userAgent.includes("Safari")) return "Safari";
+      if (userAgent.includes("Edge")) return "Edge";
+      if (userAgent.includes("Opera") || userAgent.includes("OPR")) return "Opera";
+      return "Unknown Browser";
+  }
+
+  // Get OS Version
+  async getOSVersion() {
+      const userAgent = navigator.userAgent;
+      if (/android/i.test(userAgent)) return "Android " + (userAgent.match(/Android\s([\d.]+)/)?.[1] || "Unknown");
+      if (/iPhone|iPad|iPod/i.test(userAgent)) return "iOS " + (userAgent.match(/OS\s([\d_]+)/)?.[1]?.replace(/_/g, '.') || "Unknown");
+      return "Unknown OS";
+  }
+  // Get Screen Resolution
+  getScreenResolution(): string {
+    return `${window.screen.width}x${window.screen.height}`;
+  }
+  async getIpAddress(): Promise<string> {
+    try {
+      const response = await this.http.get<any>('https://api64.ipify.org?format=json').toPromise();
+      return response.ip;
+    } catch (error) {
+      return 'Unknown IP';
+    }
+  }
+  
+  // Helper function to check if the device is mobile
+  private isMobileDevice(deviceName: string): boolean {
+    return deviceName === 'Android Device' || deviceName === 'iPhone';
+  }
+
   private async generateDeviceId() {
     const fp = await FingerprintJS.load();
     const result = await fp.get();
@@ -24,7 +76,7 @@ export class AuthService {
     if (!this.deviceId) {
       await this.generateDeviceId();
     }
-    console.log('device id',this.deviceId);
+    // console.log('device id',this.deviceId);
     return this.deviceId!;
   }
 

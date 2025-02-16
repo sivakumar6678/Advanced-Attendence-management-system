@@ -30,6 +30,7 @@ import { FieldsetModule } from 'primeng/fieldset';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { CardModule } from 'primeng/card';
+import { MessageModule } from 'primeng/message';
 
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { CrcAuthComponent } from './features/crc/crc-auth/crc-auth.component';
@@ -74,6 +75,7 @@ import { SuperadminComponent } from './features/superadmin/superadmin.component'
         FieldsetModule,
         ToastModule,
         CardModule,
+        MessageModule
 
       
 
