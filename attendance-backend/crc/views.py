@@ -5,7 +5,7 @@ from .models import CRC
 from django.contrib.auth import authenticate
 from django.db.utils import IntegrityError
 from teacher.models import Faculty
-
+from core.models import Branch 
 class LoginCRC(APIView):
     def post(self, request):
         crc_data = request.data
@@ -24,30 +24,40 @@ class LoginCRC(APIView):
             return Response({"error": "Invalid email or password"}, status=status.HTTP_401_UNAUTHORIZED)
 
 class RegisterCRC(APIView):
-    def post(self, request):
+    def post(self, request, *args, **kwargs):
         try:
             crc_data = request.data
-            email = crc_data.get('email', '').strip()
+            employee_id = crc_data.get('employeeId')
+            email = crc_data.get('email')
+            phone_number = crc_data.get('phoneNumber')  # New field
+            branch_id = crc_data.get('branch')
+            year = crc_data.get('year')
+            semester = crc_data.get('semester')
+            password = crc_data.get('password')
 
-            # Check if the email belongs to a registered teacher
-            teacher = Faculty.objects.filter(email=email).first()
-            if not teacher:
-                return Response({"error": "Only registered teachers can become CRC"}, status=status.HTTP_403_FORBIDDEN)
+            # ✅ Check if the faculty exists
+            faculty = Faculty.objects.filter(employee_id=employee_id, email=email).first()
+            if not faculty:
+                return Response({"error": "Faculty not found. Only registered faculty can become CRC."}, status=status.HTTP_400_BAD_REQUEST)
 
-            # Create CRC if teacher exists
-            crc = CRC.objects.create(
-                crc_id=crc_data['crcId'],
-                name=crc_data['name'],
+            # ✅ Check if CRC is already assigned to this class (branch, year, semester)
+            existing_crc = CRC.objects.filter(branch_id=branch_id, year=year, semester=semester).exists()
+            if existing_crc:
+                return Response({"error": "A CRC is already assigned for this class."}, status=status.HTTP_400_BAD_REQUEST)
+            
+            branch_instance = Branch.objects.get(id=crc_data['branch'])
+
+            # ✅ Register the CRC
+            crc = CRC.objects.create_crc(
+                employee_id=employee_id,
                 email=email,
-                phone_number=crc_data['phoneNumber'],
-                branch_id=crc_data['branch'],
+                phone_number=phone_number,
+                branch=branch_instance,
+                year=year,
+                semester=semester,
+                password=password
             )
-            crc.set_password(crc_data['password'])  # Hash password
-            crc.save()
+            return Response({"message": "CRC registered successfully!", "crc_id": crc.crc_id}, status=status.HTTP_201_CREATED)
 
-            return Response({"message": "CRC registered successfully!"}, status=status.HTTP_201_CREATED)
-
-        except IntegrityError:
-            return Response({"error": "CRC with this email or ID already exists"}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
