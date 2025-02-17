@@ -23,6 +23,26 @@ class LoginCRC(APIView):
         else:
             return Response({"error": "Invalid email or password"}, status=status.HTTP_401_UNAUTHORIZED)
 
+class FetchFacultyDetails(APIView):
+    """Fetch Faculty Details Before CRC Registration"""
+    def get(self, request):
+        email = request.query_params.get('email', '').strip()
+        employee_id = request.query_params.get('employee_id', '').strip()
+
+
+        if not email or not employee_id:
+            return Response({"error": "Email and Employee ID are required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        faculty = Faculty.objects.filter(email=email, employee_id=employee_id).first()
+        if faculty:
+            return Response({
+                "full_name": faculty.full_name,
+                "phone_number": faculty.phone_number,
+                "branch": faculty.branch,
+            }, status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "Faculty not found"}, status=status.HTTP_404_NOT_FOUND)
+
 class RegisterCRC(APIView):
     def post(self, request, *args, **kwargs):
         try:
