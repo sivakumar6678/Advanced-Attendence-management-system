@@ -31,6 +31,13 @@ import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { CardModule } from 'primeng/card';
 import { MessageModule } from 'primeng/message';
+import { MenuItem } from 'primeng/api';
+import { MenubarModule } from 'primeng/menubar';
+import { TabViewModule } from 'primeng/tabview';
+import { TableModule } from 'primeng/table';
+import { BadgeModule } from 'primeng/badge';
+import { AvatarModule } from 'primeng/avatar';
+
 
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { CrcAuthComponent } from './features/crc/crc-auth/crc-auth.component';
@@ -46,7 +53,8 @@ import { SuperadminComponent } from './features/superadmin/superadmin.component'
         StudentAuthComponent,
         TestComponent,
         TeacherAuthComponent,
-        SuperadminComponent
+        CrcAuthComponent,
+        SuperadminComponent,
     ],
     imports: [
         RouterModule.forRoot(routes),  // Define routes
@@ -75,7 +83,12 @@ import { SuperadminComponent } from './features/superadmin/superadmin.component'
         FieldsetModule,
         ToastModule,
         CardModule,
-        MessageModule
+        MessageModule,
+        MenubarModule,
+        TabViewModule,
+        TableModule,
+        BadgeModule,
+        AvatarModule,
 
       
 

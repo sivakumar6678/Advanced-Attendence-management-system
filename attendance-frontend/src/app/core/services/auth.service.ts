@@ -86,7 +86,7 @@ export class AuthService {
     console.log('registering device');
     return this.http.post(`${this.baseUrl}/students/register-device/`, body);
   }
-  // Update the method signature by removing the generic type
+  // Student Registraiton api
   registerStudent(data: any): Observable<any> {
     const body = { ...data };
     console.log(body);
@@ -95,7 +95,7 @@ export class AuthService {
 
     // return this.http.post('/api/students/register', body);
   }
-
+// Student login api
   loginStudent(data: any): Observable<any> {
     const body = { ...data };
     console.log("login student",body);
@@ -103,14 +103,31 @@ export class AuthService {
     // return this.http.post('/api/students/login', body);
   }
 
+  // Faculty login api
   login(email: string, password: string): Observable<any> {
     // console.log("email and passwrod",email,password);
     return this.http.post(`${this.baseUrl}/faculty/login/`, { email, password });
   }
-
+  // Faculty registration api
   register(data: any): Observable<any> {
     // console.log("registering faculty",data);
     return this.http.post(`${this.baseUrl}/faculty/register/`, data);
+  }
+
+  // CRC registration api
+  registerCRC(data: any): Observable<any> {
+    console.log("registering crc",data);
+    return this.http.post(`${this.baseUrl}/crc/register/`, data);
+  }
+//  CRC login api
+  loginCRC(credentials: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/crc/login/`, credentials);
+  }
+  fetchFacultyDetails(email: string, employeeId: string): Observable<any> {
+    return this.http.get(`${this.baseUrl}/crc/faculty-details/?email=${email}&employee_id=${employeeId}`);
+  }
+  logoutCRC(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/crc/logout/`);
   }
 
   

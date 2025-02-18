@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../../core/services/auth.service';
 import * as faceapi from 'face-api.js';
 import * as tf from '@tensorflow/tfjs';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { UserService } from '../../../core/services/user.service';
@@ -90,7 +89,6 @@ export class StudentAuthComponent implements OnInit {
   constructor(private authService: AuthService,
               private userService: UserService,
               private router: Router,
-              private snackBar: MatSnackBar,
               private messageService:MessageService,
               private _formBuilder: FormBuilder) {
     this.firstFormGroup = this._formBuilder.group({
@@ -219,14 +217,12 @@ export class StudentAuthComponent implements OnInit {
         this.registerfaceoption = false;
         this.stopVideo();
       } else {
-        this.messageService.add({key:'toast1', severity:'error', summary:'Error', detail:'Error capturing face. Please try again.'});
-        this.snackBar.open('Error capturing face. Please try again.', 'Close', {
-          duration: 3000,
-        });
+        this.messageService.add({key:'main-toast', severity:'error', summary:'Error', detail:'Error capturing face. Please try again.'});
+        
       }
     } catch (error) {
       console.error('Error capturing face:', error);
-      this.messageService.add({key:'toast1', severity:'error', summary:'Error', detail:'Error capturing face. Please try again.'});
+      this.messageService.add({key:'main-toast', severity:'error', summary:'Error', detail:'Error capturing face. Please try again.'});
       // alert('Error capturing face. Please try again.');
     } finally {
       this.loading = false;
@@ -253,7 +249,7 @@ export class StudentAuthComponent implements OnInit {
 
     } catch (error) {
         console.error('Error fetching device details:', error);
-        this.messageService.add({ key: 'toast1', severity: 'error', summary: 'Error', detail: 'Failed to fetch device details' });
+        this.messageService.add({ key: 'main-toast', severity: 'error', summary: 'Error', detail: 'Failed to fetch device details' });
     }
 }
 
@@ -277,11 +273,11 @@ confirmRegistration() {
         next: (response) => {
             this.deviceRegistered = true;
             this.registrationError = ''; // Clear error message
-            this.messageService.add({ key: 'toast1', severity: 'success', summary: 'Success', detail: 'Device registered successfully!' });
+            this.messageService.add({ key: 'main-toast', severity: 'success', summary: 'Success', detail: 'Device registered successfully!' });
         },
         error: (error) => {
             console.error('Device registration failed:', error);
-            this.messageService.add({ key: 'toast1', severity: 'error', summary: 'Error', detail: 'Device registration failed' });
+            this.messageService.add({ key: 'main-toast', severity: 'error', summary: 'Error', detail: 'Device registration failed' });
         }
     });
 }
@@ -290,13 +286,13 @@ confirmRegistration() {
   onRegisterSubmit() {
     // this.deviceId = await this.authService.getDeviceId();
     if (!this.faceRegistered || !this.faceDescriptor) {
-      this.messageService.add({key:'toast1', severity:'error', summary:'Error', detail:'Face is not registered. Please register your face before submitting.'});
+      this.messageService.add({key:'main-toast', severity:'error', summary:'Error', detail:'Face is not registered. Please register your face before submitting.'});
       // alert('Face is not registered. Please register your face before submitting.');
       return;
     }
 
     if (this.password !== this.confirmPassword) {
-      this.messageService.add({key:'toast1', severity:'error', summary:'Error', detail:'Passwords do not match!'});
+      this.messageService.add({key:'main-toast', severity:'error', summary:'Error', detail:'Passwords do not match!'});
       alert('Passwords do not match!');
       return;
     }
@@ -320,7 +316,7 @@ confirmRegistration() {
     console.log("device id ",this.deviceId);
     this.authService.registerStudent(data).subscribe(
       (res) => {
-        this.messageService.add({key:'toast1',  severity:'success', summary:'Success', detail:'Registration successful!'});
+        this.messageService.add({key:'main-toast',  severity:'success', summary:'Success', detail:'Registration successful!'});
         // alert('Registration successful!');
         this.clearForm();
         setTimeout(() => {
@@ -342,7 +338,7 @@ confirmRegistration() {
 
     this.authService.loginStudent(data).subscribe(
       (res) => {
-        this.messageService.add({key:'toast1', severity:'success', summary:'Success', detail:'Login successful!'});
+        this.messageService.add({key:'main-toast', severity:'success', summary:'Success', detail:'Login successful!'});
 
         this.clearForm();
         setTimeout(() => {
@@ -350,7 +346,7 @@ confirmRegistration() {
         }, 1000);
       },
       (err) => {
-        this.messageService.add({key:'toast1', severity:'error' , summary:'Login Failed' , detail:'Error details ' })
+        this.messageService.add({key:'main-toast', severity:'error' , summary:'Login Failed' , detail:'Error details ' })
         // alert('Login failed.');
         
       }
@@ -380,7 +376,7 @@ confirmRegistration() {
       ? 'You are registering as a Lateral Entry student. You will join the original batch and complete 3 years.' 
       : 'You are registering as a regular 4-year student.';
     
-    this.messageService.add({key:'toast1', severity:'info', summary:'Info', detail:message});
+    this.messageService.add({key:'main-toast', severity:'info', summary:'Info', detail:message});
   }
 
   togglePasswordVisibility() {

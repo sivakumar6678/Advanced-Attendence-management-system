@@ -1,1 +1,112 @@
-<p>crc-auth works!</p>
+<p-toolbar class="home-sticky-header" 
+           [style]="{'background-color': 'var(--primary-color)', 'padding' : '0.5rem 2rem', 'margin-bottom' : 0}"
+
+>                
+  <div class="p-toolbar-group-start proj-title">
+    <span>Crc Portal</span>
+  </div>
+  <div class="p-toolbar-group-end navbar-links">
+    <div class="nav-links">
+      <a pButton label="Home" routerLink="/" fragment="home"></a>
+    </div>
+  </div>
+</p-toolbar>
+
+<div class="crc-auth">
+
+  
+  <div class="crc-auth-container">
+  <p-tabView>
+    <!-- Registration Tab -->
+    <p-tabPanel header="Register CRC">
+      <div class="form-container">
+        <h3>Registration Form</h3>
+
+        <div class="input-group">
+          <label for="email">Email</label>
+          <input pInputText id="email" [(ngModel)]="email" required>
+        </div>
+
+        <div class="input-group">
+          <label for="employeeId">Employee ID</label>
+          <input pInputText id="employeeId" [(ngModel)]="employeeId" required>
+        </div>
+
+        <p-button label="Get Faculty Details" icon="pi pi-search" (click)="fetchFacultyDetails()" class="get-details-btn"></p-button>
+
+        <!-- Display Faculty Details -->
+        <div *ngIf="facultyDetails" class="faculty-details">
+          <p>Name: {{ facultyDetails.full_name }}</p>
+          <p>Phone: {{ facultyDetails.phone_number }}</p>
+        </div>
+
+        <!-- Registration Form -->
+        <form (ngSubmit)="registerCRC()" #crcForm="ngForm" *ngIf="facultyDetails" >
+          <div class="input-group">
+            <label for="branch">Branch</label>
+            <p-dropdown 
+              [options]="branchOptions" 
+              [(ngModel)]="registrationData.branch" 
+              optionLabel="name" 
+              optionValue="id" 
+              name="branch" 
+              [disabled]="true"
+              [style] = "{ 'width' : '100%' }"
+              required>
+            </p-dropdown>
+          </div>
+
+          <div class="input-group">
+            <label for="year">Year</label>
+            <p-dropdown [style]="{ 'width':'100%'}" id="dropdown" [(ngModel)]="registrationData.year" name="year" [options]="yearOptions" placeholder="Select Year"></p-dropdown>
+          </div>
+
+          <div class="input-group">
+            <label for="semester">Semester</label>
+            <p-dropdown [style]="{ 'width':'100%'}" id="dropdown" [(ngModel)]="registrationData.semester" name="semester" [options]="semesterOptions" placeholder="Select Semester"></p-dropdown>
+          </div>
+
+          <div class="input-group">
+            <label for="password">Password</label>
+
+            <p-password  id="password"   
+                        [style]="{'width': '100%'}"            
+                        [(ngModel)]="registrationData.password"  
+                        [toggleMask]="true"
+                        name="password" required>
+            </p-password>
+          </div>
+
+          <p-button type="submit" label="Register" [disabled]="!crcForm.valid"></p-button>
+        </form>
+      </div>
+    </p-tabPanel>
+
+    <!-- Login Tab -->
+    <p-tabPanel header="Login CRC">
+      <div class="form-container">
+        <h3>Login CRC</h3>
+        <form (ngSubmit)="loginCRC()" #loginForm="ngForm">
+          <div class="input-group">
+            <label for="loginEmail">Email</label>
+            <input pInputText id="loginEmail" [(ngModel)]="loginData.email" name="email" required />
+          </div>
+
+          <div class="input-group">
+            <label for="loginPassword">Password</label>
+            <p-password id="loginPassword" 
+                        [style]="{'width': '100%'}"            
+                        [(ngModel)]="loginData.password" 
+                        [toggleMask]="true"
+                        name="password" required>
+            </p-password>
+          </div>
+
+          <p-button type="submit" label="Login" [disabled]="!loginForm.valid"></p-button>
+        </form>
+      </div>
+    </p-tabPanel>
+  </p-tabView>
+</div>
+
+</div>

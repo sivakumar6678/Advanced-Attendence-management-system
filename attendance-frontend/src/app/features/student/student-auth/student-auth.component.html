@@ -102,13 +102,17 @@
                 <div class="p-field p-grid">
                   <label for="password" class="p-col-12 p-md-2">Password</label>
                   <div class="form1input p-col-12 p-md-10">
-                    <p-password id="password" formControlName="password" toggleMask="true" placeholder="Enter your password" > </p-password>
+                    <p-password id="password" 
+                                [style]="{'width': '100%'}"            
+                                formControlName="password" toggleMask="true" placeholder="Enter your password" > </p-password>
                   </div>
                 </div>
                 <div class="p-field p-grid">
                   <label for="confirmPassword" class="p-col-12 p-md-2">Confirm Password</label>
                   <div  class="form1input p-col-12 p-md-10   ">
-                    <p-password   id="confirmPassword" formControlName="confirmPassword" placeholder="Confirm your password" [toggleMask]="true" ></p-password>
+                    <p-password   id="confirmPassword" 
+                                  [style]="{'width': '100%'}"            
+                                  formControlName="confirmPassword" placeholder="Confirm your password" [toggleMask]="true" ></p-password>
                     <!-- <input id="confirmPassword" pInputText formControlName="confirmPassword" placeholder="Confirm your password" /> -->
                   </div>
                 </div>

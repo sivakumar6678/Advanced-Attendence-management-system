@@ -39,6 +39,8 @@ html {
  /* Shadows */
  --box-shadow-light: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
  --box-shadow-hover: 0 0.5rem 0.9375rem rgba(0, 0, 0, 0.2);
+ --box-shadow-login: 0 0 20px 5px rgba(11, 76, 216, 0.795) inset;
+
     --border-radius: 10px;
     --box-shadow: 0 0.125rem 0.25rem rgba(233, 221, 221, 0.1);
 }
@@ -96,9 +98,7 @@ a {
     transition: color 0.3s ease;
 }
 
-a:hover {
-    color: var(--highlight-color);
-}
+
 
 /* Global Animation Keyframes */
 @keyframes fadeIn {
