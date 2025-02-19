@@ -2,6 +2,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.db import IntegrityError
+from django.contrib.auth.hashers import make_password, check_password
+from rest_framework_simplejwt.tokens import RefreshToken
 from .models import Student, Device
 from core.models import Branch, AcademicYear
 
@@ -14,9 +16,9 @@ class RegisterStudent(APIView):
 
             if not device_id:
                 return Response({"error": "Device ID is required"}, status=status.HTTP_400_BAD_REQUEST)
+
             if Student.objects.filter(device_id=device_id).exists():
                 return Response({"error": "This device is already registered with another student"}, status=status.HTTP_400_BAD_REQUEST)
-
 
             student = Student(
                 student_id=student_data['studentId'],
@@ -30,12 +32,10 @@ class RegisterStudent(APIView):
                 academic_year_id=student_data['academicYear'],
                 is_lateral_entry=student_data['isLateralEntry'],
                 face_descriptor=face_descriptor,
-                # device_id = student_data['deviceId']
                 device_id=device_id  # Store device ID
-
             )
 
-            student.set_password(student_data['password'])
+            student.password = make_password(student_data['password'])  # Hash password before saving
             student.save()
 
             return Response({"message": "Student registered successfully!"}, status=status.HTTP_201_CREATED)
@@ -43,6 +43,37 @@ class RegisterStudent(APIView):
             return Response({"error": "Student ID or Email already exists"}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class LoginStudent(APIView):
+    def post(self, request):
+        student_data = request.data
+        identifier = student_data.get('studentIdOrEmail', '').strip()
+        password = student_data.get('password', '').strip()
+        device_id = student_data.get('deviceId', '').strip()  # Get device ID
+
+        if not identifier or not password:
+            return Response({"error": "Student ID/Email and password are required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Fetch student using email or student ID
+        student = Student.objects.filter(email=identifier).first() or Student.objects.filter(student_id=identifier).first()
+
+        if student:
+            if check_password(password, student.password):  # Verify password
+                if student.device_id == device_id:
+                    refresh = RefreshToken.for_user(student)  # Generate JWT token
+                    return Response({
+                        "message": "Login successful",
+                        "access_token": str(refresh.access_token),
+                        "refresh_token": str(refresh)
+                    }, status=status.HTTP_200_OK)
+                else:
+                    return Response({"error": "Unauthorized device. Please use your registered device or contact admin."}, status=status.HTTP_401_UNAUTHORIZED)
+            else:
+                return Response({"error": "Incorrect password"}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({"error": "Student not found"}, status=status.HTTP_404_NOT_FOUND)
+
 class RegisterDevice(APIView):
     def post(self, request):
         try:
@@ -84,29 +115,5 @@ class RegisterDevice(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-class LoginStudent(APIView):
-    def post(self, request):
-        student_data = request.data
-        identifier = student_data.get('studentIdOrEmail', '').strip()
-        password = student_data.get('password', '').strip()
-        device_id = student_data.get('deviceId', '').strip()  # Get device ID
-
-        if not identifier or not password:
-            return Response({"error": "Student ID/Email and password are required"}, status=status.HTTP_400_BAD_REQUEST)
-
-        # Fetch student using email or student ID
-        student = Student.objects.filter(email=identifier).first() or Student.objects.filter(student_id=identifier).first()
-
-        if student:
-            
-            if student.check_password(password):
-                if student.device_id == device_id:
-                    return Response({"message": "Login successful"}, status=status.HTTP_200_OK)
-                else:
-                    return Response({"error": "Unauthorized device. Please use your registered device or contact admin."}, status=status.HTTP_401_UNAUTHORIZED)
-            else:
-                return Response({"error": "Incorrect password"}, status=status.HTTP_400_BAD_REQUEST)
-
-        return Response({"error": "Student not found"}, status=status.HTTP_404_NOT_FOUND)
 
         

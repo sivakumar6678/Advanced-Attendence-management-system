@@ -10,6 +10,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.hashers import make_password,check_password
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
+
 class LoginCRC(APIView):
     def post(self, request):
         crc_data = request.data
@@ -24,20 +25,20 @@ class LoginCRC(APIView):
         except CRC.DoesNotExist:
             return Response({"error": "CRC user not found"}, status=status.HTTP_404_NOT_FOUND)
 
-        # ✅ Correct password check
         if not crc.check_password(password):  
             return Response({"error": "Invalid email or password"}, status=status.HTTP_401_UNAUTHORIZED)
 
-        # ✅ Generate JWT token
+        # ✅ Generate Refresh Token and Access Token
         refresh = RefreshToken.for_user(crc)
-        refresh["crc_id"] = crc.crc_id  # Add crc_id to the token
+        refresh["user_id"] = crc.id  # ✅ Explicitly set user_id
+        access_token = str(refresh.access_token)
 
         return Response({
-            "access_token": str(refresh.access_token),
+            "access_token": access_token,
             "refresh_token": str(refresh),
             "crc_id": crc.crc_id,
+            "user_id": crc.id,  # ✅ Return user_id for debugging
         }, status=status.HTTP_200_OK)
-
 
 class FetchFacultyDetails(APIView):
     """Fetch Faculty Details Before CRC Registration"""
@@ -101,16 +102,17 @@ class RegisterCRC(APIView):
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-class CRCProfileView(APIView):
-    authentication_classes = [JWTAuthentication]  # ✅ Ensure authentication
-    permission_classes = [IsAuthenticated]  # ✅ Ensure only logged-in users can access
+
+
+class ProfileCRC(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
+        user_id = request.user.id  # ✅ Use ID from JWT Token
+
         try:
-            crc_id = request.user.id  # ✅ Get CRC ID from token
-
-            crc = CRC.objects.get(id=crc_id)  # ✅ Fix: Use correct lookup
-
+            crc = CRC.objects.get(id=user_id)  # ✅ Fetch using ID instead of email
             return Response({
                 "crc_id": crc.crc_id,
                 "email": crc.email,
@@ -119,7 +121,6 @@ class CRCProfileView(APIView):
                 "branch": crc.branch.id,
                 "year": crc.year,
                 "semester": crc.semester,
-            }, status=status.HTTP_200_OK)
-
+            }, status=200)
         except CRC.DoesNotExist:
-            return Response({"error": "CRC not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": "CRC not found"}, status=404)

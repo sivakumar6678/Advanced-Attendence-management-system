@@ -1,10 +1,10 @@
 from django.urls import path
-from .views import RegisterCRC, LoginCRC, FetchFacultyDetails, CRCProfileView
+from .views import RegisterCRC, LoginCRC, FetchFacultyDetails, ProfileCRC
 
 urlpatterns = [
     path('register/', RegisterCRC.as_view(), name='register-crc'),
     path('login/', LoginCRC.as_view(), name='login-crc'),
     # path('faculty-details/', FetchFacultyDetails.as_view(), name='fetch-faculty'),
     path('faculty-details/', FetchFacultyDetails.as_view(), name='fetch-faculty-details'),
-    path('profile/' , CRCProfileView.as_view(), name='crc-profile'),
+    path('profile/' , ProfileCRC.as_view(), name='profile-crc'),
 ]

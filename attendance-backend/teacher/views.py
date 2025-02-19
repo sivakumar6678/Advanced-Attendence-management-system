@@ -1,10 +1,10 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from django.contrib.auth.hashers import check_password
+from django.contrib.auth.hashers import make_password, check_password
+from rest_framework_simplejwt.tokens import RefreshToken
 from core.models import Faculty as CoreFaculty  # Reference faculty added by SuperAdmin
 from .models import Faculty
-
 
 class FacultyRegisterView(APIView):
     def post(self, request):
@@ -38,11 +38,10 @@ class FacultyRegisterView(APIView):
             branch=branch,
             phone_number=phone_number,
             employee_id=employee_id,
-            joined_date=joined_date
+            joined_date=joined_date,
+            password=make_password(password)  # Hash password before saving
         )
-        faculty.set_password(password)  # Hash password before saving
-        faculty.save()
-
+        
         # Update registered status in core app
         core_faculty.registered = True
         core_faculty.save()
@@ -64,7 +63,12 @@ class FacultyLoginView(APIView):
 
             # Check password using Django's password checking function
             if check_password(password, faculty.password):
-                return Response({"message": "Login successful"}, status=status.HTTP_200_OK)
+                refresh = RefreshToken.for_user(faculty)  # Generate JWT token
+                return Response({
+                    "message": "Login successful",
+                    "access_token": str(refresh.access_token),
+                    "refresh_token": str(refresh)
+                }, status=status.HTTP_200_OK)
             else:
                 return Response({"error": "Invalid password"}, status=status.HTTP_401_UNAUTHORIZED)
 

@@ -10,7 +10,7 @@ class CRCManager(BaseUserManager):
             raise ValueError("Employee ID and Email are required")
 
         email = self.normalize_email(email)
-        crc = self.model(
+        user = self.model(
             crc_id=str(uuid.uuid4())[:8],  # Auto-generate an 8-character CRC ID
             employee_id=employee_id,
             email=email,
@@ -19,9 +19,9 @@ class CRCManager(BaseUserManager):
             year=year,
             semester=semester
         )
-        crc.set_password(password)  # ✅ Ensures password is hashed
-        crc.save(using=self._db)
-        return crc
+        user.set_password(password)  # ✅ Ensures password is hashed
+        user.save(using=self._db)
+        return user
 
 
 class CRC(AbstractBaseUser,PermissionsMixin):
