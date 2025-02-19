@@ -6,7 +6,31 @@ from core.serializers import BranchSerializer
 from core.serializers import AcademicYearSerializer
 from django.contrib.auth import authenticate
 from django.shortcuts import render, redirect
+from rest_framework_simplejwt.tokens import RefreshToken
 
+class GenerateToken(APIView):
+    def post(self, request):
+        email = request.data.get("email")
+        password = request.data.get("password")
+
+        if not email or not password:
+            return Response({"error": "Email and password are required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = Faculty.objects.get(email=email)  # Replace with your actual model (CRC, Teacher, etc.)
+        except Faculty.DoesNotExist:
+            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        # Check password (you should use hashed passwords in a real system)
+        if user.password != password:
+            return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+
+        # Generate JWT tokens
+        refresh = RefreshToken.for_user(user)
+        return Response({
+            "access_token": str(refresh.access_token),
+            "refresh_token": str(refresh)
+        }, status=status.HTTP_200_OK)
 class SuperAdminLogin(APIView):
     def post(self, request):
         data = request.data

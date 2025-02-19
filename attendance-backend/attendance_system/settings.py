@@ -147,10 +147,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 from datetime import timedelta
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),  # Set token expiry
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),  # Refresh token expiry
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),  # Token valid for 1 day
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7), # Refresh token valid for 7 days
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
-    'ALGORITHM': 'HS256',
-    'SIGNING_KEY': SECRET_KEY,  # Use your Django secret key
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'USER_ID_FIELD': 'id',  # ✅ Ensure Django identifies user correctly
+    'USER_ID_CLAIM': 'user_id',  # ✅ Store user_id in the JWT token
 }

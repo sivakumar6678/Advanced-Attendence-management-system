@@ -6,6 +6,10 @@ from django.contrib.auth import authenticate
 from django.db.utils import IntegrityError
 from teacher.models import Faculty
 from core.models import Branch 
+from rest_framework_simplejwt.tokens import RefreshToken
+from django.contrib.auth.hashers import make_password,check_password
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
 class LoginCRC(APIView):
     def post(self, request):
         crc_data = request.data
@@ -15,13 +19,25 @@ class LoginCRC(APIView):
         if not email or not password:
             return Response({"error": "Email and password are required"}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Find CRC by email
-        crc = CRC.objects.filter(email=email).first()
+        try:
+            crc = CRC.objects.get(email=email)
+        except CRC.DoesNotExist:
+            return Response({"error": "CRC user not found"}, status=status.HTTP_404_NOT_FOUND)
 
-        if crc and crc.check_password(password):
-            return Response({"message": "Login successful"}, status=status.HTTP_200_OK)
-        else:
+        # ✅ Correct password check
+        if not crc.check_password(password):  
             return Response({"error": "Invalid email or password"}, status=status.HTTP_401_UNAUTHORIZED)
+
+        # ✅ Generate JWT token
+        refresh = RefreshToken.for_user(crc)
+        refresh["crc_id"] = crc.crc_id  # Add crc_id to the token
+
+        return Response({
+            "access_token": str(refresh.access_token),
+            "refresh_token": str(refresh),
+            "crc_id": crc.crc_id,
+        }, status=status.HTTP_200_OK)
+
 
 class FetchFacultyDetails(APIView):
     """Fetch Faculty Details Before CRC Registration"""
@@ -75,9 +91,35 @@ class RegisterCRC(APIView):
                 branch=branch_instance,
                 year=year,
                 semester=semester,
-                password=password
             )
+            crc.set_password(password)  # ✅ Use set_password to hash password
+            crc.save()
             return Response({"message": "CRC registered successfully!", "crc_id": crc.crc_id}, status=status.HTTP_201_CREATED)
+        
 
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class CRCProfileView(APIView):
+    authentication_classes = [JWTAuthentication]  # ✅ Ensure authentication
+    permission_classes = [IsAuthenticated]  # ✅ Ensure only logged-in users can access
+
+    def get(self, request):
+        try:
+            crc_id = request.user.id  # ✅ Get CRC ID from token
+
+            crc = CRC.objects.get(id=crc_id)  # ✅ Fix: Use correct lookup
+
+            return Response({
+                "crc_id": crc.crc_id,
+                "email": crc.email,
+                "employee_id": crc.employee_id,
+                "phone_number": crc.phone_number,
+                "branch": crc.branch.id,
+                "year": crc.year,
+                "semester": crc.semester,
+            }, status=status.HTTP_200_OK)
+
+        except CRC.DoesNotExist:
+            return Response({"error": "CRC not found"}, status=status.HTTP_404_NOT_FOUND)

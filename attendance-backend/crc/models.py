@@ -1,6 +1,6 @@
 import uuid
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin, Group, Permission
 from core.models import Branch
 from teacher.models import Faculty
 
@@ -19,11 +19,12 @@ class CRCManager(BaseUserManager):
             year=year,
             semester=semester
         )
-        crc.set_password(password)
+        crc.set_password(password)  # ✅ Ensures password is hashed
         crc.save(using=self._db)
         return crc
 
-class CRC(AbstractBaseUser):
+
+class CRC(AbstractBaseUser,PermissionsMixin):
     crc_id = models.CharField(max_length=10, unique=True, editable=False)  # Unique CRC ID
     employee_id = models.CharField(max_length=20, unique=True)
     email = models.EmailField(unique=True)
@@ -31,6 +32,9 @@ class CRC(AbstractBaseUser):
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE)
     year = models.PositiveIntegerField(choices=[(i, f"Year {i}") for i in range(1, 5)])
     semester = models.PositiveIntegerField(choices=[(i, f"Semester {i}") for i in range(1, 3)])
+
+    groups = models.ManyToManyField(Group, related_name="crc_users", blank=True)  # ✅ Fix conflict
+    user_permissions = models.ManyToManyField(Permission, related_name="crc_users_permissions", blank=True)  # ✅ Fix conflict
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['employee_id', 'branch', 'year', 'semester']
