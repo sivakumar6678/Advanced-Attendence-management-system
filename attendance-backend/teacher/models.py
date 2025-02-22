@@ -39,3 +39,5 @@ class Faculty(AbstractBaseUser):
 
     def __str__(self):
         return self.full_name
+
+

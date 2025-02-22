@@ -6,7 +6,9 @@ from django.contrib.auth.hashers import make_password, check_password
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import Student, Device
 from core.models import Branch, AcademicYear
-
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from django.shortcuts import get_object_or_404
 class RegisterStudent(APIView):
     def post(self, request, *args, **kwargs):
         try:
@@ -55,7 +57,6 @@ class LoginStudent(APIView):
         if not identifier or not password:
             return Response({"error": "Student ID/Email and password are required"}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Fetch student using email or student ID
         student = Student.objects.filter(email=identifier).first() or Student.objects.filter(student_id=identifier).first()
 
         if student:
@@ -65,7 +66,8 @@ class LoginStudent(APIView):
                     return Response({
                         "message": "Login successful",
                         "access_token": str(refresh.access_token),
-                        "refresh_token": str(refresh)
+                        "refresh_token": str(refresh),
+                        "student_id": student.student_id
                     }, status=status.HTTP_200_OK)
                 else:
                     return Response({"error": "Unauthorized device. Please use your registered device or contact admin."}, status=status.HTTP_401_UNAUTHORIZED)
@@ -73,6 +75,7 @@ class LoginStudent(APIView):
                 return Response({"error": "Incorrect password"}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response({"error": "Student not found"}, status=status.HTTP_404_NOT_FOUND)
+
 
 class RegisterDevice(APIView):
     def post(self, request):
@@ -117,3 +120,28 @@ class RegisterDevice(APIView):
 
 
         
+class StudentDashboardView(APIView):
+    authentication_classes = [JWTAuthentication]  # Ensure JWT authentication is used
+    permission_classes = [IsAuthenticated]  # Only logged-in users can access
+
+    def get(self, request):
+        try:
+            user = request.user  # JWT authenticated user
+
+            # ✅ Fix: Fetch student using email instead of ID
+            student = get_object_or_404(Student, email=user.email)
+
+            return Response({
+                "student_id": student.student_id,
+                "name": student.name,
+                "email": student.email,
+                "branch": student.branch.name,  # Convert ID to name
+                "year": student.year,
+                "semester": student.semester,
+                "academic_year": f"{student.academic_year.start_year}-{student.academic_year.end_year}",
+                "phone_number": student.phone_number,
+                "parent_phone_number": student.parent_phone_number
+            }, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

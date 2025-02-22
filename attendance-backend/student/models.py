@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.core.validators import RegexValidator
 from core.models import Branch, AcademicYear
 
@@ -13,7 +13,7 @@ class StudentManager(BaseUserManager):
         student.save(using=self._db)
         return student
 
-class Student(AbstractBaseUser):
+class Student(AbstractBaseUser, PermissionsMixin):  # ✅ Add PermissionsMixin
     student_id = models.CharField(max_length=20, unique=True)
     name = models.CharField(max_length=100)
     email = models.EmailField(unique=True)
@@ -30,14 +30,30 @@ class Student(AbstractBaseUser):
     is_lateral_entry = models.BooleanField(default=False)
     face_descriptor = models.JSONField()
     device_id = models.CharField(max_length=255, unique=True, null=True, blank=True)
+    
+    # ✅ Add password field explicitly
+    password = models.CharField(max_length=255)
 
-    USERNAME_FIELD = 'email'
+    # ✅ Fix Django E304 Reverse Accessor Conflict
+    groups = models.ManyToManyField(
+        "auth.Group", related_name="student_groups", blank=True
+    )
+    user_permissions = models.ManyToManyField(
+        "auth.Permission", related_name="student_permissions", blank=True
+    )
+
+    is_active = models.BooleanField(default=True)  # ✅ Ensure the user is active
+    is_staff = models.BooleanField(default=False)  # ✅ Required for Django admin
+    is_superuser = models.BooleanField(default=False)  # ✅ Superuser control
+
+    USERNAME_FIELD = 'email'  # ✅ Set email as the username
     REQUIRED_FIELDS = ['student_id', 'name', 'year', 'semester']
 
     objects = StudentManager()
 
     def __str__(self):
         return self.name
+
 
 
 class Device(models.Model):

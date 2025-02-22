@@ -139,7 +139,7 @@ APPEND_SLASH = False
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
-
+# AUTH_USER_MODEL = 'crc.CRC'  # Replace 'crc' with the actual app name where the CRC model is defined
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 

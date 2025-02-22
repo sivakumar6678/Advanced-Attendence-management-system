@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from core.models import Student, Branch, AcademicYear
+from core.models import Student, Branch, AcademicYear,AcademicYearSerializer,BranchSerializer
 
 class StudentSerializer(serializers.ModelSerializer):
     branch = BranchSerializer(read_only=True)

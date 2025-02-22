@@ -5,7 +5,8 @@ from django.contrib.auth.hashers import make_password, check_password
 from rest_framework_simplejwt.tokens import RefreshToken
 from core.models import Faculty as CoreFaculty  # Reference faculty added by SuperAdmin
 from .models import Faculty
-
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
 class FacultyRegisterView(APIView):
     def post(self, request):
         data = request.data
@@ -71,6 +72,30 @@ class FacultyLoginView(APIView):
                 }, status=status.HTTP_200_OK)
             else:
                 return Response({"error": "Invalid password"}, status=status.HTTP_401_UNAUTHORIZED)
+
+        except Faculty.DoesNotExist:
+            return Response({"error": "Faculty not found"}, status=status.HTTP_404_NOT_FOUND)
+
+class FacultyDashboardView(APIView):
+    authentication_classes = [JWTAuthentication]  # Use JWT authentication
+    permission_classes = [IsAuthenticated]  # Only authenticated users can access
+
+    def get(self, request):
+        try:
+            # Extract faculty ID from JWT token
+            user = request.user  
+
+            # Fetch faculty details
+            faculty = Faculty.objects.get(id=user.id)
+
+            # Return faculty details
+            return Response({
+                "full_name": faculty.full_name,
+                "email": faculty.email,
+                "branch": faculty.branch,
+                "phone_number": faculty.phone_number,
+                "joined_date": faculty.joined_date
+            }, status=status.HTTP_200_OK)
 
         except Faculty.DoesNotExist:
             return Response({"error": "Faculty not found"}, status=status.HTTP_404_NOT_FOUND)

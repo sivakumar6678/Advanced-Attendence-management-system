@@ -17,14 +17,15 @@ class CRCManager(BaseUserManager):
             phone_number=phone_number,
             branch=branch,
             year=year,
-            semester=semester
+            semester=semester,
+            password=password  # ✅ Add password explicitly
         )
         user.set_password(password)  # ✅ Ensures password is hashed
         user.save(using=self._db)
         return user
 
 
-class CRC(AbstractBaseUser,PermissionsMixin):
+class CRC(AbstractBaseUser):
     crc_id = models.CharField(max_length=10, unique=True, editable=False)  # Unique CRC ID
     employee_id = models.CharField(max_length=20, unique=True)
     email = models.EmailField(unique=True)
@@ -33,8 +34,12 @@ class CRC(AbstractBaseUser,PermissionsMixin):
     year = models.PositiveIntegerField(choices=[(i, f"Year {i}") for i in range(1, 5)])
     semester = models.PositiveIntegerField(choices=[(i, f"Semester {i}") for i in range(1, 3)])
 
-    groups = models.ManyToManyField(Group, related_name="crc_users", blank=True)  # ✅ Fix conflict
-    user_permissions = models.ManyToManyField(Permission, related_name="crc_users_permissions", blank=True)  # ✅ Fix conflict
+    # ✅ Add missing password field
+    password = models.CharField(max_length=255)
+  
+
+    is_active = models.BooleanField(default=True)  # ✅ Required for authentication
+    is_staff = models.BooleanField(default=False)  # ✅ Needed for Django admin
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['employee_id', 'branch', 'year', 'semester']
