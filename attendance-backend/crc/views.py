@@ -11,6 +11,70 @@ from django.contrib.auth.hashers import make_password,check_password
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.shortcuts import get_object_or_404
+from core.models import User
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from core.models import User  # ✅ Import User from core
+from crc.models import CRC
+from django.contrib.auth.hashers import make_password
+
+class RegisterCRC(APIView):
+    def post(self, request):
+        email = request.data.get("email")
+        employee_id = request.data.get("employee_id")
+        phone_number = request.data.get("phone_number")
+        branch_id = request.data.get("branch")  # Assuming branch is sent as an ID
+        year = request.data.get("year")
+        semester = request.data.get("semester")
+        password = request.data.get("password")
+
+        # Check if CRC exists in User
+        existing_user = User.objects.filter(email=email).first()
+        
+        if existing_user:
+            # Check if CRC is already registered
+            existing_crc = CRC.objects.filter(email=email).first()
+            if existing_crc:
+                return Response({"error": "CRC already registered"}, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                # If user exists but not registered as CRC, update existing user
+                existing_user.role = "crc"
+                existing_user.set_password(password)
+                existing_user.save()
+
+                # Create CRC profile linked to the existing user
+                crc = CRC.objects.create(
+                    id=existing_user.id,  # ✅ Use the same ID as User
+                    email=email,
+                    employee_id=employee_id,
+                    phone_number=phone_number,
+                    branch_id=branch_id,
+                    year=year,
+                    semester=semester
+                )
+
+                return Response({"message": "CRC registered successfully"}, status=status.HTTP_201_CREATED)
+
+        # If user does not exist, create new User and CRC
+        user = User.objects.create_user(
+            email=email,
+            role="crc",  # ✅ Set role as 'crc'
+            password=make_password(password)
+        )
+
+        crc = CRC.objects.create(
+            id=user.id,  # ✅ Use the same ID as User
+            email=email,
+            employee_id=employee_id,
+            phone_number=phone_number,
+            branch_id=branch_id,
+            year=year,
+            semester=semester
+        )
+
+        return Response({"message": "CRC registered successfully"}, status=status.HTTP_201_CREATED)
 
 class LoginCRC(APIView):
     def post(self, request):
@@ -79,48 +143,4 @@ class FetchFacultyDetails(APIView):
             }, status=status.HTTP_200_OK)
         else:
             return Response({"error": "Faculty not found"}, status=status.HTTP_404_NOT_FOUND)
-
-class RegisterCRC(APIView):
-    def post(self, request, *args, **kwargs):
-        try:
-            crc_data = request.data
-            employee_id = crc_data.get('employeeId')
-            email = crc_data.get('email')
-            phone_number = crc_data.get('phoneNumber')  # New field
-            branch_id = crc_data.get('branch')
-            year = crc_data.get('year')
-            semester = crc_data.get('semester')
-            password = crc_data.get('password')
-
-            # ✅ Check if the faculty exists
-            faculty = Faculty.objects.filter(employee_id=employee_id, email=email).first()
-            if not faculty:
-                return Response({"error": "Faculty not found. Only registered faculty can become CRC."}, status=status.HTTP_400_BAD_REQUEST)
-
-            # ✅ Check if CRC is already assigned to this class (branch, year, semester)
-            existing_crc = CRC.objects.filter(branch_id=branch_id, year=year, semester=semester).exists()
-            if existing_crc:
-                return Response({"error": "A CRC is already assigned for this class."}, status=status.HTTP_400_BAD_REQUEST)
-            
-            branch_instance = Branch.objects.get(id=crc_data['branch'])
-
-            # ✅ Register the CRC
-            crc = CRC.objects.create_crc(
-                employee_id=employee_id,
-                email=email,
-                phone_number=phone_number,
-                branch=branch_instance,
-                year=year,
-                semester=semester,
-            )
-            crc.set_password(password)  # ✅ Use set_password to hash password
-            crc.save()
-            return Response({"message": "CRC registered successfully!", "crc_id": crc.crc_id}, status=status.HTTP_201_CREATED)
-        
-
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
-
 
