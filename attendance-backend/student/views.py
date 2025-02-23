@@ -37,7 +37,9 @@ class RegisterStudent(APIView):
                 device_id=device_id  # Store device ID
             )
 
-            student.password = make_password(student_data['password'])  # Hash password before saving
+
+            # student.password = make_password(student_data['password'])  # Hash password before saving
+            student.set_password(student_data['password']) 
             student.save()
 
             return Response({"message": "Student registered successfully!"}, status=status.HTTP_201_CREATED)
@@ -60,7 +62,8 @@ class LoginStudent(APIView):
         student = Student.objects.filter(email=identifier).first() or Student.objects.filter(student_id=identifier).first()
 
         if student:
-            if check_password(password, student.password):  # Verify password
+            # if check_password(password, student.password):  # Verify password
+            if student.check_password(password): 
                 if student.device_id == device_id:
                     refresh = RefreshToken.for_user(student)  # Generate JWT token
                     return Response({

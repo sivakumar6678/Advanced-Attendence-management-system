@@ -40,8 +40,10 @@ class FacultyRegisterView(APIView):
             phone_number=phone_number,
             employee_id=employee_id,
             joined_date=joined_date,
-            password=make_password(password)  # Hash password before saving
         )
+        faculty.set_password(password)  # ✅ Use Django's built-in password hashing
+        faculty.save()
+
         
         # Update registered status in core app
         core_faculty.registered = True
@@ -63,7 +65,8 @@ class FacultyLoginView(APIView):
             faculty = Faculty.objects.get(email=email)
 
             # Check password using Django's password checking function
-            if check_password(password, faculty.password):
+            # if check_password(password, faculty.password):
+            if faculty.check_password(password):  # ✅ Use Django's built-in password check
                 refresh = RefreshToken.for_user(faculty)  # Generate JWT token
                 return Response({
                     "message": "Login successful",
