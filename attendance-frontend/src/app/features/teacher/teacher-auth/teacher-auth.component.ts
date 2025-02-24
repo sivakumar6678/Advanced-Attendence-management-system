@@ -70,6 +70,7 @@ export class TeacherAuthComponent implements OnInit {
       response => {
         this.showAlert('Login successful!', 'success');
         this.loginForm.reset();
+        console.log('Login successful:', response);
       },
       error => {
         if (error.status === 401) {

@@ -80,17 +80,20 @@ export class CrcAuthComponent {
     if (this.registrationData.year && this.registrationData.semester && this.registrationData.password) {
       const crcData = {
         email: this.email,
-        employeeId: this.employeeId,
+        employee_id: this.employeeId,
         branch: this.registrationData.branch,
         year: this.registrationData.year,
         semester: this.registrationData.semester,
-        password: this.registrationData.password
+        password: this.registrationData.password,
+        phone_number: this.facultyDetails?.phone_number || "", // ✅ Ensure phone_number is sent
       };
 
       this.crcAuthService.registerCRC(crcData).subscribe(
         (res) => {
           console.log('CRC Registered Successfully!', res);
+
           this.messageservice.add({key: 'toast-anime',severity:'success', summary:'CRC Registered', detail:'CRC registered successfully!'});
+          this.clearForm();
         },
         (error) => {
           console.error('Error registering CRC', error);
@@ -107,6 +110,7 @@ export class CrcAuthComponent {
         (res) => {
           console.log('Login Successful!', res);
           this.messageservice.add({key: 'toast-anime',severity:'success', summary:'Login Successful', detail:'Logged in successfully!'});
+          this.clearForm();
         },
         (error) => {
           console.error('Error logging in', error);
@@ -116,7 +120,22 @@ export class CrcAuthComponent {
     }
   }
 
-  
+  clearForm() {
+    this.email = '';
+    this.employeeId = '';
+    this.facultyDetails = null;
+    this.registrationData = {
+      branch: null,
+      year: '',
+      semester: '',
+      password: ''
+    };
+    this.loginData = {
+      email: '',
+      password: ''
+    };
+  }
+
   // Logout CRC
   logoutCRC() {
     // this.crcAuthService.logoutCRC();

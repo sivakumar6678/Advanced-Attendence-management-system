@@ -339,6 +339,7 @@ confirmRegistration() {
     this.authService.loginStudent(data).subscribe(
       (res) => {
         this.messageService.add({key:'main-toast', severity:'success', summary:'Success', detail:'Login successful!'});
+        console.log("Login successful!'",res);
 
         this.clearForm();
         setTimeout(() => {
