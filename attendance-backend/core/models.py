@@ -26,7 +26,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         ("superadmin", "Super Admin"),
         ("faculty", "Faculty"),
         ("student", "Student"),
-        ("crc", "CRC"),
+        ("crc", "CRCProfile"),
     ]
 
     email = models.EmailField(unique=True)
