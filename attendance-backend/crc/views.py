@@ -3,10 +3,11 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from .models import CRCProfile
-from teacher.models import Faculty  # ✅ Import Faculty model
+from teacher.models import Faculty
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.tokens import RefreshToken
+
 class RegisterCRC(APIView):
     def post(self, request):
         data = request.data
@@ -15,23 +16,23 @@ class RegisterCRC(APIView):
         year = data.get("year")
         semester = data.get("semester")
 
-        # ✅ Check if Faculty exists before registering CRC
+        # Check if Faculty exists before registering CRC
         faculty = get_object_or_404(Faculty, email=email)
 
-        # ✅ Check if CRC is already registered for this faculty
+        # Check if CRC is already registered for this faculty
         if CRCProfile.objects.filter(faculty_ref=faculty).exists():
             return Response({"error": "CRC already registered"}, status=status.HTTP_400_BAD_REQUEST)
 
-        # ✅ Register CRC linked to Faculty
+        # Register CRC linked to Faculty
         crc = CRCProfile.objects.create(
             faculty_ref=faculty,
             branch=branch,
             year=year,
             semester=semester
         )
-        crc.save()
 
         return Response({"message": "CRC registered successfully!"}, status=status.HTTP_201_CREATED)
+
 class LoginCRC(APIView):
     def post(self, request):
         data = request.data
@@ -41,16 +42,16 @@ class LoginCRC(APIView):
         if not email or not password:
             return Response({"error": "Email and password are required"}, status=status.HTTP_400_BAD_REQUEST)
 
-        # ✅ Find Faculty first
+        # Find Faculty first
         faculty = get_object_or_404(Faculty, email=email)
-        
-        # ✅ Find linked CRC
-        crc = get_object_or_404(CRCProfile, faculty_ref=faculty)
 
-        if faculty.check_password(password):  # ✅ Use Faculty's password
-            # ✅ Generate JWT Token for authentication
-            refresh = RefreshToken.for_user(crc)
+        if faculty.check_password(password):  # Use Faculty's password
+            # Generate JWT Token for authentication
+            refresh = RefreshToken.for_user(faculty)  # Use faculty for token generation
             access_token = str(refresh.access_token)
+
+            # Check if CRC is linked to Faculty
+            crc = get_object_or_404(CRCProfile, faculty_ref=faculty)
 
             return Response({
                 "message": "Login successful",
@@ -58,20 +59,23 @@ class LoginCRC(APIView):
                 "refresh_token": str(refresh),
                 "faculty_id": faculty.id,
                 "email": faculty.email,
-                "role": "crc"
+                "role": "crc",
+                "user_id": crc.id,
             }, status=status.HTTP_200_OK)
         else:
             return Response({"error": "Invalid password"}, status=status.HTTP_401_UNAUTHORIZED)
+
 class CRCDashboardView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         try:
-            user = request.user  # ✅ Get the authenticated user
+            user = request.user  # Get authenticated user
+            faculty = get_object_or_404(Faculty, email=user.email)  # Find Faculty
 
-            # ✅ Fetch CRC details based on Faculty reference
-            crc = get_object_or_404(CRCProfile, faculty_ref=user)  # Use `faculty_ref` field
+            # Fetch CRC profile using Faculty reference
+            crc = get_object_or_404(CRCProfile, faculty_ref=faculty)
 
             return Response({
                 "faculty_id": crc.faculty_ref.id,
@@ -82,11 +86,9 @@ class CRCDashboardView(APIView):
                 "role": "crc"
             }, status=status.HTTP_200_OK)
 
-        except CRCProfile.DoesNotExist:
-            return Response({"error": "CRC Profile not found"}, status=status.HTTP_404_NOT_FOUND)
-
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 class FetchFacultyDetails(APIView):
     """Fetch Faculty Details Before CRC Registration"""
     def get(self, request):
