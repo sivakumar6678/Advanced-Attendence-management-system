@@ -26,11 +26,15 @@ class Student(User):  # Inherit from User
 
 
 class Device(models.Model):
-    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name="devices")
-    fingerprint = models.CharField(max_length=255, unique=True)  # Unique device identifier
-    user_agent = models.TextField()
-    ip_address = models.GenericIPAddressField()
-    registered_at = models.DateTimeField(auto_now_add=True)
+    student = models.OneToOneField(Student, on_delete=models.CASCADE, related_name='device')
+    device_id = models.CharField(max_length=255, unique=True)
+    device_name = models.CharField(max_length=255, null=True, blank=True)
+    device_type = models.CharField(max_length=50, null=True, blank=True)
+    platform = models.CharField(max_length=50, null=True, blank=True)
+    browser = models.CharField(max_length=50, null=True, blank=True)
+    os_version = models.CharField(max_length=50, null=True, blank=True)
+    screen_resolution = models.CharField(max_length=50, null=True, blank=True)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
 
     def __str__(self):
-        return f"Device for {self.student.name} - {self.fingerprint}"
+        return f"{self.student.name} - {self.device_name}"

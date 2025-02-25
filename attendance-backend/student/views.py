@@ -15,13 +15,32 @@ class RegisterStudent(APIView):
             student_data = request.data
             face_descriptor = student_data.get('faceDescriptor', None)
             device_id = student_data.get('deviceId', None)  # Get device ID
+            device_name = student_data.get('deviceName', None)
+            device_type = student_data.get('deviceType', None)
+            platform = student_data.get('platform', None)
+            browser = student_data.get('browser', None)
+            os_version = student_data.get('osVersion', None)
+            screen_resolution = student_data.get('screenResolution', None)
+            ip_address = student_data.get('ipAddress', None)
 
             if not device_id:
                 return Response({"error": "Device ID is required"}, status=status.HTTP_400_BAD_REQUEST)
 
+            # ✅ Step 1: Ensure device is valid before proceeding
+            allowed_platforms = ["Windows", "Android", "iOS","Linux x86_64"]
+            allowed_browsers = ["Chrome", "Firefox", "Safari"]
+
+            if platform not in allowed_platforms:
+                return Response({"error": f"Platform {platform} is not supported."}, status=status.HTTP_400_BAD_REQUEST)
+
+            if browser not in allowed_browsers:
+                return Response({"error": f"Browser {browser} is not supported."}, status=status.HTTP_400_BAD_REQUEST)
+
+            # ✅ Step 2: Check if the device is already registered with another student
             if Student.objects.filter(device_id=device_id).exists():
                 return Response({"error": "This device is already registered with another student"}, status=status.HTTP_400_BAD_REQUEST)
 
+            # ✅ Step 3: Register the student **with the device details**
             student = Student(
                 student_id=student_data['studentId'],
                 name=student_data['name'],
@@ -34,20 +53,31 @@ class RegisterStudent(APIView):
                 academic_year_id=student_data['academicYear'],
                 is_lateral_entry=student_data['isLateralEntry'],
                 face_descriptor=face_descriptor,
-                device_id=device_id  # Store device ID
+                device_id=device_id,  # Store device ID
             )
 
-
-            # student.password = make_password(student_data['password'])  # Hash password before saving
-            student.set_password(student_data['password']) 
+            student.set_password(student_data['password'])  # Hash password before saving
             student.save()
 
+            # ✅ Step 4: Save device details along with student registration
+            device = Device.objects.create(
+                student=student,
+                device_id=device_id,
+                device_name=device_name,
+                device_type=device_type,
+                platform=platform,
+                browser=browser,
+                os_version=os_version,
+                screen_resolution=screen_resolution,
+                ip_address=ip_address
+            )
+
             return Response({"message": "Student registered successfully!"}, status=status.HTTP_201_CREATED)
+
         except IntegrityError:
             return Response({"error": "Student ID or Email already exists"}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
 
 class LoginStudent(APIView):
     def post(self, request):
@@ -79,47 +109,6 @@ class LoginStudent(APIView):
 
         return Response({"error": "Student not found"}, status=status.HTTP_404_NOT_FOUND)
 
-
-class RegisterDevice(APIView):
-    def post(self, request):
-        try:
-            device_id = request.data.get('deviceId', None)
-            device_name = request.data.get('deviceName', 'Unknown Device')  # Example: "Samsung Galaxy S21"
-            device_type = request.data.get('deviceType', 'Mobile')  # Example: "Mobile", "Tablet"
-            platform = request.data.get('platform', 'Android')  # Example: "Android", "iOS"
-            browser = request.data.get('browser', 'Unknown Browser')
-            os_version = request.data.get('osVersion', 'Unknown OS')
-            screen_resolution = request.data.get('screenResolution', 'Unknown Resolution')
-            ip_address = request.data.get('ipAddress', request.META.get('REMOTE_ADDR', 'Unknown IP'))  # Get IP
-            if not device_id:
-                return Response({"error": "Device ID is required"}, status=status.HTTP_400_BAD_REQUEST)
-            
-
-            # Here, you can store the device ID in the session or database
-            request.session['device_id'] = device_id  # Store in session
-            request.session['device_info'] = {
-                "deviceName": device_name,
-                "deviceType": device_type,
-                "platform": platform,
-                "browser": browser,
-                "osVersion": os_version,
-                "screenResolution": screen_resolution,
-                "ipAddress": ip_address
-            }
-
-            return Response({"message": "Device registered successfully!",
-                            "deviceInfo": {
-                                        "deviceName": device_name,
-                                        "deviceType": device_type,
-                                        "platform": platform,
-                                        "browser": browser,
-                                        "osVersion": os_version,
-                                        "screenResolution": screen_resolution,
-                                        "ipAddress": ip_address
-                                    }
-                            }, status=status.HTTP_201_CREATED)
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
         
