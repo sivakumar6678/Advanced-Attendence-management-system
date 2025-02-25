@@ -80,12 +80,7 @@ export class AuthService {
     return this.deviceId!;
   }
 
-  registerDevice(data: any): Observable<any> {
-    const body = { ...data };
-    console.log(body);
-    console.log('registering device');
-    return this.http.post(`${this.baseUrl}/students/register-device/`, body);
-  }
+
   // Student Registraiton api
   registerStudent(data: any): Observable<any> {
     const body = { ...data };

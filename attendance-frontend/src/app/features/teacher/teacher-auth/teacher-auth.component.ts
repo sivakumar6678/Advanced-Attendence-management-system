@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth.service';
 import { UserService } from '../../../core/services/user.service';
+import { MessageService } from 'primeng/api';
+
 
 @Component({
   selector: 'app-teacher-auth',
@@ -14,13 +16,13 @@ export class TeacherAuthComponent implements OnInit {
   registerForm: FormGroup;
   branchOptions: any[] = [];
 
-  alertMessage: string = '';
-  alertType: string = '';
+
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private userService: UserService
+    private userService: UserService,
+    private messageService: MessageService
   ) {
     // Initialize Login Form
     this.loginForm = this.fb.group({
@@ -48,19 +50,9 @@ export class TeacherAuthComponent implements OnInit {
 
   switchMode() {
     this.isLoginMode = !this.isLoginMode;
-    this.clearAlert();
   }
 
-  showAlert(message: string, type: string) {
-    this.alertMessage = message;
-    this.alertType = type;
-    setTimeout(() => this.clearAlert(), 3000); // Alert disappears after 3 seconds
-  }
 
-  clearAlert() {
-    this.alertMessage = '';
-    this.alertType = '';
-  }
 
   onLogin() {
     if (this.loginForm.invalid) return;
@@ -68,15 +60,15 @@ export class TeacherAuthComponent implements OnInit {
     const { email, password } = this.loginForm.value;
     this.authService.login(email, password).subscribe(
       response => {
-        this.showAlert('Login successful!', 'success');
+        this.messageService.add({ key:'toast-anime', severity: 'success', summary: 'Login successful!', detail: 'Welcome back!' });
         this.loginForm.reset();
         console.log('Login successful:', response);
       },
       error => {
         if (error.status === 401) {
-          this.showAlert('Invalid email or password!', 'error');
+          this.messageService.add({ key:'main-toast', severity: 'error', summary: 'Invalid email or password!', detail: 'Please check your credentials and try again.' });
         } else {
-          this.showAlert('Login failed! Try again.', 'error');
+          this.messageService.add({ key:'main-toast', severity: 'error', summary: 'Login failed!', detail: 'Something went wrong. Please try again.' });
         }
       }
     );
@@ -87,15 +79,15 @@ export class TeacherAuthComponent implements OnInit {
 
     this.authService.register(this.registerForm.value).subscribe(
       response => {
-        this.showAlert('Registration successful! Please log in.', 'success');
+        this.messageService.add({ key:'toast-anime', severity: 'success', summary: 'Registration successful!', detail: 'Please log in.' });
         this.registerForm.reset();
         this.switchMode(); // Switch to login mode after registration
       },
       error => {
         if (error.status === 400) {
-          this.showAlert('Faculty already registered!', 'error');
+          this.messageService.add({ key:'main-toast', severity: 'error', summary: 'Email already registered!', detail: 'Please use a different email.' });
         } else {
-          this.showAlert('Registration failed! Try again.', 'error');
+          this.messageService.add({ key:'main-toast', severity: 'error', summary: 'Registration failed!', detail: 'Please try again.' });
         }
       }
     );

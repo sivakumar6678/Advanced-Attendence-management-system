@@ -21,4 +21,9 @@ export class UserService {
   getAcademicYears(): Observable<any> {
     return this.http.get(`${this.baseUrl}/core/academic-years/`);
   }
+
+  getCrcProfile(): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/crc/dashboard/`);
+  }
+
 }

@@ -7,6 +7,7 @@ import { trigger, transition, style, animate } from '@angular/animations';
 import { UserService } from '../../../core/services/user.service';
 import { Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
+import { LoadingService } from '../../../core/services/loading.service';
 import FingerprintJS from '@fingerprintjs/fingerprintjs';
 import { isPlatformBrowser } from '@angular/common';
 @Component({
@@ -90,7 +91,9 @@ export class StudentAuthComponent implements OnInit {
               private userService: UserService,
               private router: Router,
               private messageService:MessageService,
-              private _formBuilder: FormBuilder) {
+              private _formBuilder: FormBuilder,
+              private loadingService: LoadingService
+            ) {
     this.firstFormGroup = this._formBuilder.group({
       // studentId: ['', Validators.required],
       // name : ['', Validators.required],
@@ -196,6 +199,7 @@ export class StudentAuthComponent implements OnInit {
 
   async captureFace() {
     this.loading = true;
+    this.loadingService.show();
     console.log("loading",this.loading);
     console.log('Capturing face...');
     if (!this.videoElement) {
@@ -213,7 +217,8 @@ export class StudentAuthComponent implements OnInit {
         this.faceDescriptor = detection.descriptor;
         this.faceRegistered = true; // Set this to true after successful face capture
         
-        alert('Face captured successfully!');
+        this.messageService
+        .add({key:'main-toast', severity:'success', summary:'Success', detail:'Face captured successfully!'});
         this.registerfaceoption = false;
         this.stopVideo();
       } else {
@@ -225,6 +230,9 @@ export class StudentAuthComponent implements OnInit {
       this.messageService.add({key:'main-toast', severity:'error', summary:'Error', detail:'Error capturing face. Please try again.'});
       // alert('Error capturing face. Please try again.');
     } finally {
+      setTimeout(() => {
+      this.loadingService.hide();
+      }, 2000);
       this.loading = false;
     }
   }
@@ -253,81 +261,92 @@ export class StudentAuthComponent implements OnInit {
     }
 }
 
-confirmRegistration() {
-    // ✅ Allow registration only for Android & iOS
-    // if (this.deviceType !== 'Android' && this.deviceType !== 'iPhone') {
-    //     this.registrationError = '❌ Unsupported Device. Only Android and iOS devices can be registered.';
-    //     return;
-    // }
 
-    this.authService.registerDevice({
-        deviceId: this.deviceId,
-        deviceName: this.deviceName,
-        deviceType: this.deviceType,
-        platform: this.platform,
-        browser: this.browser,
-        osVersion: this.osVersion,
-        screenResolution: this.screenResolution,
-        ipAddress: this.ipAddress
-    }).subscribe({
-        next: (response) => {
-            this.deviceRegistered = true;
-            this.registrationError = ''; // Clear error message
-            this.messageService.add({ key: 'main-toast', severity: 'success', summary: 'Success', detail: 'Device registered successfully!' });
-        },
-        error: (error) => {
-            console.error('Device registration failed:', error);
-            this.messageService.add({ key: 'main-toast', severity: 'error', summary: 'Error', detail: 'Device registration failed' });
-        }
-    });
+confirmRegistration() {
+  // ✅ Step 1: Ensure device details are fetched
+  if (!this.deviceDetailsFetched) {
+      this.messageService.add({ key: 'main-toast', severity: 'error', summary: 'Error', detail: 'Please fetch device details first.' });
+      return;
+  }
+
+  // ✅ Step 2: Validate device details (Modify conditions as needed)
+  const allowedPlatforms = ["Windows", "Android", "iOS", "Linux x86_64"];
+  const allowedBrowsers = ["Chrome", "Firefox", "Safari"];
+
+  if (!this.deviceId || !this.deviceName || !this.platform || !this.browser || !this.osVersion) {
+      this.messageService.add({ key: 'main-toast', severity: 'error', summary: 'Error', detail: 'Incomplete device details. Please try again.' });
+      return;
+  }
+
+  if (!allowedPlatforms.includes(this.platform)) {
+      this.messageService.add({ key: 'main-toast', severity: 'error', summary: 'Error', detail: `Unsupported platform: ${this.platform}.` });
+      return;
+  }
+
+  if (!allowedBrowsers.includes(this.browser)) {
+      this.messageService.add({ key: 'main-toast', severity: 'error', summary: 'Error', detail: `Unsupported browser: ${this.browser}.` });
+      return;
+  }
+
+  // ✅ Step 3: If everything is valid, allow moving to the next step
+  this.deviceRegistered = true;
+  this.messageService.add({ key: 'main-toast', severity: 'success', summary: 'Success', detail: 'Device is valid. You can proceed.' });
+
+  // ✅ Move to the next step (update stepper index)
+  this.active! += 1;
 }
 
-
-  onRegisterSubmit() {
-    // this.deviceId = await this.authService.getDeviceId();
-    if (!this.faceRegistered || !this.faceDescriptor) {
-      this.messageService.add({key:'main-toast', severity:'error', summary:'Error', detail:'Face is not registered. Please register your face before submitting.'});
-      // alert('Face is not registered. Please register your face before submitting.');
-      return;
-    }
-
-    if (this.password !== this.confirmPassword) {
-      this.messageService.add({key:'main-toast', severity:'error', summary:'Error', detail:'Passwords do not match!'});
-      alert('Passwords do not match!');
-      return;
-    }
-
-    const data = {
-      studentId: this.firstFormGroup.value.studentId,
-      name: this.firstFormGroup.value.name,
-      email: this.firstFormGroup.value.email,
-      password: this.firstFormGroup.value.password,
-      branch: this.firstFormGroup.value.branch,
-      year: this.firstFormGroup.value.year,
-      semester: this.firstFormGroup.value.semester,
-      phoneNumber: this.firstFormGroup.value.phoneNumber,
-      phoneNumber1: this.firstFormGroup.value.phoneNumber1,
-      academicYear: this.firstFormGroup.value.academicYear,
-      isLateralEntry: this.firstFormGroup.value.isLateralEntry,
-      faceDescriptor: this.faceDescriptor,
-      deviceId: this.deviceId,
-    };
-
-    console.log("device id ",this.deviceId);
-    this.authService.registerStudent(data).subscribe(
-      (res) => {
-        this.messageService.add({key:'main-toast',  severity:'success', summary:'Success', detail:'Registration successful!'});
-        // alert('Registration successful!');
-        this.clearForm();
-        setTimeout(() => {
-        this.toggleForm();
-        }, 1000);
-      },
-      (err) => {
-        alert('Registration failed.');
-      }
-    );
+onRegisterSubmit() {
+  if (!this.faceRegistered || !this.faceDescriptor) {
+    this.messageService.add({key:'main-toast', severity:'error', summary:'Error', detail:'Face is not registered. Please register your face before submitting.'});
+    return;
   }
+
+  if (this.password !== this.confirmPassword) {
+    this.messageService.add({key:'main-toast', severity:'error', summary:'Error', detail:'Passwords do not match!'});
+    return;
+  }
+
+  // ✅ Include device details in student registration
+  const data = {
+    studentId: this.firstFormGroup.value.studentId,
+    name: this.firstFormGroup.value.name,
+    email: this.firstFormGroup.value.email,
+    password: this.firstFormGroup.value.password,
+    branch: this.firstFormGroup.value.branch,
+    year: this.firstFormGroup.value.year,
+    semester: this.firstFormGroup.value.semester,
+    phoneNumber: this.firstFormGroup.value.phoneNumber,
+    phoneNumber1: this.firstFormGroup.value.phoneNumber1,
+    academicYear: this.firstFormGroup.value.academicYear,
+    isLateralEntry: this.firstFormGroup.value.isLateralEntry,
+    faceDescriptor: this.faceDescriptor,
+
+    // ✅ Add device details
+    deviceId: this.deviceId,
+    deviceName: this.deviceName,
+    deviceType: this.deviceType,
+    platform: this.platform,
+    browser: this.browser,
+    osVersion: this.osVersion,
+    screenResolution: this.screenResolution,
+    ipAddress: this.ipAddress,
+  };
+
+  this.authService.registerStudent(data).subscribe(
+    (res) => {
+      this.messageService.add({key:'main-toast',  severity:'success', summary:'Success', detail:'Registration successful!'});
+      this.clearForm();
+      setTimeout(() => {
+        this.toggleForm();
+      }, 1000);
+    },
+    (err) => {
+      this.messageService.add({key:'main-toast', severity:'error', summary:'Error', detail:'Registration failed. Please try again.'});
+    }
+  );
+}
+
 
   onLoginSubmit() {
     const data = {

@@ -14,6 +14,7 @@
   </div>
 </p-toolbar>
 <p-toast key="toast1"></p-toast>
+
 <div class="auth-container">
   <!-- Login Form -->
   <div *ngIf="!isLogin" @formTransition>
@@ -185,9 +186,7 @@
 
 
 
-           <div *ngIf="loading"  class="loading">
-            <p-progressSpinner></p-progressSpinner>
-           </div>
+           
 
           <div class="face-recognition">
             <video id="videoElement" width="100%" autoplay muted></video>

@@ -12,11 +12,7 @@
 
 <div class="crc-auth">
   <div class="crc-auth-container">
-    <!-- Alerts -->
-    <div *ngIf="alertMessage" class="alert" [ngClass]="alertType">
-      {{ alertMessage }}
-    </div>
-
+   
     <!-- TabView for Login and Registration -->
     <p-tabView>
       <!-- Login Tab -->
@@ -74,6 +70,7 @@
                         [style]="{'width': '100%'}"            
                         formControlName="password" 
                         [toggleMask]="true"
+                        [feedback]="true"
                         required>
             </p-password>
           </div>

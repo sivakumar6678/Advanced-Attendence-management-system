@@ -85,7 +85,7 @@ export class CrcAuthComponent {
         year: this.registrationData.year,
         semester: this.registrationData.semester,
         password: this.registrationData.password,
-        phone_number: this.facultyDetails?.phone_number || "", // ✅ Ensure phone_number is sent
+        // phone_number: this.facultyDetails?.phone_number || "", // ✅ Ensure phone_number is sent
       };
 
       this.crcAuthService.registerCRC(crcData).subscribe(

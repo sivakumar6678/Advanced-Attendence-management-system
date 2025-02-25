@@ -1,16 +1,27 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { AppComponent } from './app.component';
 import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { routes } from './app.routes';
 
-import { StudentAuthComponent } from './features/student/student-auth/student-auth.component';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { LoadingInterceptor } from './core/interceptors/loading.interceptor';
+
+import { AppComponent } from './app.component';
 import { TestComponent } from './test/test.component';
+
 import { HomeComponent } from './shared/components/home/home.component';
+import { LoadingComponent } from './shared/loading/loading.component';
+
+import { SuperadminComponent } from './features/superadmin/superadmin.component';
+import { StudentAuthComponent } from './features/student/student-auth/student-auth.component';
+import { TeacherAuthComponent } from './features/teacher/teacher-auth/teacher-auth.component';
+import { CrcAuthComponent } from './features/crc/crc-auth/crc-auth.component';
+
+import { CrcDashboardComponent } from './features/crc/crc-dashboard/crc-dashboard.component';
 
 
 import { ButtonModule } from "primeng/button";
@@ -40,9 +51,6 @@ import { AvatarModule } from 'primeng/avatar';
 
 
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
-import { CrcAuthComponent } from './features/crc/crc-auth/crc-auth.component';
-import { TeacherAuthComponent } from './features/teacher/teacher-auth/teacher-auth.component';
-import { SuperadminComponent } from './features/superadmin/superadmin.component';
 
 
 
@@ -50,11 +58,14 @@ import { SuperadminComponent } from './features/superadmin/superadmin.component'
     declarations: [
         AppComponent,
         HomeComponent,
+        LoadingComponent,
         StudentAuthComponent,
+
         TestComponent,
         TeacherAuthComponent,
         CrcAuthComponent,
         SuperadminComponent,
+        CrcDashboardComponent
     ],
     imports: [
         RouterModule.forRoot(routes),  // Define routes
@@ -96,7 +107,8 @@ import { SuperadminComponent } from './features/superadmin/superadmin.component'
     ],
     providers: [
         MessageService,
-        provideHttpClient(withInterceptorsFromDi())  // HTTP client setup
+        provideHttpClient(withInterceptorsFromDi()),  // HTTP client setup
+        { provide: HTTP_INTERCEPTORS, useClass: LoadingInterceptor, multi: true },  // Loading interceptor
     ],
     bootstrap: [AppComponent],
     exports: [RouterModule],

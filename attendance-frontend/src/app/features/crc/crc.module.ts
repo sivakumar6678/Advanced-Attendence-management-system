@@ -8,7 +8,7 @@ import { CrcTimetableComponent } from './crc-timetable/crc-timetable.component';
 @NgModule({
   declarations: [
     // CrcAuthComponent,
-    CrcDashboardComponent,
+    // CrcDashboardComponent,
     CrcTimetableComponent,
   ],
   imports: [CommonModule, FormsModule, RouterModule],
