@@ -1,0 +1,40 @@
+.timetable-container {
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  h2 {
+    color: #007bff;
+    text-align: center;
+  }
+  
+  .add-subject {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  
+  .add-subject input {
+    width: 250px;
+    padding: 8px;
+    margin-right: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .p-dropdown {
+    width: 100%;
+  }
+  
+  .p-table {
+    width: 100%;
+    margin-top: 20px;
+  }
+  
+  button {
+    margin-top: 10px;
+  }
+  

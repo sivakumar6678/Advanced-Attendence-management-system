@@ -22,6 +22,7 @@ import { TeacherAuthComponent } from './features/teacher/teacher-auth/teacher-au
 import { CrcAuthComponent } from './features/crc/crc-auth/crc-auth.component';
 
 import { CrcDashboardComponent } from './features/crc/crc-dashboard/crc-dashboard.component';
+import { CrcTimetableComponent } from './features/crc/crc-timetable/crc-timetable.component';
 
 
 import { ButtonModule } from "primeng/button";
@@ -48,8 +49,10 @@ import { TabViewModule } from 'primeng/tabview';
 import { TableModule } from 'primeng/table';
 import { BadgeModule } from 'primeng/badge';
 import { AvatarModule } from 'primeng/avatar';
-
-
+import {DialogModule} from 'primeng/dialog';
+import { PanelModule } from 'primeng/panel';
+import { TieredMenuModule } from 'primeng/tieredmenu';
+import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 
@@ -65,7 +68,8 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
         TeacherAuthComponent,
         CrcAuthComponent,
         SuperadminComponent,
-        CrcDashboardComponent
+        CrcDashboardComponent,
+        CrcTimetableComponent,
     ],
     imports: [
         RouterModule.forRoot(routes),  // Define routes
@@ -100,6 +104,10 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
         TableModule,
         BadgeModule,
         AvatarModule,
+        DialogModule,
+        PanelModule,
+        TieredMenuModule,
+        BreadcrumbModule,
 
       
 

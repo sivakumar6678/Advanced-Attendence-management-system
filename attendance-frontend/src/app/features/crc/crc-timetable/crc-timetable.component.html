@@ -1,1 +1,90 @@
-<p>crc-timetable works!</p>
+<div class="timetable-container">
+    <h2>Timetable Management</h2>
+  
+    <!-- ✅ Tabbed Interface for Subject & Timetable Management -->
+    <p-tabView>
+      <!-- Tab 1: Manage Subjects -->
+      <p-tabPanel header="Manage Subjects">
+        <div class="add-subject">
+          <h3>Add New Subject</h3>
+          <input type="text" pInputText [(ngModel)]="newSubject" placeholder="Enter Subject Name">
+          <button pButton label="Add Subject" class="p-button-primary" (click)="addSubject()"></button>
+        </div>
+  
+        <!-- ✅ List of Subjects with Delete Option -->
+        <p-table [value]="subjects">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Subject Name</th>
+              <th>Actions</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-subject let-i="rowIndex">
+            <tr>
+              <td>{{ subject }}</td>
+              <td>
+                <button pButton icon="fas fa-trash" class="p-button-danger p-button-sm"
+                  (click)="deleteSubject(i)"></button>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </p-tabPanel>
+  
+      <!-- Tab 2: Manage Timetable -->
+      <p-tabPanel header="Manage Timetable">
+        <p-table [value]="days">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Day</th>
+              <th *ngFor="let slot of timeSlots; let i = index">
+                {{ slot.time }}
+                <button pButton pRipple icon="fas fa-pencil" class="p-button-text p-button-sm" 
+                  *ngIf="!semesterFinalized" (click)="openEditTimeSlotDialog(i)"></button>
+              </th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-day>
+            <tr>
+              <td>{{ day }}</td>
+              <td *ngFor="let entry of timetable[day]; let i = index">
+                <div>
+                  <p-dropdown *ngIf="!semesterFinalized" [options]="subjects"
+                    [ngModel]="timetable[day][i].subject"
+                    (onChange)="updateEntry(day, i, 'subject', $event.value)"
+                    placeholder="Select Subject">
+                  </p-dropdown>
+                  <span *ngIf="semesterFinalized"><strong>{{ timetable[day][i].subject || '—' }}</strong></span>
+  
+                  <br>
+  
+                  <p-dropdown *ngIf="!semesterFinalized" [options]="facultyList"
+                    [ngModel]="timetable[day][i].faculty"
+                    (onChange)="updateEntry(day, i, 'faculty', $event.value)"
+                    placeholder="Select Faculty">
+                  </p-dropdown>
+                  <span *ngIf="semesterFinalized"><small>{{ timetable[day][i].faculty || '—' }}</small></span>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+  
+        <button pButton label="Finalize Timetable" class="p-button-success"
+          *ngIf="!semesterFinalized" (click)="finalizeTimetable()"></button>
+      </p-tabPanel>
+    </p-tabView>
+  
+    <!-- Time Slot Edit Dialog -->
+    <p-dialog [(visible)]="isEditDialogVisible" [modal]="true" header="Edit Time Slot">
+      <div class="p-fluid">
+        <label>New Time Slot:</label>
+        <input type="text" pInputText [(ngModel)]="newTimeSlot">
+      </div>
+      <ng-template pTemplate="footer">
+        <button pButton label="Save" icon="pi pi-check" class="p-button-success" (click)="saveTimeSlot()"></button>
+        <button pButton label="Cancel" icon="pi pi-times" class="p-button-text" (click)="isEditDialogVisible = false"></button>
+      </ng-template>
+    </p-dialog>
+  </div>
+  

@@ -1,1 +1,65 @@
-<p>crc-dashboard works!</p>
+<div class="dashboard-container">
+    <!-- ✅ Sidebar Navigation -->
+    <div class="sidebar">
+      <p-menubar [model]="menuItems"></p-menubar>
+    </div>
+  
+    <!-- ✅ Main Content Section -->
+    <div class="content">
+      <!-- ✅ Breadcrumb Navigation -->
+      <p-breadcrumb [model]="[{ label: activePage.charAt(0).toUpperCase() + activePage.slice(1) }]"></p-breadcrumb>
+  
+      <!-- ✅ Dynamic Sections Based on Menu Selection -->
+      <div *ngIf="activePage === 'home'">
+        <h1>Welcome, {{ crcProfile?.email }}</h1>
+        <p-card>
+          <p>Manage your college’s timetable, track attendance, and review notifications efficiently.</p>
+        </p-card>
+  
+        <div class="dashboard-widgets">
+          <p-card class="widget">
+            <h3>Upcoming Classes</h3>
+            <p>View the next scheduled classes for this semester.</p>
+          </p-card>
+          <p-card class="widget">
+            <h3>Pending Faculty Requests</h3>
+            <p>Manage requests from faculty members.</p>
+          </p-card>
+          <p-card class="widget">
+            <h3>Recent Notifications</h3>
+            <p>Check the latest announcements and updates.</p>
+          </p-card>
+        </div>
+      </div>
+  
+      <div *ngIf="activePage === 'timetable'">
+        <app-crc-timetable></app-crc-timetable>
+      </div>
+  
+      <div *ngIf="activePage === 'attendance'">
+        <p-card>
+          <h3>Attendance Overview</h3>
+          <p>View and manage student attendance records.</p>
+        </p-card>
+      </div>
+  
+      <div *ngIf="activePage === 'notifications'">
+        <p-card>
+          <h3>Notifications</h3>
+          <p>View important updates and messages.</p>
+        </p-card>
+      </div>
+  
+      <div *ngIf="activePage === 'profile'">
+        <p-card>
+          <h3>Profile</h3>
+            <p><strong>Faculty ID:</strong> {{ crcProfile?.faculty_id }} </p>
+            <p><strong>Branch:</strong> {{ crcProfile?.branch }}  </p>
+            <p><strong>Year:</strong> {{ crcProfile?.year }}  </p>
+            <p><strong>Semester:</strong>{{ crcProfile?.semester }}  </p>
+            <p><strong>Role:</strong> {{ crcProfile?.role }} </p>
+        </p-card>
+      </div>
+    </div>
+  </div>
+  
