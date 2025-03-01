@@ -359,6 +359,8 @@ onRegisterSubmit() {
       (res) => {
         this.messageService.add({key:'main-toast', severity:'success', summary:'Success', detail:'Login successful!'});
         console.log("Login successful!'",res);
+        localStorage.setItem('access_token', res.access_token);
+        localStorage.setItem('refresh_token', res.refresh_token);
 
         this.clearForm();
         setTimeout(() => {

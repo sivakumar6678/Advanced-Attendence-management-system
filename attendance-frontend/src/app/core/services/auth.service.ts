@@ -80,6 +80,14 @@ export class AuthService {
     return this.deviceId!;
   }
 
+  getToken(): string | null {
+    return localStorage.getItem('access_token');
+  }
+
+  private getAuthHeaders() {
+    const token = this.getToken();
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  }
 
   // Student Registraiton api
   registerStudent(data: any): Observable<any> {
@@ -94,7 +102,10 @@ export class AuthService {
   loginStudent(data: any): Observable<any> {
     const body = { ...data };
     console.log("login student",body);
-    return this.http.post(`${this.baseUrl}/students/login/`,body);
+    return this.http.post(`${this.baseUrl}/students/login/`,{
+      ...body,
+      headers : this.getAuthHeaders()
+    });
     // return this.http.post('/api/students/login', body);
   }
 
@@ -116,7 +127,10 @@ export class AuthService {
   }
 //  CRC login api
   loginCRC(credentials: any): Observable<any> {
-    return this.http.post(`${this.baseUrl}/crc/login/`, credentials);
+    return this.http.post(`${this.baseUrl}/crc/login/`, {
+      ...credentials,
+      headers : this.getAuthHeaders()
+    });
   }
   fetchFacultyDetails(email: string, employeeId: string): Observable<any> {
     return this.http.get(`${this.baseUrl}/crc/faculty-details/?email=${email}&employee_id=${employeeId}`);
@@ -124,6 +138,11 @@ export class AuthService {
   logoutCRC(): Observable<any> {
     return this.http.get(`${this.baseUrl}/crc/logout/`);
   }
+  logout() {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+  }
+  
 
   
 }

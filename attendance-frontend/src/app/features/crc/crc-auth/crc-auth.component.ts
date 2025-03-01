@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { AuthService } from '../../../core/services/auth.service';
 import { UserService } from '../../../core/services/user.service';
 import { MessageService } from 'primeng/api';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-crc-auth',
@@ -28,7 +29,8 @@ export class CrcAuthComponent {
 
   constructor(private crcAuthService: AuthService,
               private userService: UserService,
-              private messageservice: MessageService
+              private messageservice: MessageService,
+              private router: Router
             ) {}
 
   ngOnInit() {
@@ -109,8 +111,12 @@ export class CrcAuthComponent {
       this.crcAuthService.loginCRC(this.loginData).subscribe(
         (res) => {
           console.log('Login Successful!', res);
+          localStorage.setItem('access_token', res.access_token);
+          localStorage.setItem('refresh_token', res.refresh_token);
           this.messageservice.add({key: 'toast-anime',severity:'success', summary:'Login Successful', detail:'Logged in successfully!'});
           this.clearForm();
+          this.router.navigate(['/crc/dashboard']);
+
         },
         (error) => {
           console.error('Error logging in', error);

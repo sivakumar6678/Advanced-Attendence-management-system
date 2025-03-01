@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth.service';
 import { UserService } from '../../../core/services/user.service';
 import { MessageService } from 'primeng/api';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -22,7 +23,8 @@ export class TeacherAuthComponent implements OnInit {
     private fb: FormBuilder,
     private authService: AuthService,
     private userService: UserService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private router: Router
   ) {
     // Initialize Login Form
     this.loginForm = this.fb.group({
@@ -63,6 +65,11 @@ export class TeacherAuthComponent implements OnInit {
         this.messageService.add({ key:'toast-anime', severity: 'success', summary: 'Login successful!', detail: 'Welcome back!' });
         this.loginForm.reset();
         console.log('Login successful:', response);
+        localStorage.setItem('access_token', response.access_token);
+        localStorage.setItem('refresh_token', response.refresh_token);
+        setTimeout(() => {
+          this.router.navigate(['/teacher/dashboard']);
+        },1000);
       },
       error => {
         if (error.status === 401) {
