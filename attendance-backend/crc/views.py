@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from .models import CRCProfile
+from core.models import Branch
 from teacher.models import Faculty
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
@@ -52,6 +53,7 @@ class LoginCRC(APIView):
 
             # Check if CRC is linked to Faculty
             crc = get_object_or_404(CRCProfile, faculty_ref=faculty)
+            
 
             return Response({
                 "message": "Login successful",
@@ -77,10 +79,13 @@ class CRCDashboardView(APIView):
             # Fetch CRC profile using Faculty reference
             crc = get_object_or_404(CRCProfile, faculty_ref=faculty)
 
+            branch = get_object_or_404(Branch, id=crc.branch)
+            branch_name = branch.name 
+
             return Response({
                 "faculty_id": crc.faculty_ref.id,
                 "email": crc.faculty_ref.email,
-                "branch": crc.branch,
+                "branch": branch_name,
                 "year": crc.year,
                 "semester": crc.semester,
                 "role": "crc"
@@ -90,6 +95,7 @@ class CRCDashboardView(APIView):
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class FetchFacultyDetails(APIView):
+
     """Fetch Faculty Details Before CRC Registration"""
     def get(self, request):
         email = request.query_params.get('email', '').strip()
@@ -107,3 +113,4 @@ class FetchFacultyDetails(APIView):
             }, status=status.HTTP_200_OK)
         else:
             return Response({"error": "Faculty not found"}, status=status.HTTP_404_NOT_FOUND)
+

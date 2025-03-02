@@ -142,9 +142,5 @@ export class CrcAuthComponent {
     };
   }
 
-  // Logout CRC
-  logoutCRC() {
-    // this.crcAuthService.logoutCRC();
-    this.messageservice.add({key: 'toast-anime',severity:'info', summary:'Logged Out', detail:'Logged out successfully!'});
-  }
+
 }

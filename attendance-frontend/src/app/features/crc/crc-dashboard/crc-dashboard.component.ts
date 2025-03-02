@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { UserService } from '../../../core/services/user.service';
 import { HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-crc-dashboard',
@@ -11,14 +12,19 @@ import { Router } from '@angular/router';
 export class CrcDashboardComponent implements OnInit {
   crcProfile: any;
   activePage: string = 'home'; // Default section
-  
-  
+  visible: boolean = false;
+  currentTime: string = '';
+  sidebarHidden: boolean = false; // Sidebar toggle state
+
+  constructor(private crcDashboardService: UserService, private router: Router, private messageService: MessageService) {}
+
   ngOnInit(): void {
     this.loadDashboard();
-    
-   
+    this.updateTime();
+    setInterval(() => this.updateTime(), 60000); // Update time every minute
   }
-   loadDashboard() {
+  
+  loadDashboard() {
     const headers = new HttpHeaders().set('Authorization', `Bearer ${localStorage.getItem('access_token')}`);
     this.crcDashboardService.getCrcProfile(headers).subscribe(
       (data) => {
@@ -30,31 +36,50 @@ export class CrcDashboardComponent implements OnInit {
         this.router.navigate(['/crc/login']);
       }
     );
-   
   }
 
-    menuItems = [
-    { label: 'Home', icon: 'fas fa-home', command: () => this.setActivePage('home') },
-    { label: 'Profile', icon: 'fas fa-user', command: () => this.setActivePage('profile') },
-    { label: 'Timetable', icon: 'fas fa-calendar', command: () => this.setActivePage('timetable') },
-    { label: 'Attendance', icon: 'fas fa-check-square', command: () => this.setActivePage('attendance') },
-    { label: 'Notifications', icon: 'fas fa-bell', command: () => this.setActivePage('notifications') },
-    { label: 'Logout', icon: 'fas fa-sign-out', command: () => this.logout() }
+  updateTime() {
+    const now = new Date();
+    this.currentTime = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+
+  toggleSidebar() {
+    this.sidebarHidden = !this.sidebarHidden;
+  }
+
+  menuItems = [
+    { label: 'Home', icon: 'pi pi-home', command: () => this.setActivePage('home') },
+    { label: 'Timetable', icon: 'pi pi-calendar', command: () => this.setActivePage('timetable') },
+    { label: 'Attendance', icon: 'pi pi-check-square', command: () => this.setActivePage('attendance') },
+    { label: 'Notifications', icon: 'pi pi-bell', command: () => this.setActivePage('notifications') },
+    { separator: true },
+    { label: 'Logout', icon: 'pi pi-sign-out', command: () => this.confirmLogout() }
   ];
+
   setActivePage(page: string) {
     this.activePage = page;
-  }
-  
-  constructor(private crcDashboardService: UserService, private router: Router) {}
-
-
-  approveRequest(requestId: number, type: string): void {
-    console.log(`Approved ${type} request:`, requestId);
-    alert(`${type} request approved!`);
   }
 
   logout() {
     localStorage.removeItem('access_token');
     this.router.navigate(['/crc-auth']);
+  }
+
+  confirmLogout() {
+    this.messageService.add({ key: 'confirm', sticky: true, severity: 'warn', summary: 'Confirm Logout?', detail: 'Are you sure you want to logout?' });
+    this.visible = true;
+  }
+  
+  onConfirm() {
+    this.messageService.clear('confirm');
+    this.visible = false;
+    setTimeout(() => {
+      this.logout();
+    }, 1000);
+  }
+
+  onReject() {
+    this.messageService.clear('confirm');
+    this.visible = false;
   }
 }

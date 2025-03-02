@@ -1,65 +1,76 @@
 <div class="dashboard-container">
-    <!-- ✅ Sidebar Navigation -->
-    <div class="sidebar">
-      <p-menubar [model]="menuItems"></p-menubar>
-    </div>
-  
-    <!-- ✅ Main Content Section -->
-    <div class="content">
-      <!-- ✅ Breadcrumb Navigation -->
-      <p-breadcrumb [model]="[{ label: activePage.charAt(0).toUpperCase() + activePage.slice(1) }]"></p-breadcrumb>
-  
-      <!-- ✅ Dynamic Sections Based on Menu Selection -->
-      <div *ngIf="activePage === 'home'">
-        <h1>Welcome, {{ crcProfile?.email }}</h1>
-        <p-card>
-          <p>Manage your college’s timetable, track attendance, and review notifications efficiently.</p>
-        </p-card>
-  
-        <div class="dashboard-widgets">
-          <p-card class="widget">
-            <h3>Upcoming Classes</h3>
-            <p>View the next scheduled classes for this semester.</p>
-          </p-card>
-          <p-card class="widget">
-            <h3>Pending Faculty Requests</h3>
-            <p>Manage requests from faculty members.</p>
-          </p-card>
-          <p-card class="widget">
-            <h3>Recent Notifications</h3>
-            <p>Check the latest announcements and updates.</p>
-          </p-card>
+  <!-- ✅ Sidebar Navigation -->
+  <div class="sidebar">
+    <p-menubar [model]="menuItems"></p-menubar>
+  </div>
+
+  <!-- ✅ Main Content Section -->
+  <div class="content">
+    <!-- ✅ Breadcrumb Navigation -->
+    <p-breadcrumb [model]="[{ label: activePage.charAt(0).toUpperCase() + activePage.slice(1) }]"></p-breadcrumb>
+
+    <!-- ✅ Home Section -->
+    <div *ngIf="activePage === 'home'" class="home-container">
+      <!-- ✅ Welcome & Profile Section -->
+      <div class="profile-section">
+        <div class="profile-avatar">
+          <p-avatar icon="fas fa-user" size="xlarge" styleClass="mr-2"></p-avatar>
+        </div>
+        <div class="profile-info">
+          <h2>Welcome, {{ crcProfile?.email }}</h2>
+          <p>Branch: {{ crcProfile?.branch }} </p> 
+          <p> Year: {{ crcProfile?.year }} | Semester: {{ crcProfile?.semester }}</p>
+          <p><i class="pi pi-clock"></i> Current Time: {{ currentTime }}</p>
         </div>
       </div>
-  
-      <div *ngIf="activePage === 'timetable'">
-        <app-crc-timetable></app-crc-timetable>
+
+      <!-- ✅ Quick Action Buttons -->
+      <div class="quick-actions">
+        <p-button label="Manage Timetable" icon="pi pi-calendar" class="p-button-info" (click)="setActivePage('timetable')"></p-button>
+        <p-button label="View Attendance" icon="pi pi-check-square" class="p-button-success" (click)="setActivePage('attendance')"></p-button>
+        <p-button label="Notifications" icon="pi pi-bell" class="p-button-warning" (click)="setActivePage('notifications')"></p-button>
       </div>
-  
-      <div *ngIf="activePage === 'attendance'">
-        <p-card>
-          <h3>Attendance Overview</h3>
-          <p>View and manage student attendance records.</p>
+
+      <!-- ✅ Live Updates & Widgets -->
+      <div class="dashboard-widgets">
+        <p-card class="widget">
+          <h3><i class="pi pi-calendar"></i> Today's Schedule</h3>
+          <p>View your classes scheduled for today.</p>
         </p-card>
-      </div>
-  
-      <div *ngIf="activePage === 'notifications'">
-        <p-card>
-          <h3>Notifications</h3>
-          <p>View important updates and messages.</p>
-        </p-card>
-      </div>
-  
-      <div *ngIf="activePage === 'profile'">
-        <p-card>
-          <h3>Profile</h3>
-            <p><strong>Faculty ID:</strong> {{ crcProfile?.faculty_id }} </p>
-            <p><strong>Branch:</strong> {{ crcProfile?.branch }}  </p>
-            <p><strong>Year:</strong> {{ crcProfile?.year }}  </p>
-            <p><strong>Semester:</strong>{{ crcProfile?.semester }}  </p>
-            <p><strong>Role:</strong> {{ crcProfile?.role }} </p>
+        <p-card class="widget">
+          <h3><i class="pi pi-bell"></i> Recent Notifications</h3>
+          <p>Check latest updates from the administration.</p>
         </p-card>
       </div>
     </div>
+
+    <div *ngIf="activePage === 'timetable'">
+      <app-crc-timetable></app-crc-timetable>
+    </div>
+
+    <div *ngIf="activePage === 'attendance'">
+      <p-card>
+        <h3>Attendance Overview</h3>
+        <p>View and manage student attendance records.</p>
+      </p-card>
+    </div>
+
+    <div *ngIf="activePage === 'notifications'">
+      <p-card>
+        <h3>Notifications</h3>
+        <p>View important updates and messages.</p>
+      </p-card>
+    </div>
+
+    <!-- ✅ Logout Confirmation -->
+    <p-toast position="bottom-center" key="confirm" (onClose)="onReject()">
+      <ng-template let-message pTemplate="message">
+        <div class="confirm-box">
+          <h3>Confirm Logout</h3>
+          <p>{{ message.detail }}</p>
+          <p-button label="Logout" class="p-button-danger" (click)="onConfirm()"></p-button>
+        </div>
+      </ng-template>
+    </p-toast>
   </div>
-  
+</div>
