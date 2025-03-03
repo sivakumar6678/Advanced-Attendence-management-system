@@ -114,3 +114,19 @@ class FetchFacultyDetails(APIView):
         else:
             return Response({"error": "Faculty not found"}, status=status.HTTP_404_NOT_FOUND)
 
+
+class GetFaculty(APIView):
+    def get(self, request):
+        faculty = Faculty.objects.all()
+        faculty_list = []
+        
+
+
+        if faculty:
+            for member in faculty:
+                faculty_list.append({
+                    "full_name": member.full_name,
+                    "email": member.email
+                })
+            return Response(faculty_list, status=status.HTTP_200_OK)
+
