@@ -8,7 +8,10 @@ from teacher.models import Faculty
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.tokens import RefreshToken
-
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateAPIView
+from .models import Timetable, TimetableEntry, Subject
+from .serializers import TimetableSerializer, SubjectSerializer
+from rest_framework import generics
 class RegisterCRC(APIView):
     def post(self, request):
         data = request.data
@@ -130,3 +133,34 @@ class GetFaculty(APIView):
                 })
             return Response(faculty_list, status=status.HTTP_200_OK)
 
+# Get all subjects & create a new subject
+class SubjectListCreateView(generics.ListCreateAPIView):
+    queryset = Subject.objects.all()
+    serializer_class = SubjectSerializer
+
+# Delete a subject
+class SubjectDeleteView(APIView):
+    def delete(self, request, subject_id):
+        try:
+            subject = Subject.objects.get(id=subject_id)
+            subject.delete()
+            return Response({"message": "Subject deleted successfully"}, status=status.HTTP_200_OK)
+        except Subject.DoesNotExist:
+            return Response({"error": "Subject not found"}, status=status.HTTP_404_NOT_FOUND)
+class TimetableListCreateView(ListCreateAPIView):
+    queryset = Timetable.objects.all()
+    serializer_class = TimetableSerializer
+
+class TimetableDetailView(RetrieveUpdateAPIView):
+    queryset = Timetable.objects.all()
+    serializer_class = TimetableSerializer
+
+class FinalizeTimetableView(APIView):
+    def put(self, request, timetable_id):
+        try:
+            timetable = Timetable.objects.get(id=timetable_id)
+            timetable.is_finalized = True
+            timetable.save()
+            return Response({"message": "Timetable finalized successfully"}, status=status.HTTP_200_OK)
+        except Timetable.DoesNotExist:
+            return Response({"error": "Timetable not found"}, status=status.HTTP_404_NOT_FOUND)

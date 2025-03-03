@@ -1,7 +1,9 @@
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from .models import CRCProfile
 from rest_framework_simplejwt.tokens import Token
-
+from rest_framework import serializers
+from core.models import User
+from .models import Subject, Timetable, TimetableEntry
 class CRCTokenObtainPairSerializer(TokenObtainPairSerializer):
     """Custom JWT Serializer for CRC"""
     
@@ -27,3 +29,41 @@ class CRCToken(Token):
             "email": crc.email,
             "role": "crc"
         }
+
+
+class SubjectSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Subject
+        fields = '__all__'
+
+class TimetableEntrySerializer(serializers.ModelSerializer):
+    subject_id = serializers.PrimaryKeyRelatedField(
+        queryset=Subject.objects.all(), source='subject', allow_null=True
+    )
+    faculty_id = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(), source='faculty', allow_null=True
+    )
+
+    class Meta:
+        model = TimetableEntry
+        fields = ['id', 'day', 'time_slot', 'subject_id', 'faculty_id']
+
+class TimetableSerializer(serializers.ModelSerializer):
+    crc_id = serializers.PrimaryKeyRelatedField(
+        queryset=User .objects.all(), source='crc'
+    )
+    entries = TimetableEntrySerializer(many=True)
+
+    class Meta:
+        model = Timetable
+        fields = ['id', 'crc_id', 'branch', 'is_finalized', 'entries']
+
+    def create(self, validated_data):
+        entries_data = validated_data.pop('entries')
+        timetable = Timetable.objects.create(**validated_data)
+        
+        for entry_data in entries_data:
+            entry = TimetableEntry.objects.create(**entry_data)
+            timetable.entries.add(entry)
+
+        return timetable

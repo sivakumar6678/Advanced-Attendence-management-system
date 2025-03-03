@@ -13,3 +13,27 @@ class CRCProfile(User):  # ✅ Inherit from User for authentication
 
     def __str__(self):
         return f"CRC - {self.faculty_ref.email}"  # ✅ Uses linked Faculty email
+
+class Subject(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+
+    def __str__(self):
+        return self.name
+
+class TimetableEntry(models.Model):
+    day = models.CharField(max_length=10)  # Monday, Tuesday, etc.
+    time_slot = models.CharField(max_length=50)  # e.g., "9:15 AM - 10:15 AM"
+    subject = models.ForeignKey(Subject, on_delete=models.SET_NULL, null=True, blank=True)
+    faculty = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.day} - {self.time_slot}: {self.subject} ({self.faculty})"
+
+class Timetable(models.Model):
+    crc = models.ForeignKey(User, on_delete=models.CASCADE, related_name="timetables")  # CRC who created it
+    branch = models.CharField(max_length=255)  # Branch name
+    entries = models.ManyToManyField(TimetableEntry, related_name='timetables')  # Each timetable has multiple entries
+    is_finalized = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Timetable for {self.branch} (Finalized: {self.is_finalized})"

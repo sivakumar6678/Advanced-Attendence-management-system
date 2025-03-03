@@ -1,11 +1,16 @@
 from django.urls import path
-from .views import RegisterCRC, LoginCRC, FetchFacultyDetails, CRCDashboardView, GetFaculty
+from .views import RegisterCRC, LoginCRC, FetchFacultyDetails, CRCDashboardView, GetFaculty, SubjectListCreateView, SubjectDeleteView, TimetableListCreateView, TimetableDetailView, FinalizeTimetableView
 
 urlpatterns = [
     path('register/', RegisterCRC.as_view(), name='register-crc'),
     path('login/', LoginCRC.as_view(), name='login-crc'),
     path('faculty-details/', FetchFacultyDetails.as_view(), name='fetch-faculty-details'),
     path('dashboard/', CRCDashboardView.as_view(), name='crc-dashboard'),
+    path('timetables/', TimetableListCreateView.as_view(), name='timetable-list-create'),
+    path('timetables/<int:pk>/', TimetableDetailView.as_view(), name='timetable-detail'),
+    path('timetables/<int:timetable_id>/finalize/', FinalizeTimetableView.as_view(), name='finalize-timetable'),
     path('getfactuly/', GetFaculty.as_view(), name='get-faculty'),
+    path('subjects/', SubjectListCreateView.as_view(), name='subject-list-create'),
+    path('subjects/<int:subject_id>/', SubjectDeleteView.as_view(), name='subject-delete'),
     
     ]
