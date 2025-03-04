@@ -149,20 +149,40 @@ class SubjectDeleteView(APIView):
             return Response({"message": "Subject deleted successfully"}, status=status.HTTP_200_OK)
         except Subject.DoesNotExist:
             return Response({"error": "Subject not found"}, status=status.HTTP_404_NOT_FOUND)
-class TimetableListCreateView(ListCreateAPIView):
-    queryset = Timetable.objects.all()
-    serializer_class = TimetableSerializer
+class TimetableView(APIView):
+    def get(self, request):
+        timetables = Timetable.objects.all()
+        serializer = TimetableSerializer(timetables, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        serializer = TimetableSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request, timetable_id):
+        try:
+            timetable = Timetable.objects.get(id=timetable_id)
+            serializer = TimetableSerializer(timetable, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Timetable.DoesNotExist:
+            return Response({"error": "Timetable not found"}, status=status.HTTP_404_NOT_FOUND)
+
+
 
 class TimetableDetailView(RetrieveUpdateAPIView):
     queryset = Timetable.objects.all()
     serializer_class = TimetableSerializer
 
+
 class FinalizeTimetableView(APIView):
     def put(self, request, timetable_id):
-        try:
-            timetable = Timetable.objects.get(id=timetable_id)
-            timetable.is_finalized = True
-            timetable.save()
-            return Response({"message": "Timetable finalized successfully"}, status=status.HTTP_200_OK)
-        except Timetable.DoesNotExist:
-            return Response({"error": "Timetable not found"}, status=status.HTTP_404_NOT_FOUND)
+        timetable = get_object_or_404(Timetable, id=timetable_id)
+        timetable.is_finalized = True
+        timetable.save()
+        return Response({"message": "Timetable finalized successfully"}, status=status.HTTP_200_OK)

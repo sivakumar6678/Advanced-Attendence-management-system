@@ -3,6 +3,7 @@ from .models import CRCProfile
 from rest_framework_simplejwt.tokens import Token
 from rest_framework import serializers
 from core.models import User
+from teacher.models import Faculty
 from .models import Subject, Timetable, TimetableEntry
 class CRCTokenObtainPairSerializer(TokenObtainPairSerializer):
     """Custom JWT Serializer for CRC"""
@@ -41,7 +42,7 @@ class TimetableEntrySerializer(serializers.ModelSerializer):
         queryset=Subject.objects.all(), source='subject', allow_null=True
     )
     faculty_id = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.all(), source='faculty', allow_null=True
+        queryset=Faculty.objects.all(), source='faculty', allow_null=True # ✅ Fix reference to Faculty
     )
 
     class Meta:
