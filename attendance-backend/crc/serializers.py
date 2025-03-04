@@ -49,9 +49,28 @@ class TimetableEntrySerializer(serializers.ModelSerializer):
         model = TimetableEntry
         fields = ['id', 'day', 'time_slot', 'subject_id', 'faculty_id']
 
+# class TimetableSerializer(serializers.ModelSerializer):
+#     crc_id = serializers.PrimaryKeyRelatedField(
+#         queryset=User .objects.all(), source='crc'
+#     )
+#     entries = TimetableEntrySerializer(many=True)
+
+#     class Meta:
+#         model = Timetable
+#         fields = ['id', 'crc_id', 'branch', 'is_finalized', 'entries']
+
+#     def create(self, validated_data):
+#         entries_data = validated_data.pop('entries')
+#         timetable = Timetable.objects.create(**validated_data)
+        
+#         for entry_data in entries_data:
+#             entry = TimetableEntry.objects.create(**entry_data)
+#             timetable.entries.add(entry)
+
+#         return timetable
 class TimetableSerializer(serializers.ModelSerializer):
     crc_id = serializers.PrimaryKeyRelatedField(
-        queryset=User .objects.all(), source='crc'
+        queryset=User.objects.all(), source='crc'
     )
     entries = TimetableEntrySerializer(many=True)
 
@@ -62,9 +81,32 @@ class TimetableSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         entries_data = validated_data.pop('entries')
         timetable = Timetable.objects.create(**validated_data)
-        
+
         for entry_data in entries_data:
             entry = TimetableEntry.objects.create(**entry_data)
             timetable.entries.add(entry)
 
         return timetable
+
+    def update(self, instance, validated_data):
+        entries_data = validated_data.pop('entries', None)
+
+        # ✅ Update other Timetable fields
+        instance.crc = validated_data.get('crc', instance.crc)
+        instance.branch = validated_data.get('branch', instance.branch)
+        instance.is_finalized = validated_data.get('is_finalized', instance.is_finalized)
+        instance.save()
+
+        # ✅ Handle updating or replacing entries
+        if entries_data is not None:
+            instance.entries.all().delete()  # Remove old entries
+            for entry_data in entries_data:
+                TimetableEntry.objects.create(
+                    day=entry_data['day'],
+                    time_slot=entry_data['time_slot'],
+                    subject=entry_data.get('subject_id'),  # Ensure correct ForeignKey reference
+                    faculty=entry_data.get('faculty_id'),  # Ensure correct ForeignKey reference
+                    timetable=instance  # ✅ Correct way to associate
+                )
+
+        return instance
