@@ -128,6 +128,8 @@ class GetFaculty(APIView):
         if faculty:
             for member in faculty:
                 faculty_list.append({
+                    "id": member.id,
+
                     "full_name": member.full_name,
                     "email": member.email
                 })
