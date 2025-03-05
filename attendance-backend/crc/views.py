@@ -149,6 +149,7 @@ class SubjectDeleteView(APIView):
             return Response({"message": "Subject deleted successfully"}, status=status.HTTP_200_OK)
         except Subject.DoesNotExist:
             return Response({"error": "Subject not found"}, status=status.HTTP_404_NOT_FOUND)
+
 class TimetableView(APIView):
     def get(self, request):
         timetables = Timetable.objects.all()
@@ -164,15 +165,14 @@ class TimetableView(APIView):
 
     def put(self, request, timetable_id):
         try:
-            timetable = Timetable.objects.get(id=timetable_id)
-            serializer = TimetableSerializer(timetable, data=request.data, partial=True)
+            timetables = Timetable.objects.get(id=timetable_id)
+            serializer = TimetableSerializer(timetables, data=request.data, partial=True)
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_200_OK)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Timetable.DoesNotExist:
             return Response({"error": "Timetable not found"}, status=status.HTTP_404_NOT_FOUND)
-
 
 
 class TimetableDetailView(RetrieveUpdateAPIView):
