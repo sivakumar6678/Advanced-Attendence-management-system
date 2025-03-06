@@ -39,22 +39,21 @@ class SubjectSerializer(serializers.ModelSerializer):
 
 class TimetableEntrySerializer(serializers.ModelSerializer):
     subject_id = serializers.PrimaryKeyRelatedField(
-        queryset=Subject.objects.all(), source='subject', write_only=True
+        queryset=Subject.objects.all(), source='subject', allow_null=True
     )
     faculty_id = serializers.PrimaryKeyRelatedField(
-        queryset=Faculty.objects.all(), source='faculty', write_only=True
+        queryset=Faculty.objects.all(), source='faculty', allow_null=True
     )
-
-    subject = serializers.PrimaryKeyRelatedField(read_only=True)  # Represent subject as ID
-    faculty = serializers.PrimaryKeyRelatedField(read_only=True)  # Represent faculty as ID
 
     class Meta:
         model = TimetableEntry
-        fields = ['id', 'day', 'time_slot', 'subject_id', 'faculty_id', 'subject', 'faculty']
+        fields = ['id', 'day', 'time_slot', 'subject_id', 'faculty_id']
 
 
 class TimetableSerializer(serializers.ModelSerializer):
-    crc_id = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), source='crc')
+    crc_id = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(), source='crc'
+    )
     entries = TimetableEntrySerializer(many=True)
 
     class Meta:
@@ -65,46 +64,28 @@ class TimetableSerializer(serializers.ModelSerializer):
         entries_data = validated_data.pop('entries')
         timetable = Timetable.objects.create(**validated_data)
 
-        new_entries = []
         for entry_data in entries_data:
-            subject = entry_data.pop('subject')  # Get subject object
-            faculty = entry_data.pop('faculty')  # Get faculty object
+            entry = TimetableEntry.objects.create(**entry_data)
+            timetable.entries.add(entry)
 
-            entry = TimetableEntry.objects.create(
-                day=entry_data['day'],
-                time_slot=entry_data['time_slot'],
-                subject=subject,
-                faculty=faculty
-            )
-            new_entries.append(entry)
-
-        timetable.entries.set(new_entries)
         return timetable
 
     def update(self, instance, validated_data):
-        entries_data = validated_data.pop('entries', [])
-
-        # Update timetable fields
+        entries_data = validated_data.pop('entries', None)
         instance.crc = validated_data.get('crc', instance.crc)
         instance.branch = validated_data.get('branch', instance.branch)
         instance.is_finalized = validated_data.get('is_finalized', instance.is_finalized)
         instance.save()
 
-        # Clear old entries before adding updated ones
-        instance.entries.clear()
-        new_entries = []
+        if entries_data is not None:
+            instance.entries.all().delete()  # Remove old entries
+            for entry_data in entries_data:
+                TimetableEntry.objects.create(
+                    day=entry_data['day'],
+                    time_slot=entry_data['time_slot'],
+                    subject=entry_data.get('subject_id'),
+                    faculty=entry_data.get('faculty_id'),
+                    timetable=instance
+                )
 
-        for entry_data in entries_data:
-            subject = entry_data.pop('subject')  # Get subject object
-            faculty = entry_data.pop('faculty')  # Get faculty object
-
-            new_entry = TimetableEntry.objects.create(
-                day=entry_data['day'],
-                time_slot=entry_data['time_slot'],
-                subject=subject,
-                faculty=faculty
-            )
-            new_entries.append(new_entry)
-
-        instance.entries.set(new_entries)
         return instance

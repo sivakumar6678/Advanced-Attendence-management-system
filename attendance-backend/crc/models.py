@@ -24,7 +24,7 @@ class TimetableEntry(models.Model):
     day = models.CharField(max_length=10)  # Monday, Tuesday, etc.
     time_slot = models.CharField(max_length=50)  # e.g., "9:15 AM - 10:15 AM"
     subject = models.ForeignKey(Subject, on_delete=models.SET_NULL, null=True, blank=True)
-    faculty = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    faculty = models.ForeignKey(Faculty, on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return f"{self.day} - {self.time_slot}: {self.subject} ({self.faculty})"

@@ -150,7 +150,17 @@ class SubjectDeleteView(APIView):
         except Subject.DoesNotExist:
             return Response({"error": "Subject not found"}, status=status.HTTP_404_NOT_FOUND)
 
+class PublicTimetableView(APIView):
+    """✅ Public endpoint for fetching timetables (No authentication required)"""
+    
+    def get(self, request):
+        timetables = Timetable.objects.all()
+        serializer = TimetableSerializer(timetables, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 class TimetableView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
     def get(self, request):
         timetables = Timetable.objects.all()
         serializer = TimetableSerializer(timetables, many=True)
@@ -165,8 +175,8 @@ class TimetableView(APIView):
 
     def put(self, request, timetable_id):
         try:
-            timetables = Timetable.objects.get(id=timetable_id)
-            serializer = TimetableSerializer(timetables, data=request.data, partial=True)
+            timetable = Timetable.objects.get(id=timetable_id)
+            serializer = TimetableSerializer(timetable, data=request.data, partial=True)
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_200_OK)
@@ -174,15 +184,10 @@ class TimetableView(APIView):
         except Timetable.DoesNotExist:
             return Response({"error": "Timetable not found"}, status=status.HTTP_404_NOT_FOUND)
 
-
-class TimetableDetailView(RetrieveUpdateAPIView):
-    queryset = Timetable.objects.all()
-    serializer_class = TimetableSerializer
-
-
 class FinalizeTimetableView(APIView):
     def put(self, request, timetable_id):
         timetable = get_object_or_404(Timetable, id=timetable_id)
         timetable.is_finalized = True
         timetable.save()
         return Response({"message": "Timetable finalized successfully"}, status=status.HTTP_200_OK)
+
