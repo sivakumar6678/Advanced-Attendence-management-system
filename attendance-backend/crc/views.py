@@ -1,3 +1,4 @@
+import datetime
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -19,6 +20,7 @@ class RegisterCRC(APIView):
         branch = data.get("branch")
         year = data.get("year")
         semester = data.get("semester")
+        academic_year = data.get("academic_year")
 
         # Check if Faculty exists before registering CRC
         faculty = get_object_or_404(Faculty, email=email)
@@ -32,7 +34,8 @@ class RegisterCRC(APIView):
             faculty_ref=faculty,
             branch=branch,
             year=year,
-            semester=semester
+            semester=semester,
+            academic_year = academic_year
         )
 
         return Response({"message": "CRC registered successfully!"}, status=status.HTTP_201_CREATED)
@@ -66,6 +69,7 @@ class LoginCRC(APIView):
                 "email": faculty.email,
                 "role": "crc",
                 "user_id": crc.id,
+
             }, status=status.HTTP_200_OK)
         else:
             return Response({"error": "Invalid password"}, status=status.HTTP_401_UNAUTHORIZED)
@@ -91,6 +95,8 @@ class CRCDashboardView(APIView):
                 "branch": branch_name,
                 "year": crc.year,
                 "semester": crc.semester,
+                "academic_year":crc.academic_year,
+                "crcId":crc.id,
                 "role": "crc"
             }, status=status.HTTP_200_OK)
 
@@ -159,8 +165,9 @@ class PublicTimetableView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 class TimetableView(APIView):
     def get(self, request):
-        current_year = datetime.now().year
+        current_year = datetime.datetime.now().year
         academic_year = f"{current_year}-{current_year + 1}"  # Example: "2024-2025"
+        
         
         timetables = Timetable.objects.filter(academic_year=academic_year)
         serializer = TimetableSerializer(timetables, many=True)
