@@ -30,6 +30,7 @@ export class CrcDashboardComponent implements OnInit {
       (data) => {
         this.crcProfile = data;
         console.log('CRC Profile:', this.crcProfile);
+        this.crcDashboardService.setCRCDetails(this.crcProfile);
       },
       (error) => {
         console.error('Authorization failed', error);
