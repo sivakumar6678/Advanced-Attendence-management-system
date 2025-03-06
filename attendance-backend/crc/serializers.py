@@ -58,7 +58,7 @@ class TimetableSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Timetable
-        fields = ['id', 'crc_id', 'branch', 'is_finalized', 'entries']
+        fields = ['id', 'crc_id', 'branch', 'year', 'semester', 'academic_year', 'is_finalized', 'entries']
 
     def create(self, validated_data):
         entries_data = validated_data.pop('entries')
@@ -69,23 +69,3 @@ class TimetableSerializer(serializers.ModelSerializer):
             timetable.entries.add(entry)
 
         return timetable
-
-    def update(self, instance, validated_data):
-        entries_data = validated_data.pop('entries', None)
-        instance.crc = validated_data.get('crc', instance.crc)
-        instance.branch = validated_data.get('branch', instance.branch)
-        instance.is_finalized = validated_data.get('is_finalized', instance.is_finalized)
-        instance.save()
-
-        if entries_data is not None:
-            instance.entries.all().delete()  # Remove old entries
-            for entry_data in entries_data:
-                TimetableEntry.objects.create(
-                    day=entry_data['day'],
-                    time_slot=entry_data['time_slot'],
-                    subject=entry_data.get('subject_id'),
-                    faculty=entry_data.get('faculty_id'),
-                    timetable=instance
-                )
-
-        return instance

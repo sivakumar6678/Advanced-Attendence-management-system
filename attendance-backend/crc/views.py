@@ -158,11 +158,11 @@ class PublicTimetableView(APIView):
         serializer = TimetableSerializer(timetables, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 class TimetableView(APIView):
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
-
     def get(self, request):
-        timetables = Timetable.objects.all()
+        current_year = datetime.now().year
+        academic_year = f"{current_year}-{current_year + 1}"  # Example: "2024-2025"
+        
+        timetables = Timetable.objects.filter(academic_year=academic_year)
         serializer = TimetableSerializer(timetables, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -172,18 +172,6 @@ class TimetableView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def put(self, request, timetable_id):
-        try:
-            timetable = Timetable.objects.get(id=timetable_id)
-            serializer = TimetableSerializer(timetable, data=request.data, partial=True)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        except Timetable.DoesNotExist:
-            return Response({"error": "Timetable not found"}, status=status.HTTP_404_NOT_FOUND)
-
 class FinalizeTimetableView(APIView):
     def put(self, request, timetable_id):
         timetable = get_object_or_404(Timetable, id=timetable_id)
