@@ -143,9 +143,18 @@ class GetFaculty(APIView):
 
 # Get all subjects & create a new subject
 class SubjectListCreateView(generics.ListCreateAPIView):
-    queryset = Subject.objects.all()
     serializer_class = SubjectSerializer
+    permission_classes = [IsAuthenticated]  # ✅ Ensure only authenticated CRC can manage subjects
 
+    def get_queryset(self):
+        user = self.request.user
+        crc = get_object_or_404(CRCProfile, faculty_ref=user)
+        return Subject.objects.filter(crc=crc)
+
+    def perform_create(self, serializer):
+        user = self.request.user
+        crc = get_object_or_404(CRCProfile, faculty_ref=user)
+        serializer.save(crc=crc)
 # Delete a subject
 class SubjectDeleteView(APIView):
     def delete(self, request, subject_id):

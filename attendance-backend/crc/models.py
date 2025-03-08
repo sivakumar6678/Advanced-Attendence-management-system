@@ -15,10 +15,11 @@ class CRCProfile(User):  # ✅ Inherit from User for authentication
         return f"CRC - {self.faculty_ref.email}"  # ✅ Uses linked Faculty email
 
 class Subject(models.Model):
-    name = models.CharField(max_length=255, unique=True)
+    name = models.CharField(max_length=255)
+    crc = models.ForeignKey(CRCProfile, on_delete=models.CASCADE, related_name="subjects")
 
     def __str__(self):
-        return self.name
+        return f"{self.name} - {self.crc.branch} ({self.crc.academic_year})"
 
 class TimetableEntry(models.Model):
     day = models.CharField(max_length=10)  
