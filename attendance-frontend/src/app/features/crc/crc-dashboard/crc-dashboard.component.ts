@@ -34,7 +34,7 @@ export class CrcDashboardComponent implements OnInit {
       },
       (error) => {
         console.error('Authorization failed', error);
-        this.router.navigate(['/crc/login']);
+        // this.router.navigate(['/crc-auth']);
       }
     );
   }

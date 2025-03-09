@@ -99,23 +99,20 @@ class CRCDashboardView(APIView):
 
     def get(self, request):
         try:
-            user = request.user  # Get authenticated user
-            faculty = get_object_or_404(Faculty, email=user.email)  # Find Faculty
+            user = request.user  # ✅ Get authenticated user
+            faculty = get_object_or_404(Faculty, email=user.email)  # ✅ Find Faculty
 
-            # Fetch CRC profile using Faculty reference
+            # ✅ Fetch CRC profile using Faculty reference
             crc = get_object_or_404(CRCProfile, faculty_ref=faculty)
-
-            branch = get_object_or_404(Branch, id=crc.branch)
-            branch_name = branch.name 
 
             return Response({
                 "faculty_id": crc.faculty_ref.id,
                 "email": crc.faculty_ref.email,
-                "branch": branch,
+                "branch": crc.branch.name,  # ✅ Convert Branch object to a string
                 "year": crc.year,
                 "semester": crc.semester,
-                "academic_year":crc.academic_year,
-                "crcId":crc.id,
+                "academic_year": f"{crc.academic_year.start_year}-{crc.academic_year.end_year}",  # ✅ Convert AcademicYear to string
+                "crcId": crc.id,
                 "role": "crc"
             }, status=status.HTTP_200_OK)
 

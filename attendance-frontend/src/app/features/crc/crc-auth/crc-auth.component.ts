@@ -17,7 +17,8 @@ export class CrcAuthComponent {
     branch: null,
     year: '',
     semester: '',
-    password: ''
+    password: '',
+    academicYear:''
   };
   loginData: any = {
     email: '',
@@ -26,6 +27,7 @@ export class CrcAuthComponent {
   branchOptions: any[] = [];
   yearOptions = [1, 2, 3, 4];
   semesterOptions = [1, 2];
+  academicYearOptions: any[] = [];
 
   constructor(private crcAuthService: AuthService,
               private userService: UserService,
@@ -37,13 +39,21 @@ export class CrcAuthComponent {
     this.userService.getBranches().subscribe((data: any) => {
       this.branchOptions = data;
       console.log('Branches:', this.branchOptions);
-
-      // If faculty details were already fetched before branches loaded, match the branch now
+  
       if (this.facultyDetails?.branch) {
         this.setBranchSelection();
       }
     });
-  }
+  
+    this.userService.getAcademicYears().subscribe((data: any) => {
+      this.academicYearOptions = data.map((year: any) => ({
+        label: `${year.start_year}-${year.end_year}`,  // Display as "2024-2025"
+        value: year.id  // Store the ID instead of string
+      }));
+      console.log('Academic years:', this.academicYearOptions);
+    });
+            }
+            
 
   // Fetch Faculty Details
   fetchFacultyDetails() {
@@ -77,7 +87,6 @@ export class CrcAuthComponent {
     }
   }
 
-  // Register CRC
   registerCRC() {
     if (this.registrationData.year && this.registrationData.semester && this.registrationData.password) {
       const crcData = {
@@ -87,23 +96,24 @@ export class CrcAuthComponent {
         year: this.registrationData.year,
         semester: this.registrationData.semester,
         password: this.registrationData.password,
-        // phone_number: this.facultyDetails?.phone_number || "", // ✅ Ensure phone_number is sent
+        academic_year_id: this.registrationData.academicYear // ✅ Send ID, not string
       };
-
+  
       this.crcAuthService.registerCRC(crcData).subscribe(
         (res) => {
           console.log('CRC Registered Successfully!', res);
-
-          this.messageservice.add({key: 'toast-anime',severity:'success', summary:'CRC Registered', detail:'CRC registered successfully!'});
+          this.messageservice.add({ key: 'toast-anime', severity: 'success', summary: 'CRC Registered', detail: 'CRC registered successfully!' });
           this.clearForm();
         },
         (error) => {
           console.error('Error registering CRC', error);
-          this.messageservice.add({key: 'toast-anime',severity:'error', summary:'CRC Registration Failed', detail:'CRC registration failed. Please try again.'});
+          this.messageservice.add({ key: 'toast-anime', severity: 'error', summary: 'CRC Registration Failed', detail: 'CRC registration failed. Please try again.' });
         }
       );
     }
   }
+  
+  
 
   // Login CRC
   loginCRC() {

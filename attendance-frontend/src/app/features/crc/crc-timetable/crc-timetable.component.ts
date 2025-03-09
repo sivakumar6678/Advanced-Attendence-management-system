@@ -42,7 +42,7 @@ export class CrcTimetableComponent implements OnInit {
   constructor(private userService: UserService) {}
 
   ngOnInit() {
-    this.loadSubjectsFromBackend();
+    this.loadSubjects();
     this.loadFacultyFromBackend();
   
     const crcDetails = this.userService.getCRCDetails();
@@ -53,36 +53,60 @@ export class CrcTimetableComponent implements OnInit {
       this.academicYear = crcDetails.academic_year;
       this.branch = crcDetails.branch;
     }
+    console.log("Crc details : ",crcDetails.crcId);
   
     this.loadTimetable(); // ✅ Load local first, then backend
   }
   
 
-  loadSubjectsFromBackend() {
-    this.userService.getSubjects().subscribe(data => {
-      this.subjects = data;
-    }, error => {
-      console.error("Error loading subjects:", error);
-    });
+  loadSubjects() {
+    const crcDetails = this.userService.getCRCDetails();
+    this.crcId = crcDetails.crcId;
+
+    
+
+    // console.log("CRC ID ",crcDetails.crcId);
+    if (!this.crcId) return;
+
+    this.userService.getSubjects(this.crcId).subscribe(
+      (data) => {
+        this.subjects = data;
+        console.log("Subject are ",this.subjects);
+      },
+      (error) => {
+        console.error("Error loading subjects:", error);
+      }
+    );
   }
 
   addSubject() {
-    if (this.newSubject.trim() && !this.subjects.some(subject => subject.name === this.newSubject)) {
-      this.userService.addSubject({ name: this.newSubject }).subscribe(response => {
-        this.subjects.push(response);
-        this.newSubject = '';
-      }, error => {
-        console.error("Error adding subject:", error);
-      });
+    if (!this.newSubject.trim() || !this.crcId) {
+      alert("Invalid subject name or missing CRC ID.");
+      return;
     }
+
+    this.userService.addSubject(this.newSubject, this.crcId).subscribe(
+      (response) => {
+        this.subjects.push(response);
+        this.newSubject = ''; // Clear input field
+      },
+      (error) => {
+        console.error("Error adding subject:", error);
+        alert(error.error?.error || "Failed to add subject.");
+      }
+    );
   }
 
+  // ✅ Delete a subject
   deleteSubject(subjectId: number) {
-    this.userService.deleteSubject(subjectId).subscribe(() => {
-      this.subjects = this.subjects.filter(subject => subject.id !== subjectId);
-    }, error => {
-      console.error("Error deleting subject:", error);
-    });
+    this.userService.deleteSubject(subjectId).subscribe(
+      () => {
+        this.subjects = this.subjects.filter((subject) => subject.id !== subjectId);
+      },
+      (error) => {
+        console.error("Error deleting subject:", error);
+      }
+    );
   }
 
   loadFacultyFromBackend() {
@@ -204,6 +228,9 @@ export class CrcTimetableComponent implements OnInit {
     this.saveToLocalStorage();
     this.showSaveToBackendButton = true;
     alert('Timetable finalized. Click "Save to Backend" to store it online.');
+    localStorage.removeItem('crcTimetable');
+    localStorage.removeItem('crcSemesterFinalized');
+    
   }
 
   saveTimetableToBackend() {
@@ -214,7 +241,7 @@ export class CrcTimetableComponent implements OnInit {
   
     const timetableData = {
       crc_id: this.crcId,
-      branch: "CSE",
+      branch: this.branch,
       year: this.year,
       semester: this.semester,
       academic_year: this.academicYear,

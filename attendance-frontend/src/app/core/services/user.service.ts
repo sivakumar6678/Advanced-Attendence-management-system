@@ -48,25 +48,25 @@ export class UserService {
   getFaculties():Observable<any>{
     return this.http.get(`${this.baseUrl}/crc/getfactuly/`);
   }
-  // Fetch all subjects
-  getSubjects(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/crc/subjects/` );
-  }
-
+  
   setCRCDetails(details: any) {
     this.crcDetails = details;
   }
-
+  
   getCRCDetails() {
     return this.crcDetails;
   }
-
-  // Add a new subject
-  addSubject(subjectData: any): Observable<any> {
-    return this.http.post(`${this.baseUrl}/crc/subjects/`,subjectData );
+  getSubjects(crcId: number): Observable<any> {
+    return this.http.get(`${this.baseUrl}/crc/subjects/?crc_id=${crcId}`,{ headers: this.getAuthHeaders() });
   }
-
-  // Delete a subject
+  
+  addSubject(subjectName: string, crcId: number): Observable<any> {
+    return this.http.post(`${this.baseUrl}/crc/subjects/`, {
+      name: subjectName,
+      crc: crcId
+    },{ headers: this.getAuthHeaders() });
+  }
+  
   deleteSubject(subjectId: number): Observable<any> {
     return this.http.delete(`${this.baseUrl}/crc/subjects/${subjectId}/`);
   }
