@@ -9,3 +9,4 @@ class StudentAdmin(admin.ModelAdmin):
     search_fields = ('name', 'email', 'branch')
     list_filter = ('branch', 'is_active')
     ordering = ('branch', 'name')
+
