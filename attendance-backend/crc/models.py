@@ -1,13 +1,13 @@
 from django.db import models
-from core.models import User, Branch
+from core.models import User, Branch,AcademicYear
 from teacher.models import Faculty  # ✅ Import Faculty model
 
 class CRCProfile(User):  # ✅ Inherit from User for authentication
     faculty_ref = models.OneToOneField(Faculty, on_delete=models.CASCADE, related_name="crc_profile")  # ✅ Renamed
-    branch = models.CharField(max_length=100)
+    branch = models.ForeignKey(Branch, on_delete=models.CASCADE)
     year = models.PositiveIntegerField(choices=[(i, f"Year {i}") for i in range(1, 5)])
     semester = models.PositiveIntegerField(choices=[(i, f"Semester {i}") for i in range(1, 3)])
-    academic_year = models.CharField(max_length=20)  # Example: "2024-2025"
+    academic_year = models.ForeignKey(AcademicYear, on_delete=models.CASCADE)  # ✅ Add it back
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 
