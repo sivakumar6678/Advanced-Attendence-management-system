@@ -7,7 +7,7 @@ class CRCProfile(User):  # ✅ Inherit from User for authentication
     branch = models.CharField(max_length=100)
     year = models.PositiveIntegerField(choices=[(i, f"Year {i}") for i in range(1, 5)])
     semester = models.PositiveIntegerField(choices=[(i, f"Semester {i}") for i in range(1, 3)])
-    academic_year = models.CharField(max_length=9)  # Example: "2024-2025"
+    academic_year = models.CharField(max_length=20)  # Example: "2024-2025"
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 

@@ -22,6 +22,7 @@ class RegisterCRC(APIView):
         semester = data.get("semester")
         academic_year = data.get("academic_year")
 
+
         # Check if Faculty exists before registering CRC
         faculty = get_object_or_404(Faculty, email=email)
 
@@ -35,11 +36,10 @@ class RegisterCRC(APIView):
             branch=branch,
             year=year,
             semester=semester,
-            academic_year = academic_year
+            academic_year=academic_year
         )
 
         return Response({"message": "CRC registered successfully!"}, status=status.HTTP_201_CREATED)
-
 class LoginCRC(APIView):
     def post(self, request):
         data = request.data
@@ -69,6 +69,7 @@ class LoginCRC(APIView):
                 "email": faculty.email,
                 "role": "crc",
                 "user_id": crc.id,
+                "academic_year": crc.academic_year,  # ✅ Send academic year in response
 
             }, status=status.HTTP_200_OK)
         else:
