@@ -190,11 +190,29 @@ class PublicTimetableView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 class TimetableView(APIView):
     def get(self, request):
-        current_year = datetime.datetime.now().year
-        academic_year = f"{current_year}-{current_year + 1}"  # Example: "2024-2025"
-        
-        
-        timetables = Timetable.objects.filter(academic_year=academic_year)
+        # Get all required parameters from the frontend
+        crc_id = request.query_params.get('crc_id')
+        year = request.query_params.get('year')
+        semester = request.query_params.get('semester')
+        branch = request.query_params.get('branch')
+        academic_year = request.query_params.get('academic_year')  # Now received from frontend
+
+        # Validate that all required parameters are provided
+        if not all([crc_id, year, semester, branch, academic_year]):
+            return Response({"error": "Missing required query parameters"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Filter timetable based on all provided parameters
+        timetables = Timetable.objects.filter(
+            crc_id=crc_id,
+            year=year,
+            semester=semester,
+            branch=branch,
+            academic_year=academic_year
+        )
+
+        if not timetables.exists():
+            return Response({"error": "No timetable found for the given details"}, status=status.HTTP_404_NOT_FOUND)
+
         serializer = TimetableSerializer(timetables, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
