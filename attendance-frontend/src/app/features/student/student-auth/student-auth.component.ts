@@ -348,12 +348,14 @@ onRegisterSubmit() {
 }
 
 
-  onLoginSubmit() {
+  async onLoginSubmit() {
+    this.deviceId = await this.authService.getDeviceId(); // ✅ Ensure deviceId is freshly fetched
     const data = {
       studentIdOrEmail: this.loginStudentIdOrEmail,
       password: this.loginPassword,
       deviceId: this.deviceId,
     };
+    console.log("device id",this.deviceId);
 
     this.authService.loginStudent(data).subscribe(
       (res) => {
