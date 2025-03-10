@@ -84,7 +84,7 @@ class LoginStudent(APIView):
         student_data = request.data
         identifier = student_data.get('studentIdOrEmail', '').strip()
         password = student_data.get('password', '').strip()
-        new_device_id = student_data.get('deviceId', '').strip()  # Device trying to login
+        device_id = student_data.get('deviceId', '').strip()  # Get device ID
 
         if not identifier or not password:
             return Response({"error": "Student ID/Email and password are required"}, status=status.HTTP_400_BAD_REQUEST)
@@ -92,37 +92,22 @@ class LoginStudent(APIView):
         student = Student.objects.filter(email=identifier).first() or Student.objects.filter(student_id=identifier).first()
 
         if student:
-            if student.check_password(password):  
-                # ✅ Check if the device is already registered to the student
-                if student.device_id == new_device_id:
-                    refresh = RefreshToken.for_user(student)  
+            # if check_password(password, student.password):  # Verify password
+            if student.check_password(password): 
+                if student.device_id == device_id:
+                    refresh = RefreshToken.for_user(student)  # Generate JWT token
                     return Response({
                         "message": "Login successful",
                         "access_token": str(refresh.access_token),
                         "refresh_token": str(refresh),
                         "student_id": student.student_id
                     }, status=status.HTTP_200_OK)
-
                 else:
-                    # 🚀 **Fix: Allow Previously Registered Devices**
-                    registered_device = Device.objects.filter(device_id=new_device_id, student=student).first()
-                    if registered_device:
-                        refresh = RefreshToken.for_user(student)
-                        return Response({
-                            "message": "Login successful from a previously registered device",
-                            "access_token": str(refresh.access_token),
-                            "refresh_token": str(refresh),
-                            "student_id": student.student_id
-                        }, status=status.HTTP_200_OK)
-
-                    # 🚨 If the device is not recognized, reject login
-                    return Response({"error": "Unrecognized device. Please register your device again or contact admin."}, status=status.HTTP_401_UNAUTHORIZED)
-
+                    return Response({"error": "Unauthorized device. Please use your registered device or contact admin."}, status=status.HTTP_401_UNAUTHORIZED)
             else:
                 return Response({"error": "Incorrect password"}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response({"error": "Student not found"}, status=status.HTTP_404_NOT_FOUND)
-
 
         
 class StudentDashboardView(APIView):

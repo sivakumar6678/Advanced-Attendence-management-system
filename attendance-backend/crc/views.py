@@ -58,8 +58,6 @@ class RegisterCRC(APIView):
             status=status.HTTP_201_CREATED
         )
 
-
-
 class LoginCRC(APIView):
     def post(self, request):
         data = request.data
@@ -157,6 +155,7 @@ class GetFaculty(APIView):
                 })
             return Response(faculty_list, status=status.HTTP_200_OK)
 
+
 # Get all subjects & create a new subject
 class SubjectListCreateView(generics.ListCreateAPIView):
     serializer_class = SubjectSerializer
@@ -171,6 +170,8 @@ class SubjectListCreateView(generics.ListCreateAPIView):
         user = self.request.user
         crc = get_object_or_404(CRCProfile, faculty_ref=user)
         serializer.save(crc=crc)
+
+
 # Delete a subject
 class SubjectDeleteView(APIView):
     def delete(self, request, subject_id):
@@ -180,6 +181,8 @@ class SubjectDeleteView(APIView):
             return Response({"message": "Subject deleted successfully"}, status=status.HTTP_200_OK)
         except Subject.DoesNotExist:
             return Response({"error": "Subject not found"}, status=status.HTTP_404_NOT_FOUND)
+
+
 
 class PublicTimetableView(APIView):
     """✅ Public endpoint for fetching timetables (No authentication required)"""
