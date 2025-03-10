@@ -1,1 +1,44 @@
-<p>student-dashboard works!</p>
+<div class="dashboard-container">
+    <!-- Header -->
+    <div class="header">
+      <h1>Student Dashboard</h1>
+    </div>
+  
+    <!-- Student Profile (Always Visible) -->
+    <div class="card profile" *ngIf="studentProfile">
+      <h2>Profile</h2>
+      <p><strong>{{ studentProfile.name }}</strong></p>
+      <p>Roll No: {{ studentProfile.roll_number }}</p>
+      <p>Branch: {{ studentProfile.branch }}</p>
+      <p>Device: {{ studentProfile.device }}</p>
+    </div>
+  
+    <!-- Dynamic Sections -->
+    <div *ngIf="activeSection === 'dashboard'">
+      <!-- Attendance Overview -->
+      <div class="card attendance">
+        <h2>Attendance</h2>
+        <p>Today's Status: <span class="status">{{ attendanceStatus }}</span></p>
+        <p>Overall: <span class="percentage">{{ attendancePercentage }}%</span></p>
+      </div>
+    </div>
+  
+    <div *ngIf="activeSection === 'timetable'">
+      <!-- Public Timetable -->
+      <div class="card timetable">
+        <h2>Public Timetable</h2>
+        <div *ngFor="let class of publicTimetable" class="class-item">
+          <p><strong>{{ class.subject }}</strong> - {{ class.time }}</p>
+          <p>Faculty: {{ class.faculty }}</p>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Bottom Navigation Bar -->
+    <div class="bottom-nav">
+      <button (click)="setActiveSection('dashboard')" class="nav-btn" [class.active]="activeSection === 'dashboard'">🏠 Dashboard</button>
+      <button (click)="setActiveSection('timetable')" class="nav-btn" [class.active]="activeSection === 'timetable'">📅 Timetable</button>
+      <button (click)="logout()" class="logout-btn">🚪 Logout</button>
+    </div>
+  </div>
+  

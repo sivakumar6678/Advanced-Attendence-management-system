@@ -17,10 +17,13 @@ import { HomeComponent } from './shared/components/home/home.component';
 import { LoadingComponent } from './shared/loading/loading.component';
 
 import { SuperadminComponent } from './features/superadmin/superadmin.component';
-import { StudentAuthComponent } from './features/student/student-auth/student-auth.component';
-import { TeacherAuthComponent } from './features/teacher/teacher-auth/teacher-auth.component';
-import { CrcAuthComponent } from './features/crc/crc-auth/crc-auth.component';
 
+import { StudentAuthComponent } from './features/student/student-auth/student-auth.component';
+import { StudentDashboardComponent } from './features/student/student-dashboard/student-dashboard.component';
+
+import { TeacherAuthComponent } from './features/teacher/teacher-auth/teacher-auth.component';
+
+import { CrcAuthComponent } from './features/crc/crc-auth/crc-auth.component';
 import { CrcDashboardComponent } from './features/crc/crc-dashboard/crc-dashboard.component';
 import { CrcTimetableComponent } from './features/crc/crc-timetable/crc-timetable.component';
 
@@ -60,14 +63,18 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 @NgModule({
     declarations: [
         AppComponent,
+        TestComponent,
         HomeComponent,
         LoadingComponent,
-        StudentAuthComponent,
-
-        TestComponent,
-        TeacherAuthComponent,
-        CrcAuthComponent,
+        
         SuperadminComponent,
+        
+        StudentAuthComponent,
+        StudentDashboardComponent,
+        
+        TeacherAuthComponent,
+        
+        CrcAuthComponent,
         CrcDashboardComponent,
         CrcTimetableComponent,
     ],

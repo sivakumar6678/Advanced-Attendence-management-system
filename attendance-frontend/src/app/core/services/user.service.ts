@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient , HttpHeaders} from '@angular/common/http';
+import { HttpClient , HttpHeaders,HttpParams} from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -71,9 +71,25 @@ export class UserService {
     return this.http.delete(`${this.baseUrl}/crc/subjects/${subjectId}/`);
   }
   // Fetch all timetables
-  getTimetables(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/crc/timetables/` );
+  // getTimetables(): Observable<any> {
+  //   return this.http.get(`${this.baseUrl}/crc/timetables/` ,{headers:this.getAuthHeaders()});
+  // }
+
+  getTimetables(crcId: number, year: number, semester: number, branch: string, academicYear: string): Observable<any> {
+    const params = new HttpParams()
+      .set('crc_id', crcId.toString())
+      .set('year', year.toString())
+      .set('semester', semester.toString())
+      .set('branch', branch)
+      .set('academic_year', academicYear);
+  
+    return this.http.get(`${this.baseUrl}/crc/timetables/`, {
+      headers: this.getAuthHeaders(),
+      params: params  // ✅ Sending query parameters correctly
+    });
   }
+  
+  
 
   // Add a new timetable
   addTimetable(timetableData: any): Observable<any> {

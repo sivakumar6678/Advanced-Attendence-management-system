@@ -34,6 +34,7 @@
               <ng-container *ngIf="timetable[day] && timetable[day][i]">
                 <ng-container *ngIf="!semesterFinalized; else finalizedTemplate">
                   <p-dropdown
+                    *ngIf="timetable[day][i].subject_id !== undefined"
                     [options]="subjects"
                     optionLabel="name"
                     optionValue="id"
@@ -41,8 +42,9 @@
                     [(ngModel)]="timetable[day][i].subject_id"
                     (ngModelChange)="updateEntry(day, i, 'subject', $event)">
                   </p-dropdown>
-                
+            
                   <p-dropdown
+                    *ngIf="timetable[day][i].faculty_id !== undefined"
                     [options]="facultyList"
                     optionLabel="full_name"
                     optionValue="id"
@@ -51,19 +53,25 @@
                     (ngModelChange)="updateEntry(day, i, 'faculty', $event)">
                   </p-dropdown>
                 </ng-container>
-                
+            
                 <ng-template #finalizedTemplate>
                   <div>
                     {{ getSubjectName(timetable[day][i].subject_id) }}<br>
                     {{ getFacultyName(timetable[day][i].faculty_id) }}
                   </div>
                 </ng-template>
-                
               </ng-container>
             </td>
+            
+            
           </tr>
         </ng-template>
       </p-table>
+      <button *ngIf="semesterFinalized && showSaveToBackendButton"
+      pButton label="Edit TimeTable"
+      class="p-button-info"
+      (click)="loadTimetableFromBackend()">
+    </button>
     
       <button *ngIf="!semesterFinalized" pButton label="Save Timetable" class="p-button-warning" (click)="finalizeTimetable()"></button>
       <button *ngIf="semesterFinalized && showSaveToBackendButton" pButton label="Edit TimeTable" class="p-button-info" (click)="semesterFinalized = false"  ></button>

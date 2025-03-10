@@ -63,6 +63,7 @@ export class CrcDashboardComponent implements OnInit {
 
   logout() {
     localStorage.removeItem('access_token');
+    localStorage.clear();
     this.router.navigate(['/crc-auth']);
   }
 

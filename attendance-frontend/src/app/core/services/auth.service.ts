@@ -72,13 +72,11 @@ export class AuthService {
   }
 
   async getDeviceId(): Promise<string> {
+    const fp = await FingerprintJS.load();
+    const result = await fp.get();
+    return result.visitorId;  // ✅ Use visitorId (More stable across sessions)
+}
 
-    if (!this.deviceId) {
-      await this.generateDeviceId();
-    }
-    // console.log('device id',this.deviceId);
-    return this.deviceId!;
-  }
 
   getToken(): string | null {
     return localStorage.getItem('access_token');
