@@ -20,6 +20,7 @@ import { SuperadminComponent } from './features/superadmin/superadmin.component'
 
 import { StudentAuthComponent } from './features/student/student-auth/student-auth.component';
 import { StudentDashboardComponent } from './features/student/student-dashboard/student-dashboard.component';
+import { StudentAttendanceComponent } from './features/student/student-attendance/student-attendance.component';
 
 import { TeacherAuthComponent } from './features/teacher/teacher-auth/teacher-auth.component';
 
@@ -71,6 +72,7 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
         
         StudentAuthComponent,
         StudentDashboardComponent,
+        StudentAttendanceComponent,
         
         TeacherAuthComponent,
         

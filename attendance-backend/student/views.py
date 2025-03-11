@@ -130,7 +130,8 @@ class StudentDashboardView(APIView):
                 "semester": student.semester,
                 "academic_year": f"{student.academic_year.start_year}-{student.academic_year.end_year}",
                 "phone_number": student.phone_number,
-                "parent_phone_number": student.parent_phone_number
+                "parent_phone_number": student.parent_phone_number,
+                "device_name": student.device.device_name  # Send device name to the frontend
             }, status=status.HTTP_200_OK)
 
         except Exception as e:

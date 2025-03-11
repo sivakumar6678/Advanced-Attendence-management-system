@@ -1,1 +1,12 @@
-<p>student-attendance works!</p>
+<div *ngIf="activeAttendanceSession" class="card attendance-session">
+    <h2>Ongoing Attendance Session</h2>
+    <p><strong>Subject:</strong> {{ activeAttendanceSession.subject }}</p>
+    <p><strong>Faculty:</strong> {{ activeAttendanceSession.faculty }}</p>
+    <button class="mark-btn" (click)="markAttendance()">✅ Mark Attendance</button>
+  </div>
+  
+  <div *ngIf="!activeAttendanceSession" class="card no-session">
+    <h2>No Active Attendance Sessions</h2>
+    <p>Check back later.</p>
+  </div>
+  

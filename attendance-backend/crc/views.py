@@ -185,12 +185,28 @@ class SubjectDeleteView(APIView):
 
 
 class PublicTimetableView(APIView):
-    """✅ Public endpoint for fetching timetables (No authentication required)"""
-    
     def get(self, request):
-        timetables = Timetable.objects.all()
+        year = request.query_params.get('year')
+        semester = request.query_params.get('semester')
+        branch = request.query_params.get('branch')
+        academic_year = request.query_params.get('academic_year')
+
+        if not all([year, semester, branch, academic_year]):
+            return Response({"error": "Missing required parameters"}, status=status.HTTP_400_BAD_REQUEST)
+
+        timetables = Timetable.objects.filter(
+            year=year,
+            semester=semester,
+            branch=branch,
+            academic_year=academic_year
+        )
+
+        if not timetables.exists():
+            return Response({"error": "No public timetable found"}, status=status.HTTP_404_NOT_FOUND)
+
         serializer = TimetableSerializer(timetables, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
 class TimetableView(APIView):
     def get(self, request):
         # Get all required parameters from the frontend

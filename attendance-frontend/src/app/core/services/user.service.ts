@@ -41,9 +41,16 @@ export class UserService {
     return this.http.get(`${this.baseUrl}/faculty/dashboard/`, { headers });
   }
 
-  getPublicTimetables(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/crc/public/timetables/`);
+  getPublicTimetables(year: number, semester: number, branch: string, academicYear: string): Observable<any> {
+    const params = new HttpParams()
+    .set('year', year.toString())
+    .set('semester', semester.toString())
+    .set('branch', branch)
+    .set('academic_year', academicYear);
+  
+    return this.http.get(`${this.baseUrl}/crc/public/timetables/`, { params });
   }
+  
 
   getFaculties():Observable<any>{
     return this.http.get(`${this.baseUrl}/crc/getfactuly/`);
