@@ -1,1 +1,81 @@
-<p>student-dashboard works!</p>
+<div class="dashboard-container">
+    <!-- Header -->
+    <div class="header">
+      <h1>Student Dashboard</h1>
+    </div>
+  
+    <!-- Student Profile (Always Visible) -->
+    <div class="card profile" *ngIf="studentProfile">
+      <h2>Profile</h2>
+      <p><strong>{{ studentProfile.name }}</strong></p>
+      <p>Roll No: {{ studentProfile.student_id }}</p>
+      <p>Branch: {{ studentProfile.branch }}</p>
+      <p>Device: {{ studentProfile.device_name }}</p>
+      <p>Year : {{ studentProfile.year }} | Sem : {{ studentProfile.semester  }} </p>
+      <button class="logout-btn" (click)="logout()">🚪 Logout</button>
+    </div>
+  
+    <!-- Dynamic Sections -->
+    <div *ngIf="activeSection === 'dashboard'">
+      <!-- Attendance Overview -->
+      <div class="card attendance">
+        <h2>Attendance</h2>
+        <p>Today's Status: <span class="status">{{ attendanceStatus }}</span></p>
+        <p>Overall: <span class="percentage">{{ attendancePercentage }}%</span></p>
+      </div>
+    </div>
+  
+    <div *ngIf="activeSection === 'timetable'">
+      <!-- Public Timetable -->
+      <div class="public-timetable-container">
+        <h2>Public Timetable</h2>
+      
+        <p-table [value]="publicTimetable">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Day</th>
+              <th>Time Slot</th>
+              <th>Subject</th>
+              <th>Faculty</th>
+            </tr>
+          </ng-template>
+          
+          <ng-template pTemplate="body" let-entry>
+            <tr>
+              <td>{{ entry.day }}</td>
+              <td>{{ entry.time_slot }}</td>
+              <td>{{ getSubjectName(entry.subject_id) }}</td>
+              <td>{{ getFacultyName(entry.faculty_id) }}</td>
+            </tr>
+          </ng-template>
+          </p-table>
+        
+          <p *ngIf="publicTimetable.length === 0">No timetable available.</p>
+        </div>
+      </div>
+      <div *ngIf="activeSection === 'attendance'">
+        <app-student-attendance></app-student-attendance>
+      </div>
+    
+      <div *ngIf="activeSection === 'reports'">
+        <!-- Attendance Reports -->
+        <div class="card reports">
+          <h2>Attendance Reports</h2>
+          <div *ngFor="let record of attendanceReports" class="report-item">
+            <p><strong>{{ record.date }}</strong>: {{ record.status }}</p>
+          </div>
+        </div>
+      </div>
+    
+      <!-- Bottom Navigation Bar -->
+      <div class="bottom-nav">
+        <button (click)="setActiveSection('dashboard')" class="nav-btn" [class.active]="activeSection === 'dashboard'">🏠 Dashboard</button>
+        <button (click)="setActiveSection('timetable')" class="nav-btn" [class.active]="activeSection === 'timetable'">📅 Timetable</button>
+        <button (click)="setActiveSection('attendance')" class="nav-btn" [class.active]="activeSection === 'attendance'">📍 Attendance</button>
+        <button (click)="setActiveSection('reports')" class="nav-btn" [class.active]="activeSection === 'reports'">📊 Reports</button>
+      </div>
+      
+</div>
+  
+
+  

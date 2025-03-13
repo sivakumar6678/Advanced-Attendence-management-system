@@ -35,7 +35,15 @@ class CRCToken(Token):
 class SubjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Subject
-        fields = '__all__'
+        fields = ['id', 'name', 'crc']
+
+    def create(self, validated_data):
+        crc = validated_data['crc']
+        # Ensure subject name is unique within the same CRC
+        if Subject.objects.filter(name=validated_data['name'], crc=crc).exists():
+            raise serializers.ValidationError({"error": "Subject already exists for this CRC"})
+        
+        return super().create(validated_data)
 
 class TimetableEntrySerializer(serializers.ModelSerializer):
     subject_id = serializers.PrimaryKeyRelatedField(

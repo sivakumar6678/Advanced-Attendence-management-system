@@ -1,13 +1,13 @@
 from django.db import models
-from core.models import User, Branch
+from core.models import User, Branch,AcademicYear
 from teacher.models import Faculty  # ✅ Import Faculty model
 
 class CRCProfile(User):  # ✅ Inherit from User for authentication
     faculty_ref = models.OneToOneField(Faculty, on_delete=models.CASCADE, related_name="crc_profile")  # ✅ Renamed
-    branch = models.CharField(max_length=100)
+    branch = models.ForeignKey(Branch, on_delete=models.CASCADE)
     year = models.PositiveIntegerField(choices=[(i, f"Year {i}") for i in range(1, 5)])
     semester = models.PositiveIntegerField(choices=[(i, f"Semester {i}") for i in range(1, 3)])
-    academic_year = models.CharField(max_length=9)  # Example: "2024-2025"
+    academic_year = models.ForeignKey(AcademicYear, on_delete=models.CASCADE)  # ✅ Add it back
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 
@@ -15,10 +15,11 @@ class CRCProfile(User):  # ✅ Inherit from User for authentication
         return f"CRC - {self.faculty_ref.email}"  # ✅ Uses linked Faculty email
 
 class Subject(models.Model):
-    name = models.CharField(max_length=255, unique=True)
+    name = models.CharField(max_length=255)
+    crc = models.ForeignKey(CRCProfile, on_delete=models.CASCADE, related_name="subjects")
 
     def __str__(self):
-        return self.name
+        return f"{self.name} - {self.crc.branch} ({self.crc.academic_year})"
 
 class TimetableEntry(models.Model):
     day = models.CharField(max_length=10)  

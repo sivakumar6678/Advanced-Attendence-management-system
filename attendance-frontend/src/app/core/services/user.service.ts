@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient , HttpHeaders} from '@angular/common/http';
+import { HttpClient , HttpHeaders,HttpParams} from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -41,39 +41,62 @@ export class UserService {
     return this.http.get(`${this.baseUrl}/faculty/dashboard/`, { headers });
   }
 
-  getPublicTimetables(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/crc/public/timetables/`);
+  getPublicTimetables(year: number, semester: number, branch: string, academicYear: string): Observable<any> {
+    const params = new HttpParams()
+    .set('year', year.toString())
+    .set('semester', semester.toString())
+    .set('branch', branch)
+    .set('academic_year', academicYear);
+  
+    return this.http.get(`${this.baseUrl}/crc/public/timetables/`, { params });
   }
+  
 
   getFaculties():Observable<any>{
     return this.http.get(`${this.baseUrl}/crc/getfactuly/`);
   }
-  // Fetch all subjects
-  getSubjects(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/crc/subjects/` );
-  }
-
+  
   setCRCDetails(details: any) {
     this.crcDetails = details;
   }
-
+  
   getCRCDetails() {
     return this.crcDetails;
   }
-
-  // Add a new subject
-  addSubject(subjectData: any): Observable<any> {
-    return this.http.post(`${this.baseUrl}/crc/subjects/`,subjectData );
+  getSubjects(crcId: number): Observable<any> {
+    return this.http.get(`${this.baseUrl}/crc/subjects/?crc_id=${crcId}`,{ headers: this.getAuthHeaders() });
   }
-
-  // Delete a subject
+  
+  addSubject(subjectName: string, crcId: number): Observable<any> {
+    return this.http.post(`${this.baseUrl}/crc/subjects/`, {
+      name: subjectName,
+      crc: crcId
+    },{ headers: this.getAuthHeaders() });
+  }
+  
   deleteSubject(subjectId: number): Observable<any> {
     return this.http.delete(`${this.baseUrl}/crc/subjects/${subjectId}/`);
   }
   // Fetch all timetables
-  getTimetables(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/crc/timetables/` );
+  // getTimetables(): Observable<any> {
+  //   return this.http.get(`${this.baseUrl}/crc/timetables/` ,{headers:this.getAuthHeaders()});
+  // }
+
+  getTimetables(crcId: number, year: number, semester: number, branch: string, academicYear: string): Observable<any> {
+    const params = new HttpParams()
+      .set('crc_id', crcId.toString())
+      .set('year', year.toString())
+      .set('semester', semester.toString())
+      .set('branch', branch)
+      .set('academic_year', academicYear);
+  
+    return this.http.get(`${this.baseUrl}/crc/timetables/`, {
+      headers: this.getAuthHeaders(),
+      params: params  // ✅ Sending query parameters correctly
+    });
   }
+  
+  
 
   // Add a new timetable
   addTimetable(timetableData: any): Observable<any> {

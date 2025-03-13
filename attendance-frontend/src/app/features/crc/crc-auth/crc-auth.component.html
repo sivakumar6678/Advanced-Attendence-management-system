@@ -57,6 +57,21 @@
           </div>
 
           <div class="input-group">
+            <div>
+              <label for="academicYear">Academic Year</label>
+              <p-dropdown
+                [options]="academicYearOptions"
+                name="academicYear" 
+                [(ngModel)]="registrationData.academicYear"
+                placeholder="Select Academic Year"
+                [filter]="true"
+                >
+              </p-dropdown>
+
+            </div>
+            <!-- <p-dropdown [style]="{ 'width':'100%'}" id="academicYear" [(ngModel)]="registrationData.academicYear" name="academicYear" [options]="academicYearOptions" placeholder="Select Academic Year"></p-dropdown> -->
+          </div>
+          <div class="input-group">
             <label for="year">Year</label>
             <p-dropdown [style]="{ 'width':'100%'}" id="dropdown" [(ngModel)]="registrationData.year" name="year" [options]="yearOptions" placeholder="Select Year"></p-dropdown>
           </div>

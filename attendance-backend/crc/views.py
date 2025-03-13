@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from .models import CRCProfile
-from core.models import Branch
+from core.models import Branch,AcademicYear
 from teacher.models import Faculty
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
@@ -17,28 +17,46 @@ class RegisterCRC(APIView):
     def post(self, request):
         data = request.data
         email = data.get("email")
-        branch = data.get("branch")
+        employee_id = data.get("employee_id")
+        branch_id = data.get("branch")
         year = data.get("year")
         semester = data.get("semester")
-        academic_year = data.get("academic_year")
+        academic_year_id = data.get("academic_year_id")  # ✅ Use ID for academic year
+        password = data.get("password")  # ✅ Ensure password is provided
 
-        # Check if Faculty exists before registering CRC
-        faculty = get_object_or_404(Faculty, email=email)
+        # ✅ Fetch the existing Faculty (User) instance
+        faculty = get_object_or_404(Faculty, email=email, employee_id=employee_id)
 
-        # Check if CRC is already registered for this faculty
+        # ✅ Ensure CRC is not already registered
         if CRCProfile.objects.filter(faculty_ref=faculty).exists():
-            return Response({"error": "CRC already registered"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "CRC already registered for this faculty"}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Register CRC linked to Faculty
-        crc = CRCProfile.objects.create(
-            faculty_ref=faculty,
-            branch=branch,
-            year=year,
-            semester=semester,
-            academic_year = academic_year
+        # ✅ Fetch Branch and Academic Year by ID
+        branch = get_object_or_404(Branch, id=branch_id)
+        academic_year = get_object_or_404(AcademicYear, id=academic_year_id)
+
+        # ✅ Create or Update CRCProfile without modifying Faculty directly
+        crc_user, created = CRCProfile.objects.update_or_create(
+            id=faculty.id,  # ✅ Use Faculty's existing User ID
+            defaults={
+                "email": faculty.email,
+                "faculty_ref": faculty,
+                "branch": branch,
+                "year": year,
+                "semester": semester,
+                "academic_year": academic_year,
+            }
         )
 
-        return Response({"message": "CRC registered successfully!"}, status=status.HTTP_201_CREATED)
+        # ✅ If a new CRCProfile was created, set and hash the password
+        if created:
+            crc_user.set_password(password)  # 🔒 Ensure password is securely hashed
+            crc_user.save()
+
+        return Response(
+            {"message": "CRC registered successfully!", "created": created},
+            status=status.HTTP_201_CREATED
+        )
 
 class LoginCRC(APIView):
     def post(self, request):
@@ -49,17 +67,16 @@ class LoginCRC(APIView):
         if not email or not password:
             return Response({"error": "Email and password are required"}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Find Faculty first
+        # ✅ Find Faculty first
         faculty = get_object_or_404(Faculty, email=email)
 
-        if faculty.check_password(password):  # Use Faculty's password
-            # Generate JWT Token for authentication
-            refresh = RefreshToken.for_user(faculty)  # Use faculty for token generation
+        if faculty.check_password(password):  # ✅ Use Faculty's password
+            # ✅ Generate JWT Token for authentication
+            refresh = RefreshToken.for_user(faculty)  
             access_token = str(refresh.access_token)
 
-            # Check if CRC is linked to Faculty
+            # ✅ Check if CRC is linked to Faculty
             crc = get_object_or_404(CRCProfile, faculty_ref=faculty)
-            
 
             return Response({
                 "message": "Login successful",
@@ -69,7 +86,7 @@ class LoginCRC(APIView):
                 "email": faculty.email,
                 "role": "crc",
                 "user_id": crc.id,
-
+                "academic_year": f"{crc.academic_year.start_year}-{crc.academic_year.end_year}",  # ✅ Convert to string
             }, status=status.HTTP_200_OK)
         else:
             return Response({"error": "Invalid password"}, status=status.HTTP_401_UNAUTHORIZED)
@@ -80,23 +97,20 @@ class CRCDashboardView(APIView):
 
     def get(self, request):
         try:
-            user = request.user  # Get authenticated user
-            faculty = get_object_or_404(Faculty, email=user.email)  # Find Faculty
+            user = request.user  # ✅ Get authenticated user
+            faculty = get_object_or_404(Faculty, email=user.email)  # ✅ Find Faculty
 
-            # Fetch CRC profile using Faculty reference
+            # ✅ Fetch CRC profile using Faculty reference
             crc = get_object_or_404(CRCProfile, faculty_ref=faculty)
-
-            branch = get_object_or_404(Branch, id=crc.branch)
-            branch_name = branch.name 
 
             return Response({
                 "faculty_id": crc.faculty_ref.id,
                 "email": crc.faculty_ref.email,
-                "branch": branch_name,
+                "branch": crc.branch.name,  # ✅ Convert Branch object to a string
                 "year": crc.year,
                 "semester": crc.semester,
-                "academic_year":crc.academic_year,
-                "crcId":crc.id,
+                "academic_year": f"{crc.academic_year.start_year}-{crc.academic_year.end_year}",  # ✅ Convert AcademicYear to string
+                "crcId": crc.id,
                 "role": "crc"
             }, status=status.HTTP_200_OK)
 
@@ -141,10 +155,22 @@ class GetFaculty(APIView):
                 })
             return Response(faculty_list, status=status.HTTP_200_OK)
 
+
 # Get all subjects & create a new subject
 class SubjectListCreateView(generics.ListCreateAPIView):
-    queryset = Subject.objects.all()
     serializer_class = SubjectSerializer
+    permission_classes = [IsAuthenticated]  # ✅ Ensure only authenticated CRC can manage subjects
+
+    def get_queryset(self):
+        user = self.request.user
+        crc = get_object_or_404(CRCProfile, faculty_ref=user)
+        return Subject.objects.filter(crc=crc)
+
+    def perform_create(self, serializer):
+        user = self.request.user
+        crc = get_object_or_404(CRCProfile, faculty_ref=user)
+        serializer.save(crc=crc)
+
 
 # Delete a subject
 class SubjectDeleteView(APIView):
@@ -156,20 +182,56 @@ class SubjectDeleteView(APIView):
         except Subject.DoesNotExist:
             return Response({"error": "Subject not found"}, status=status.HTTP_404_NOT_FOUND)
 
+
+
 class PublicTimetableView(APIView):
-    """✅ Public endpoint for fetching timetables (No authentication required)"""
-    
     def get(self, request):
-        timetables = Timetable.objects.all()
+        year = request.query_params.get('year')
+        semester = request.query_params.get('semester')
+        branch = request.query_params.get('branch')
+        academic_year = request.query_params.get('academic_year')
+
+        if not all([year, semester, branch, academic_year]):
+            return Response({"error": "Missing required parameters"}, status=status.HTTP_400_BAD_REQUEST)
+
+        timetables = Timetable.objects.filter(
+            year=year,
+            semester=semester,
+            branch=branch,
+            academic_year=academic_year
+        )
+
+        if not timetables.exists():
+            return Response({"error": "No public timetable found"}, status=status.HTTP_404_NOT_FOUND)
+
         serializer = TimetableSerializer(timetables, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
 class TimetableView(APIView):
     def get(self, request):
-        current_year = datetime.datetime.now().year
-        academic_year = f"{current_year}-{current_year + 1}"  # Example: "2024-2025"
-        
-        
-        timetables = Timetable.objects.filter(academic_year=academic_year)
+        # Get all required parameters from the frontend
+        crc_id = request.query_params.get('crc_id')
+        year = request.query_params.get('year')
+        semester = request.query_params.get('semester')
+        branch = request.query_params.get('branch')
+        academic_year = request.query_params.get('academic_year')  # Now received from frontend
+
+        # Validate that all required parameters are provided
+        if not all([crc_id, year, semester, branch, academic_year]):
+            return Response({"error": "Missing required query parameters"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Filter timetable based on all provided parameters
+        timetables = Timetable.objects.filter(
+            crc_id=crc_id,
+            year=year,
+            semester=semester,
+            branch=branch,
+            academic_year=academic_year
+        )
+
+        if not timetables.exists():
+            return Response({"error": "No timetable found for the given details"}, status=status.HTTP_404_NOT_FOUND)
+
         serializer = TimetableSerializer(timetables, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 

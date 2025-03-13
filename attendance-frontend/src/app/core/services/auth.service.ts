@@ -10,7 +10,7 @@ export class AuthService {
   private deviceId: string | null = null;
 
   constructor(private http: HttpClient) {
-    this.generateDeviceId();
+    this.getDeviceId();
   }
 
   async getDeviceName(): Promise<string> {
@@ -65,20 +65,25 @@ export class AuthService {
     return deviceName === 'Android Device' || deviceName === 'iPhone';
   }
 
-  private async generateDeviceId() {
-    const fp = await FingerprintJS.load();
-    const result = await fp.get();
-    this.deviceId = result.visitorId;  // Unique device ID
-  }
+
 
   async getDeviceId(): Promise<string> {
-
-    if (!this.deviceId) {
-      await this.generateDeviceId();
+    if (localStorage.getItem('device_id')) {
+      return localStorage.getItem('device_id')!; // ✅ Return stored device ID if available
     }
-    // console.log('device id',this.deviceId);
-    return this.deviceId!;
+  
+    const fp = await FingerprintJS.load();
+    const result = await fp.get();
+    const userAgent = navigator.userAgent;
+    const screenResolution = `${window.screen.width}x${window.screen.height}`;
+  
+    const generatedDeviceId = `${result.visitorId}-${userAgent}-${screenResolution}`;
+  
+    localStorage.setItem('device_id', generatedDeviceId); // ✅ Store it so it remains the same
+    return generatedDeviceId;
   }
+  
+
 
   getToken(): string | null {
     return localStorage.getItem('access_token');
