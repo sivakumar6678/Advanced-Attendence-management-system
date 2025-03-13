@@ -19,6 +19,7 @@ import { LoadingComponent } from './shared/loading/loading.component';
 import { SuperadminComponent } from './features/superadmin/superadmin.component';
 import { StudentAuthComponent } from './features/student/student-auth/student-auth.component';
 import { TeacherAuthComponent } from './features/teacher/teacher-auth/teacher-auth.component';
+import { TeacherDashboardComponent } from './features/teacher/teacher-dashboard/teacher-dashboard.component';
 import { CrcAuthComponent } from './features/crc/crc-auth/crc-auth.component';
 
 import { CrcDashboardComponent } from './features/crc/crc-dashboard/crc-dashboard.component';
@@ -63,13 +64,13 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
         HomeComponent,
         LoadingComponent,
         StudentAuthComponent,
-
         TestComponent,
         TeacherAuthComponent,
         CrcAuthComponent,
         SuperadminComponent,
         CrcDashboardComponent,
         CrcTimetableComponent,
+        TeacherDashboardComponent
     ],
     imports: [
         RouterModule.forRoot(routes),  // Define routes

@@ -28,6 +28,7 @@
     "face-api.js": "^0.20.0",
     "fingerprintjs2": "^2.1.4",
     "primeng": "^17.18.15",
+    "requirements": "^2.0.2",
     "rxjs": "~7.8.0",
     "tfjs-image-recognition-base": "^0.6.0",
     "tslib": "^2.3.0",

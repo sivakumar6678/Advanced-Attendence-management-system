@@ -1,1 +1,98 @@
-<p>teacher-dashboard works!</p>
+<div class="dashboard-container">
+    <!-- ✅ Sticky Navigation Bar -->
+    <p-toolbar class="home-sticky-header"  [style]="{'background-color': 'var(--primary-color)', 'padding' : '0.5rem 2rem', 'margin-bottom' : 0}" >
+      <div class="p-toolbar-group-start proj-title">
+        <span>Teacher Dashboard</span>
+      </div>
+      <div class="p-toolbar-group-end navbar-links">
+      </div>
+    </p-toolbar>
+  
+    <!-- ✅ Main Content Wrapper -->
+    <div class="main-content-wrapper">
+      <!-- ✅ Sidebar Navigation -->
+      <div class="sidebar" [ngClass]="{ 'hidden': sidebarHidden }">
+        <p-menubar [model]="menuItems"></p-menubar>
+      </div>
+  
+      <!-- ✅ Main Content Section -->
+      <div class="content">
+        <!-- ✅ Breadcrumb Navigation -->
+        <p-breadcrumb [model]="[{ label: activePage.charAt(0).toUpperCase() + activePage.slice(1) }]"></p-breadcrumb>
+  
+        <!-- ✅ Home Section -->
+        <div *ngIf="activePage === 'home'" class="home-container">
+          <!-- ✅ Welcome & Profile Section -->
+          <div class="profile-section">
+            <div class="profile-avatar">
+              <p-avatar icon="fas fa-user" size="xlarge" styleClass="mr-2"></p-avatar>
+            </div>
+            <div class="profile-info">
+              <h2>Welcome, {{ teacherProfile?.name }}</h2>
+              <p>Email: {{ teacherProfile?.email }}</p>
+              <p>Department: {{ teacherProfile?.department }}</p>
+              <p><i class="pi pi-clock"></i> Current Time: {{ currentTime }}</p>
+            </div>
+          </div>
+  
+          <!-- ✅ Quick Action Buttons -->
+          <div class="quick-actions">
+            <p-button label="Mark Attendance" icon="pi pi-check-square" class="p-button-success" (click)="setActivePage('attendance')"></p-button>
+            <p-button label="View Timetable" icon="pi pi-calendar" class="p-button-info" (click)="setActivePage('timetable')"></p-button>
+            <p-button label="Student Reports" icon="pi pi-chart-bar" class="p-button-warning" (click)="setActivePage('students')"></p-button>
+          </div>
+  
+          <!-- ✅ Live Updates & Widgets -->
+          <div class="dashboard-widgets">
+            <p-card class="widget">
+              <h3><i class="pi pi-calendar"></i> Today's Classes</h3>
+              <p>View your classes scheduled for today.</p>
+            </p-card>
+            <p-card class="widget">
+              <h3><i class="pi pi-bell"></i> Recent Notifications</h3>
+              <p>Check latest updates from the administration.</p>
+            </p-card>
+            <p-card class="widget">
+              <h3><i class="pi pi-chart-line"></i> Attendance Trends</h3>
+              <p>Analyze attendance trends for your classes.</p>
+            </p-card>
+          </div>
+        </div>
+  
+        <!-- ✅ Timetable Section -->
+        <div *ngIf="activePage === 'timetable'">
+          <p-card>
+            <h3>Class Timetable</h3>
+            <p>View and manage your class schedule.</p>
+          </p-card>
+        </div>
+  
+        <!-- ✅ Attendance Section -->
+        <div *ngIf="activePage === 'attendance'">
+          <p-card>
+            <h3>Attendance Management</h3>
+            <p>Mark and view attendance records.</p>
+          </p-card>
+        </div>
+  
+        <!-- ✅ Student Management Section -->
+        <div *ngIf="activePage === 'students'">
+          <p-card>
+            <h3>Student Management</h3>
+            <p>View and manage student details and attendance.</p>
+          </p-card>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- ✅ Logout Confirmation Toast -->
+  <p-toast position="bottom-center" key="confirm" (onClose)="onReject()">
+    <ng-template let-message pTemplate="message">
+      <div class="confirm-box">
+        <h3>Confirm Logout</h3>
+        <p>{{ message.detail }}</p>
+        <p-button label="Logout" class="p-button-danger" (click)="onConfirm()"></p-button>
+      </div>
+    </ng-template>
+  </p-toast>
