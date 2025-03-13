@@ -23,7 +23,7 @@ export class CrcDashboardComponent implements OnInit {
     this.updateTime();
     setInterval(() => this.updateTime(), 60000); // Update time every minute
   }
-  
+
   loadDashboard() {
     const headers = new HttpHeaders().set('Authorization', `Bearer ${localStorage.getItem('access_token')}`);
     this.crcDashboardService.getCrcProfile(headers).subscribe(
@@ -71,7 +71,7 @@ export class CrcDashboardComponent implements OnInit {
     this.messageService.add({ key: 'confirm', sticky: true, severity: 'warn', summary: 'Confirm Logout?', detail: 'Are you sure you want to logout?' });
     this.visible = true;
   }
-  
+
   onConfirm() {
     this.messageService.clear('confirm');
     this.visible = false;
