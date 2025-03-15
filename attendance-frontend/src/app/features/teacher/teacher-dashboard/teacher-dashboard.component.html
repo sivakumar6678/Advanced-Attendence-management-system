@@ -62,16 +62,78 @@
         <!-- ✅ Timetable Section -->
         <div *ngIf="activePage === 'timetable'">
           <p-card>
-            <h3>Class Timetable</h3>
-            <p>View and manage your class schedule.</p>
+            
+            <h3>Assigned Subjects</h3>
+            <p *ngIf="assignedSubjects.length === 0">No subjects assigned.</p>
+          
+            <div *ngFor="let batchKey of groupedSubjects | keyvalue">
+              <h3>{{ batchKey.key }}</h3> <!-- ✅ Display batch title -->
+              
+              <p-table [value]="groupedSubjects[batchKey.key]">
+                <ng-template pTemplate="header">
+                  <tr>
+                    <th>Subject Name</th>
+                    <th>Timetable</th>
+                  </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-subject>
+                  <tr>
+                    <td>{{ subject.subject_name }}</td>
+                    <td>
+                      <button pButton label="View Timetable" class="p-button-info" (click)="loadPublicTimetable(subject)"></button>
+                    </td>
+                  </tr>
+                </ng-template>
+              </p-table>
+          
+              <div *ngIf="activeBatch === batchKey.key">
+                <h4>Timetable for {{ batchKey }}</h4>
+                <p-table [value]="subjectTimetable[batchKey.key]">
+                  <ng-template pTemplate="header">
+                    <tr>
+                      <th>Day</th>
+                      <th>Time Slot</th>
+                      <th>Faculty</th>
+                    </tr>
+                  </ng-template>
+                  <ng-template pTemplate="body" let-entry>
+                    <tr>
+                      <td>{{ entry.day }}</td>
+                      <td>{{ entry.time_slot }}</td>
+                      <td>{{ getFacultyName(entry.faculty_id) }}</td>
+
+                      <!-- <td>{{ getFacultyName(entry.faculty_id) }}</td> ✅ Call function -->
+                    </tr>
+                  </ng-template>
+                </p-table>
+              </div>
+            </div>
           </p-card>
         </div>
   
         <!-- ✅ Attendance Section -->
         <div *ngIf="activePage === 'attendance'">
           <p-card>
-            <h3>Attendance Management</h3>
-            <p>Mark and view attendance records.</p>
+            <h3>Assigned Subjects</h3>
+                <p *ngIf="assignedSubjects.length === 0">No subjects assigned.</p>
+
+                <p-table [value]="assignedSubjects">
+                    <ng-template pTemplate="header">
+                    <tr>
+                        <th>Subject Name</th>
+                        <th>Actions</th>
+                    </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-subject>
+                    <tr>
+                        <td>{{ subject.subject_name }}</td>
+                        <td>
+                        <button pButton label="View Details" class="p-button-info" (click)="viewSubjectDetails(subject)"></button>
+                        </td>
+                    </tr>
+                    </ng-template>
+                </p-table>
+            
           </p-card>
         </div>
   

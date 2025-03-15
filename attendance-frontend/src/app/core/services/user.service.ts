@@ -111,4 +111,12 @@ export class UserService {
   finalizeTimetable(timetableId: number): Observable<any> {
     return this.http.put(`${this.baseUrl}/crc/timetables/${timetableId}/finalize/`,{}, {headers: this.getAuthHeaders() });
   }
+
+
+  getAssignedSubjects(facultyId: number): Observable<any> {
+    return this.http.get(`${this.baseUrl}/faculty/${facultyId}/assigned-subjects/`, {
+      headers: this.getAuthHeaders(),
+    });
+  }
+  
 }

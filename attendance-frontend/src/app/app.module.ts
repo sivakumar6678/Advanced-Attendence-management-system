@@ -72,16 +72,15 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
         SuperadminComponent,
         
         StudentAuthComponent,
-        TestComponent,
         StudentDashboardComponent,
         StudentAttendanceComponent,
         
         TeacherAuthComponent,
+        TeacherDashboardComponent,
         
         CrcAuthComponent,
         CrcDashboardComponent,
         CrcTimetableComponent,
-        TeacherDashboardComponent
     ],
     imports: [
         RouterModule.forRoot(routes),  // Define routes

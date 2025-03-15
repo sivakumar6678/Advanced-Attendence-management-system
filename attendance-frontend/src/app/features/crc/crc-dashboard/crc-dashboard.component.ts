@@ -49,12 +49,12 @@ export class CrcDashboardComponent implements OnInit {
   }
 
   menuItems = [
-    { label: 'Home', icon: 'pi pi-home', command: () => this.setActivePage('home') },
-    { label: 'Timetable', icon: 'pi pi-calendar', command: () => this.setActivePage('timetable') },
-    { label: 'Attendance', icon: 'pi pi-check-square', command: () => this.setActivePage('attendance') },
-    { label: 'Notifications', icon: 'pi pi-bell', command: () => this.setActivePage('notifications') },
+    { label: 'Home', icon: 'fas fa-home', command: () => this.setActivePage('home') },
+    { label: 'Timetable', icon: 'fas fa-calendar', command: () => this.setActivePage('timetable') },
+    { label: 'Attendance', icon: 'fas fa-check-square', command: () => this.setActivePage('attendance') },
+    { label: 'Notifications', icon: 'fas fa-bell', command: () => this.setActivePage('notifications') },
     { separator: true },
-    { label: 'Logout', icon: 'pi pi-sign-out', command: () => this.confirmLogout() }
+    { label: 'Logout', icon: 'fas fa-sign-out', command: () => this.confirmLogout() }
   ];
 
   setActivePage(page: string) {
