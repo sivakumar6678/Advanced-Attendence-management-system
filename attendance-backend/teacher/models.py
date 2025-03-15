@@ -11,8 +11,16 @@ class Faculty(User):  # Inherit from User
     exit_date = models.DateField(blank=True, null=True)
     rejoin_date = models.DateField(blank=True, null=True)
 
+    # ✅ Fix: Use 'attendance.TimetableEntry' instead of 'TimetableEntry'
+    assigned_subjects = models.ManyToManyField(
+        'crc.Subject',  # ✅ Fix: Add correct app label for Subject
+        through='crc.TimetableEntry',  # ✅ Fix: Add correct app label for TimetableEntry
+        related_name='faculty_assigned'
+    )
+
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['employee_id']
 
     def __str__(self):
         return self.full_name
+

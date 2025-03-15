@@ -7,6 +7,8 @@ from core.models import Faculty as CoreFaculty  # Reference faculty added by Sup
 from .models import Faculty
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from crc.models import Subject,Timetable,TimetableEntry
+from crc.serializers import SubjectSerializer
 class FacultyRegisterView(APIView):
     def post(self, request):
         data = request.data
@@ -80,6 +82,7 @@ class FacultyLoginView(APIView):
             return Response({"error": "Faculty not found"}, status=status.HTTP_404_NOT_FOUND)
 
 class FacultyDashboardView(APIView):
+
     authentication_classes = [JWTAuthentication]  # Use JWT authentication
     permission_classes = [IsAuthenticated]  # Only authenticated users can access
 
@@ -93,12 +96,45 @@ class FacultyDashboardView(APIView):
 
             # Return faculty details
             return Response({
+                "id":faculty.id,
                 "full_name": faculty.full_name,
                 "email": faculty.email,
                 "branch": faculty.branch,
                 "phone_number": faculty.phone_number,
                 "joined_date": faculty.joined_date
             }, status=status.HTTP_200_OK)
+
+        except Faculty.DoesNotExist:
+            return Response({"error": "Faculty not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+
+class FacultyAssignedSubjectsView(APIView):
+    def get(self, request, faculty_id):
+        try:
+            faculty = Faculty.objects.get(id=faculty_id)  # ✅ Get faculty instance
+            
+            # ✅ Get all timetable entries where faculty is assigned
+            timetable_entries = TimetableEntry.objects.filter(faculty=faculty).select_related('subject')
+
+            if not timetable_entries.exists():
+                return Response({"message": "No assigned subjects found"}, status=status.HTTP_200_OK)
+
+            assigned_subjects = []
+            for entry in timetable_entries:
+                timetable = Timetable.objects.filter(entries=entry).first()  # ✅ Get related Timetable
+                
+                if timetable:
+                    assigned_subjects.append({
+                        "subject_id": entry.subject.id if entry.subject else None,
+                        "subject_name": entry.subject.name if entry.subject else "Unknown",
+                        "crc_id": timetable.crc_id,  # ✅ Get CRC ID from Timetable
+                        "year": timetable.year,
+                        "semester": timetable.semester,
+                        "branch": timetable.branch,
+                        "academic_year": timetable.academic_year
+                    })
+
+            return Response(assigned_subjects, status=status.HTTP_200_OK)
 
         except Faculty.DoesNotExist:
             return Response({"error": "Faculty not found"}, status=status.HTTP_404_NOT_FOUND)

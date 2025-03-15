@@ -26,9 +26,10 @@ class TimetableEntry(models.Model):
     time_slot = models.CharField(max_length=50)  
     subject = models.ForeignKey(Subject, on_delete=models.SET_NULL, null=True, blank=True)
     faculty = models.ForeignKey(Faculty, on_delete=models.SET_NULL, null=True, blank=True)
+    is_completed = models.BooleanField(default=False)  # ✅ New field to track completion
 
     def __str__(self):
-        return f"{self.day} - {self.time_slot}: {self.subject} ({self.faculty})"
+        return f"{self.day} - {self.time_slot}: {self.subject} ({self.faculty}) - Completed: {self.is_completed}"
 
 class Timetable(models.Model):
     crc = models.ForeignKey(User, on_delete=models.CASCADE, related_name="timetables")  
