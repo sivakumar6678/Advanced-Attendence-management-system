@@ -66,6 +66,18 @@
   .sidebar p-menubar {
     width: 100%;
   }
+  .highlight-subject {
+    color: #3122ff;  /* 🔥 Bright orange for subject */
+    font-weight: bold;
+    text-transform: uppercase;
+    border-bottom: 2px solid #ff5722;
+    padding: 2px;
+  }
+  
+  .highlight-faculty {
+    color: #4CAF50;  /* ✅ Green for faculty */
+    font-weight: bold;
+  }
   
   /* Main Content Section */
   .content {

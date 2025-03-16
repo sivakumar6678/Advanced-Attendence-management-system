@@ -10,10 +10,13 @@ import { MessageService } from 'primeng/api';
   styleUrls: ['./teacher-dashboard.component.css']
 })
 export class TeacherDashboardComponent implements OnInit {
+  viewSubjectDetails(_t147: any) {
+    throw new Error('Method not implemented.');
+  }
   teacherProfile: any;
-  activePage: string = 'home'; // Default section
+  activePage: string = 'home'; 
   currentTime: string = '';
-  sidebarHidden: boolean = false; // Sidebar toggle state
+  sidebarHidden: boolean = false;  
   publicTimetable: any[] = [];
 
   year: number | null = null;
@@ -22,10 +25,17 @@ export class TeacherDashboardComponent implements OnInit {
   branch: string | null = null;
 
   assignedSubjects: any[] = [];
-  groupedSubjects: { [key: string]: any[] } = {};  // ✅ Store subjects grouped by (year, semester, branch)
-  subjectTimetable: { [key: string]: any[] } = {}; // ✅ Store timetable per batch
-  activeBatch: string | null = null; // ✅ Track which timetable is active
+  groupedSubjects: { [key: string]: any[] } = {};  
+  subjectTimetable: { [key: string]: any[] } = {}; 
+  activeBatch: string | null = null; 
 
+  subjectsList: any[] = [];
+  facultyList: any[] = [];
+
+  crcId: number | null = null ;
+  
+  days: string[] = [];
+  timeSlots: { time: string }[] = [];
 
   constructor(
     private teacherDashboardService: UserService,
@@ -35,9 +45,19 @@ export class TeacherDashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadDashboard();
+    this.fetchTimetableConfig();  
     this.updateTime();
-    setInterval(() => this.updateTime(), 60000); // Update time every minute
+    setInterval(() => this.updateTime(), 60000);
   }
+
+  menuItems = [
+    { label: 'Home', icon: 'fas fa-home', command: () => this.setActivePage('home') },
+    { label: 'Timetable', icon: 'fas fa-calendar', command: () => this.setActivePage('timetable') },
+    { label: 'Attendance', icon: 'fas fa-check-square', command: () => this.setActivePage('attendance') },
+    { label: 'Students', icon: 'fas fa-users', command: () => this.setActivePage('students') },
+    { separator: true },
+    { label: 'Logout', icon: 'fas fa-sign-out', command: () => this.confirmLogout() }
+  ];
 
   loadDashboard() {
     const headers = new HttpHeaders().set('Authorization', `Bearer ${localStorage.getItem('access_token')}`);
@@ -49,7 +69,20 @@ export class TeacherDashboardComponent implements OnInit {
       },
       (error) => {
         console.error('Authorization failed', error);
-        this.router.navigate(['/teacher-auth']); // Redirect if unauthorized
+        this.router.navigate(['/teacher-auth']);
+      }
+    );
+  }
+
+  fetchTimetableConfig(): void {
+    this.teacherDashboardService.getTimetableConfig().subscribe(
+      (data) => {
+        console.log("Timetable Config:", data);
+        this.days = data.days || [];  
+        this.timeSlots = data.time_slots.map((time: string) => ({ time })) || [];
+      },
+      (error) => {
+        console.error("Error fetching timetable config:", error);
       }
     );
   }
@@ -58,27 +91,58 @@ export class TeacherDashboardComponent implements OnInit {
     this.teacherDashboardService.getAssignedSubjects(facultyId).subscribe(
       (data) => {
         console.log("Assigned Subjects (Before Removing Duplicates):", data);
+        if (data.length > 0 && data[0].crc_id !== undefined) {
+          this.crcId = data[0].crc_id;
+          console.log("crc id", this.crcId);
+          // Call loadSubjectsAndFaculties after setting crcId
+          this.loadSubjectsAndFaculties(this.crcId);
+        } else {
+          console.error("crc_id not found in the response data");
+        }
 
-        // ✅ Remove duplicate subjects (Group by subject_id, year, semester, branch)
-        const uniqueSubjects = data.reduce((acc: { [key: string]: any }, subject: any) => {
+        const uniqueSubjectsMap = new Map();  
+        data.forEach((subject: any) => {
           const key = `${subject.subject_id}-${subject.year}-${subject.semester}-${subject.branch}-${subject.academic_year}`;
-          if (!acc[key]) {
-            acc[key] = subject;
+          if (!uniqueSubjectsMap.has(key)) {
+            uniqueSubjectsMap.set(key, subject);
           }
-          return acc;
-        }, {} as { [key: string]: any });
-        
-        
+        });
 
-        this.assignedSubjects = Object.values(uniqueSubjects);
+        this.assignedSubjects = Array.from(uniqueSubjectsMap.values());
         console.log("Unique Assigned Subjects:", this.assignedSubjects);
-
-        // ✅ Group subjects by (year, semester, branch)
         this.groupSubjectsByBatch();
-
       },
       (error) => {
         console.error("Error fetching assigned subjects:", error);
+      }
+    );
+  }
+
+  loadSubjectsAndFaculties(crcId: number | null): void {
+    if (crcId === null) {
+      console.error("crcId is null, cannot load subjects.");
+      return; // Early return if crcId is null
+    }
+
+    // ✅ Fetch subjects list
+    this.teacherDashboardService.getSubjects(crcId).subscribe(
+      (data) => {
+        this.subjectsList = data;
+        console.log("Subjects List:", this.subjectsList);
+      },
+      (error) => {
+        console.error("Error fetching subjects list:", error);
+      }
+    );
+
+    // ✅ Fetch faculty list
+    this.teacherDashboardService.getFaculties().subscribe(
+      (data) => {
+        this.facultyList = data;
+        console.log("Faculty List:", this.facultyList);
+      },
+      (error) => {
+        console.error("Error fetching faculty list:", error);
       }
     );
   }
@@ -99,14 +163,19 @@ export class TeacherDashboardComponent implements OnInit {
 
   loadPublicTimetable(subject: any): void {
     console.log("Fetching timetable for:", subject);
-  
+    
     if (!subject.year || !subject.semester || !subject.branch || !subject.academic_year) {
       console.error("Missing required parameters to fetch timetable.");
       return;
     }
   
-    // ✅ Define batchKey before using it
     const batchKey = `${subject.year} Year - Sem ${subject.semester} (${subject.branch}, ${subject.academic_year})`;
+  
+    // ✅ Toggle timetable: If already open, close it
+    if (this.activeBatch === batchKey) {
+      this.activeBatch = null; // Close timetable if already open
+      return;
+    }
   
     this.teacherDashboardService.getPublicTimetables(subject.year, subject.semester, subject.branch, subject.academic_year)
       .subscribe(
@@ -115,7 +184,7 @@ export class TeacherDashboardComponent implements OnInit {
           
           if (data.length > 0 && data[0].entries) {
             this.subjectTimetable[batchKey] = data[0].entries;
-            this.activeBatch = batchKey;  // ✅ Correctly set active batch
+            this.activeBatch = batchKey; // ✅ Open timetable
           } else {
             console.warn("No timetable found for subject:", subject.subject_name);
             this.subjectTimetable[batchKey] = [];
@@ -127,18 +196,38 @@ export class TeacherDashboardComponent implements OnInit {
       );
   }
   
-
   toggleTimetable(batchKey: string): void {
     this.activeBatch = this.activeBatch === batchKey ? null : batchKey;
   }
+
+  getSubjectName(subjectId: number | null): string {
+    if (!subjectId) return 'Unknown'; // Return 'Unknown' if ID is null
+    
+    // Check if the subject is already cached
+    const cachedSubject = this.subjectsList.find(s => Number(s.id) === Number(subjectId));
+    if (cachedSubject) {
+      return cachedSubject.name;
+    }
   
-
-
-  viewSubjectDetails(subject: any): void {
-    console.log("Viewing subject:", subject);
-    // Navigate to subject details page (implement routing later)
+    // Fetch the subject name if not cached
+    this.teacherDashboardService.getSubjectById(subjectId).subscribe(
+      (data) => {
+        this.subjectsList.push(data);  // ✅ Cache the subject to avoid duplicate API calls
+      },
+      (error) => {
+        console.error("Error fetching subject name:", error);
+      }
+    );
+  
+    return 'Loading...'; // Placeholder text while fetching
   }
-  
+
+  getFacultyName(facultyId: number | null): string {
+    if (!facultyId) return 'Unknown';
+    const faculty = this.facultyList.find(f => f.id === facultyId);
+    return faculty ? faculty.full_name : 'Unknown Faculty';
+  }
+
   updateTime() {
     const now = new Date();
     this.currentTime = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -147,15 +236,6 @@ export class TeacherDashboardComponent implements OnInit {
   toggleSidebar() {
     this.sidebarHidden = !this.sidebarHidden;
   }
-
-  menuItems = [
-    { label: 'Home', icon: 'fas fa-home', command: () => this.setActivePage('home') },
-    { label: 'Timetable', icon: 'fas fa-calendar', command: () => this.setActivePage('timetable') },
-    { label: 'Attendance', icon: 'fas fa-check-square', command: () => this.setActivePage('attendance') },
-    { label: 'Students', icon: 'fas fa-users', command: () => this.setActivePage('students') },
-    { separator: true },
-    { label: 'Logout', icon: 'fas fa-sign-out', command: () => this.confirmLogout() }
-  ];
 
   setActivePage(page: string) {
     this.activePage = page;
@@ -179,19 +259,15 @@ export class TeacherDashboardComponent implements OnInit {
     this.messageService.clear('confirm');
   }
 
-
-
-  getSubjectName(subjectId: number | null): string {
-    if (!subjectId) return 'Unknown';
-    return `Subject ${subjectId}`;  // Replace this with a real lookup if needed
+  getTimetableEntries(batchKey: string, day: string, timeSlot: string): any[] {
+    return this.subjectTimetable[batchKey]?.filter(entry => entry.day === day && entry.time_slot === timeSlot) || [];
   }
-  
-  getFacultyName(facultyId: number | null): string {
-    if (!facultyId) return 'Unknown';
-    return `Faculty ${facultyId}`;  // Replace this with a real lookup if needed
+
+  hasTimetableEntry(batchKey: string, day: string, timeSlot: string): boolean {
+    return this.subjectTimetable[batchKey]?.some(entry => entry.day === day && entry.time_slot === timeSlot) ?? false;
   }
-  
-  
-  
-  
+
+  getEntries(batchKey: string, day: string, time: string): any[] {
+    return (this.subjectTimetable[batchKey] || []).filter(entry => entry.day === day && entry.time_slot === time);
+  }
 }

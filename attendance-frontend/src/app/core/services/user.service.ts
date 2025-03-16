@@ -66,6 +66,10 @@ export class UserService {
   getSubjects(crcId: number): Observable<any> {
     return this.http.get(`${this.baseUrl}/crc/subjects/?crc_id=${crcId}`,{ headers: this.getAuthHeaders() });
   }
+  getSubjectById(subjectId: number): Observable<any> {
+    return this.http.get(`${this.baseUrl}/crc/subjects/${subjectId}/`);
+  }
+  
   
   addSubject(subjectName: string, crcId: number): Observable<any> {
     return this.http.post(`${this.baseUrl}/crc/subjects/`, {
@@ -77,10 +81,7 @@ export class UserService {
   deleteSubject(subjectId: number): Observable<any> {
     return this.http.delete(`${this.baseUrl}/crc/subjects/${subjectId}/`);
   }
-  // Fetch all timetables
-  // getTimetables(): Observable<any> {
-  //   return this.http.get(`${this.baseUrl}/crc/timetables/` ,{headers:this.getAuthHeaders()});
-  // }
+  
 
   getTimetables(crcId: number, year: number, semester: number, branch: string, academicYear: string): Observable<any> {
     const params = new HttpParams()
@@ -96,6 +97,9 @@ export class UserService {
     });
   }
   
+  getTimetableConfig(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/crc/timetable/config/`);
+  }
   
 
   // Add a new timetable
