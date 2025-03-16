@@ -13,6 +13,7 @@ from rest_framework.generics import ListCreateAPIView, RetrieveUpdateAPIView
 from .models import Timetable, TimetableEntry, Subject
 from .serializers import TimetableSerializer, SubjectSerializer
 from rest_framework import generics
+from django.http import JsonResponse
 class RegisterCRC(APIView):
     def post(self, request):
         data = request.data
@@ -171,6 +172,11 @@ class SubjectListCreateView(generics.ListCreateAPIView):
         crc = get_object_or_404(CRCProfile, faculty_ref=user)
         serializer.save(crc=crc)
 
+class GetSubjectById(APIView):
+    def get(self, request, subject_id):
+        subject = get_object_or_404(Subject, id=subject_id)
+        return Response({"id": subject.id, "name": subject.name}, status=status.HTTP_200_OK)
+
 
 # Delete a subject
 class SubjectDeleteView(APIView):
@@ -207,6 +213,20 @@ class PublicTimetableView(APIView):
         serializer = TimetableSerializer(timetables, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+class TimetableConfigView(APIView):
+    def get(self, request):
+        config = {
+            "days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+            "time_slots": [
+                "9:15 AM - 10:15 AM",
+                "10:15 AM - 11:15 AM",
+                "11:30 AM - 12:30 PM",
+                "1:30 PM - 2:30 PM",
+                "2:30 PM - 3:30 PM",
+                "3:30 PM - 4:30 PM"
+            ]
+        }
+        return Response(config)
 class TimetableView(APIView):
     def get(self, request):
         # Get all required parameters from the frontend
