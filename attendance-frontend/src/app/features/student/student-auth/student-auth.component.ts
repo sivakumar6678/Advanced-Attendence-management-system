@@ -270,7 +270,7 @@ confirmRegistration() {
   }
 
   // ✅ Step 2: Validate device details (Modify conditions as needed)
-  const allowedPlatforms = ["Windows", "Android", "iOS", "Linux x86_64"];
+  const allowedPlatforms = ["Windows", "Android", "iOS", "Linux x86_64","Win32"];
   const allowedBrowsers = ["Chrome", "Firefox", "Safari"];
 
   if (!this.deviceId || !this.deviceName || !this.platform || !this.browser || !this.osVersion) {

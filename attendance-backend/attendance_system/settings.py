@@ -94,9 +94,9 @@ WSGI_APPLICATION = 'attendance_system.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'attendance_system_db',
+        'NAME': 'attendance',
         'USER' : 'root',
-        'PASSWORD' : 'CSKsiva@66',
+        'PASSWORD' : '1234',
         'HOST' : 'localhost',
         'PORT' : '3306'
     }
