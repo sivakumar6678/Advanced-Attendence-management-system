@@ -13,8 +13,12 @@
       <!-- ✅ Sidebar Navigation -->
       <div class="sidebar" [ngClass]="{ 'hidden': sidebarHidden }">
         <p-menubar [model]="menuItems"></p-menubar>
+        <button *ngIf="sidebarHidden" (click)="toggleSidebar()" class="expand-sidebar-btn">
+          <i class="fas fa-bars"></i>
+          
+        </button>
       </div>
-  
+    
       <!-- ✅ Main Content Section -->
       <div class="content">
         <!-- ✅ Breadcrumb Navigation -->
@@ -37,9 +41,9 @@
   
           <!-- ✅ Quick Action Buttons -->
           <div class="quick-actions">
-            <p-button label="Mark Attendance" icon="pi pi-check-square" class="p-button-success" (click)="setActivePage('attendance')"></p-button>
-            <p-button label="View Timetable" icon="pi pi-calendar" class="p-button-info" (click)="setActivePage('timetable')"></p-button>
-            <p-button label="Student Reports" icon="pi pi-chart-bar" class="p-button-warning" (click)="setActivePage('students')"></p-button>
+            <p-button label="Mark Attendance" icon="fas fa-check-square" class="p-button-success" (click)="setActivePage('attendance')"></p-button>
+            <p-button label="View Timetable" icon="fas fa-calendar" class="p-button-info" (click)="setActivePage('timetable')"></p-button>
+            <p-button label="Student Reports" icon="fas fa-chart-bar" class="p-button-warning" (click)="setActivePage('students')"></p-button>
           </div>
   
           <!-- ✅ Live Updates & Widgets -->
@@ -62,7 +66,6 @@
         <!-- ✅ Timetable Section -->
         <div *ngIf="activePage === 'timetable'">
           <p-card>
-            
             <h3>Assigned Subjects</h3>
             <p *ngIf="assignedSubjects.length === 0">No subjects assigned.</p>
 

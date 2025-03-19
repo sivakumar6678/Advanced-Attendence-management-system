@@ -1,28 +1,51 @@
-/* Mobile-Only Dashboard */
+/* General Styles */
 .dashboard-container {
-  max-width: 400px;
+  max-width: 100%;
   margin: 0 auto;
   padding: 15px;
   font-family: Arial, sans-serif;
   background: #f5f5f5;
+  min-height: 100vh;
+  padding-bottom: 80px; /* Space for bottom nav */
 }
 
 /* Header */
 .header {
-  text-align: center;
-  font-size: 20px;
-  font-weight: bold;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 15px;
   padding: 10px;
   background: #6200ea;
   color: white;
   border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+.header h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0;
+  padding: 0;
+  line-height: 1.2;
+}
+.logout-btn {
+  background: #ff4081;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 25px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.3s ease-in-out;
+}
+.logout-btn:hover {
+  background: #f50057;
 }
 
 /* Card Styling */
 .card {
   background: white;
-  padding: 15px;
+  padding: 20px;
   margin-bottom: 15px;
   border-radius: 15px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
@@ -32,63 +55,106 @@
   transform: scale(1.02);
 }
 
+/* Profile Section */
+.profile {
+  text-align: center;
+  background: linear-gradient(135deg, #6200ea, #3700b3);
+  color: white;
+  padding: 20px;
+}
+.profile-details {
+  margin-bottom: 15px;
+}
+.profile-details p {
+  margin: 8px 0;
+  font-size: 1rem;
+}
+
 /* Attendance */
 .status {
   font-weight: bold;
-  color: green;
+  color: #4caf50;
 }
 .percentage {
   font-weight: bold;
-  color: blue;
+  color: #2196f3;
 }
 
-/* Attendance Session */
-.mark-btn {
-  width: 100%;
-  padding: 10px;
-  background: green;
-  color: white;
-  border: none;
-  font-size: 16px;
-  cursor: pointer;
-  border-radius: 5px;
+/* Timetable List */
+.timetable-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
-.mark-btn:hover {
-  background: darkgreen;
+.timetable-item {
+  background: #e3f2fd;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 /* Reports */
+.report-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
 .report-item {
   background: #e3f2fd;
-  padding: 10px;
-  margin-top: 5px;
-  border-radius: 5px;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 /* Bottom Navigation */
 .bottom-nav {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-around;
   background: #6200ea;
   padding: 10px;
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  border-radius: 10px 10px 0 0;
+  border-radius: 20px 20px 0 0;
+  z-index: 1000;
+  box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.1);
 }
 .nav-btn {
   flex: 1;
-  padding: 10px;
+  padding: 12px;
   background: none;
   border: none;
   color: white;
-  font-size: 16px;
+  font-size: 1rem;
   cursor: pointer;
-  transition: background 0.2s ease-in-out;
+  transition: all 0.3s ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 .nav-btn.active,
 .nav-btn:hover {
   background: rgba(255, 255, 255, 0.2);
-  border-radius: 5px;
+  border-radius: 25px;
+  transform: translateY(-5px);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 480px) {
+  .header h1 {
+    font-size: 1.2rem; /* Smaller font size for mobile */
+  }
+  .logout-btn {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+  }
+  .profile-details p {
+    font-size: 0.9rem;
+  }
+  .nav-btn {
+    font-size: 0.9rem;
+    padding: 10px;
+  }
 }

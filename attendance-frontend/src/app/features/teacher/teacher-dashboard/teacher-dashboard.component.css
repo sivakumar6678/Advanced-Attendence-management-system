@@ -50,6 +50,28 @@
   }
   
   /* Sidebar Navigation */
+  .expand-sidebar-btn {
+    position: fixed;
+    top: 80px;
+    left: 10px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 50%; /* ✅ Make it circular */
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px; /* ✅ Set fixed width & height */
+    height: 40px;
+    z-index: 1000;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); /* ✅ Add a slight shadow */
+}
+
+
+
   .sidebar {
     width: 250px;
     background: #ffffff;
@@ -59,7 +81,7 @@
   }
   
   .sidebar.hidden {
-    width: 60px;
+    width: 0;
     overflow: hidden;
   }
   

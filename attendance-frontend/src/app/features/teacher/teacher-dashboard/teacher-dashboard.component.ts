@@ -10,6 +10,8 @@ import { MessageService } from 'primeng/api';
   styleUrls: ['./teacher-dashboard.component.css']
 })
 export class TeacherDashboardComponent implements OnInit {
+timetable: any;
+students: any;
   viewSubjectDetails(_t147: any) {
     throw new Error('Method not implemented.');
   }
@@ -29,6 +31,9 @@ export class TeacherDashboardComponent implements OnInit {
   subjectTimetable: { [key: string]: any[] } = {}; 
   activeBatch: string | null = null; 
 
+  selectedSubject: any = null;
+  selectedBatchKey: string | null = null;
+
   subjectsList: any[] = [];
   facultyList: any[] = [];
 
@@ -36,6 +41,19 @@ export class TeacherDashboardComponent implements OnInit {
   
   days: string[] = [];
   timeSlots: { time: string }[] = [];
+
+  // ✅ Selected Subject
+  selectedSubjectId: number | null = null;
+
+  // ✅ Active Section (Timetable, Attendance, or Students)
+  activeSection: string = '';
+
+  // ✅ Section Tabs
+  sectionTabs = [
+    { key: 'timetable', label: 'Timetable' },
+    { key: 'attendance', label: 'Attendance' },
+    { key: 'students', label: 'Students' }
+  ];
 
   constructor(
     private teacherDashboardService: UserService,
@@ -73,7 +91,23 @@ export class TeacherDashboardComponent implements OnInit {
       }
     );
   }
+  selectSubject(subject: any): void {
+    if (!subject) return;
+  
+    this.selectedSubject = subject;
+    this.selectedBatchKey = `${subject.year} Year - Sem ${subject.semester} (${subject.branch}, ${subject.academic_year})`;
+    
+    this.activeBatch = null; // ✅ Auto-close timetable
+  }
+  onSubjectChange() {
+    this.activeSection = ''; // Reset active section when a new subject is selected
+  }
 
+  // ✅ Set Active Section (Timetable, Attendance, or Students)
+  setActiveSection(section: string) {
+    this.activeSection = section;
+  }
+  
   fetchTimetableConfig(): void {
     this.teacherDashboardService.getTimetableConfig().subscribe(
       (data) => {
@@ -168,15 +202,14 @@ export class TeacherDashboardComponent implements OnInit {
       console.error("Missing required parameters to fetch timetable.");
       return;
     }
-  
+
     const batchKey = `${subject.year} Year - Sem ${subject.semester} (${subject.branch}, ${subject.academic_year})`;
-  
-    // ✅ Toggle timetable: If already open, close it
+
     if (this.activeBatch === batchKey) {
-      this.activeBatch = null; // Close timetable if already open
+      this.activeBatch = null; // ✅ Close timetable if already open
       return;
     }
-  
+
     this.teacherDashboardService.getPublicTimetables(subject.year, subject.semester, subject.branch, subject.academic_year)
       .subscribe(
         (data) => {
@@ -184,7 +217,8 @@ export class TeacherDashboardComponent implements OnInit {
           
           if (data.length > 0 && data[0].entries) {
             this.subjectTimetable[batchKey] = data[0].entries;
-            this.activeBatch = batchKey; // ✅ Open timetable
+            this.activeBatch = batchKey;
+            this.sidebarHidden = true; // ✅ Auto-hide sidebar
           } else {
             console.warn("No timetable found for subject:", subject.subject_name);
             this.subjectTimetable[batchKey] = [];
@@ -194,7 +228,9 @@ export class TeacherDashboardComponent implements OnInit {
           console.error("Error fetching public timetable:", error);
         }
       );
-  }
+}
+
+  
   
   toggleTimetable(batchKey: string): void {
     this.activeBatch = this.activeBatch === batchKey ? null : batchKey;

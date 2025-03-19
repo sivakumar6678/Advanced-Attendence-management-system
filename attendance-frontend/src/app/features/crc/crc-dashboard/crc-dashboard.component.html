@@ -1,3 +1,10 @@
+<p-toolbar class="home-sticky-header"  [style]="{'background-color': 'var(--primary-color)', 'padding' : '0.5rem 2rem', 'margin-bottom' : 0}" >
+  <div class="p-toolbar-group-start proj-title">
+    <span>CRC Dashboard</span>
+  </div>
+  <div class="p-toolbar-group-end navbar-links">
+  </div>
+</p-toolbar>
 <div class="dashboard-container">
   <!-- ✅ Sidebar Navigation -->
   <div class="sidebar">
@@ -63,14 +70,25 @@
     </div>
 
     <!-- ✅ Logout Confirmation -->
-    <p-toast position="bottom-center" key="confirm" (onClose)="onReject()">
+    
+    <p-toast position="center" key="confirm" (onClose)="onReject()" >
       <ng-template let-message pTemplate="message">
-        <div class="confirm-box">
-          <h3>Confirm Logout</h3>
-          <p>{{ message.detail }}</p>
-          <p-button label="Logout" class="p-button-danger" (click)="onConfirm()"></p-button>
+        <div class="flex flex-column align-items-start" style="flex: 1">
+            <div class="flex align-items-center gap-2">
+                <i class="fas fa-user text-900"></i>
+                <span class="font-bold text-900">
+                  <h3>Confirm Logout</h3>
+                </span>
+            </div>
+            <div class="font-medium text-lg my-3 text-900">
+              <b>{{ message.detail }}</b>
+            </div>
+            <p-button label="Logout" class="p-button-danger" (click)="onConfirm()"></p-button>
         </div>
-      </ng-template>
+    </ng-template>
+      
     </p-toast>
+
+   
   </div>
 </div>

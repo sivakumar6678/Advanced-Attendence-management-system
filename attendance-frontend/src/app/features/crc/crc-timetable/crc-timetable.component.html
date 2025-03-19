@@ -2,26 +2,7 @@
   <h2 class="header">Timetable Management</h2>
 
   <p-tabView>
-    <p-tabPanel header="Manage Subjects">
-      <div class="subject-input">
-        <input type="text" pInputText [(ngModel)]="newSubject" placeholder="Enter Subject Name">
-        <button pButton label="Add Subject" class="p-button-primary" (click)="addSubject()"></button>
-      </div>
-
-      <p-table [value]="subjects">
-        <ng-template pTemplate="header">
-          <tr><th>Subject Name</th><th>Actions</th></tr>
-        </ng-template>
-        <ng-template pTemplate="body" let-subject>
-          <tr>
-            <td>{{ subject.name }}</td>
-            <td>
-              <button pButton icon="fas fa-trash" class="p-button-danger p-button-sm" (click)="deleteSubject(subject.id)"></button>
-            </td>
-          </tr>
-        </ng-template>
-      </p-table>
-    </p-tabPanel>
+    
     <p-tabPanel header="Manage Timetable">
       <p-table [value]="days">
         <ng-template pTemplate="header">
@@ -76,6 +57,26 @@
       <button *ngIf="!semesterFinalized" pButton label="Save Timetable" class="p-button-warning" (click)="finalizeTimetable()"></button>
       <button *ngIf="semesterFinalized && showSaveToBackendButton" pButton label="Edit TimeTable" class="p-button-info" (click)="semesterFinalized = false"  ></button>
       <button *ngIf=" semesterFinalized && showSaveToBackendButton" pButton label="Finalize Timetable" class="p-button-success" (click)="saveTimetableToBackend()"></button>
+    </p-tabPanel>
+    <p-tabPanel header="Manage Subjects">
+      <div class="subject-input">
+        <input type="text" pInputText [(ngModel)]="newSubject" placeholder="Enter Subject Name">
+        <button pButton label="Add Subject" class="p-button-primary" (click)="addSubject()"></button>
+      </div>
+
+      <p-table [value]="subjects">
+        <ng-template pTemplate="header">
+          <tr><th>Subject Name</th><th>Actions</th></tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-subject>
+          <tr>
+            <td>{{ subject.name }}</td>
+            <td>
+              <button pButton icon="fas fa-trash" class="p-button-danger p-button-sm" (click)="deleteSubject(subject.id)"></button>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
     </p-tabPanel>
   </p-tabView>
   

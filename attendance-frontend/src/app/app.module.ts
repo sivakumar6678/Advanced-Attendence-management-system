@@ -24,6 +24,8 @@ import { StudentAttendanceComponent } from './features/student/student-attendanc
 
 import { TeacherAuthComponent } from './features/teacher/teacher-auth/teacher-auth.component';
 import { TeacherDashboardComponent } from './features/teacher/teacher-dashboard/teacher-dashboard.component';
+import { TeacherAttendanceComponent } from './features/teacher/teacher-attendance/teacher-attendance.component';
+import { StudentsReportComponent } from './features/teacher/students-report/students-report.component';
 
 import { CrcAuthComponent } from './features/crc/crc-auth/crc-auth.component';
 import { CrcDashboardComponent } from './features/crc/crc-dashboard/crc-dashboard.component';
@@ -77,6 +79,8 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
         
         TeacherAuthComponent,
         TeacherDashboardComponent,
+        TeacherAttendanceComponent,
+        StudentAttendanceComponent,
         
         CrcAuthComponent,
         CrcDashboardComponent,

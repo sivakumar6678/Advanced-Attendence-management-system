@@ -3,6 +3,40 @@
   height: 100vh;
   background: #f4f7fc;
 }
+.home-sticky-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background-color: var(--primary-color);
+  margin-bottom: 0;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease;
+}
+
+.proj-title {
+  font-size: 1.5rem;
+  color: white;
+  font-weight: bold;
+}
+
+.navbar-links {
+  display: flex;
+  align-items: center;
+}
+
+.nav-links > a {
+  margin-left: 1rem;
+  text-decoration: none;
+  color: white;
+  transition: color 0.3s ease;
+  font-weight: bold;
+}
+
+.nav-links > a:hover {
+  border: 1px solid gold;
+  transform: translateY(0px);
+}
+
 
 /* ✅ Sidebar Navigation */
 .sidebar {
@@ -89,6 +123,8 @@
 .p-breadcrumb {
   margin-bottom: 15px;
 }
+/* ✅ Styling for the Logout Confirmation Toast */
+
 
 /* ✅ Responsive Styles */
 @media (max-width: 1024px) {
