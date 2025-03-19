@@ -1,1 +1,64 @@
-<p>teacher-attendance works!</p>
+<p-card *ngIf="selectedSubject">
+    <h3>Attendance Session - {{ selectedSubject.subject_name }}</h3>
+    <p>Branch: {{ branch }} | <b>{{ year }}</b> Year <b>{{ sem }}</b> Sem</p>
+  
+    <div class="attendance-form">
+      <!-- ✅ Select Number of Periods -->
+      <div class="form-group">
+        <label for="periods">Number of Periods:</label>
+        <p-dropdown 
+          id="periods"
+          [options]="periodOptions"
+          [(ngModel)]="numberOfPeriods"
+          placeholder="Select Number of Periods">
+        </p-dropdown>
+      </div>
+  
+      <!-- ✅ Select Specific Period -->
+      <div class="form-group">
+        <label for="period">Select Period:</label>
+        <p-dropdown 
+          id="period"
+          [options]="periodTimings"
+          optionLabel="label"
+          [(ngModel)]="selectedPeriod"
+          placeholder="Select Period">
+        </p-dropdown>
+      </div>
+  
+      <!-- ✅ Set Attendance Duration -->
+      <div class="form-group">
+        <label for="duration">Attendance Duration (minutes):</label>
+        <p-inputNumber id="duration" [(ngModel)]="sessionDuration" [min]="5" [max]="60"></p-inputNumber>
+      </div>
+  
+      <!-- ✅ Attendance Mode Selection -->
+      <div class="form-group">
+        <label>Attendance Mode:</label>
+        <div class="checkbox-group">
+          <p-checkbox 
+            name="attendanceMode" 
+            label="GPS" 
+            value="GPS" 
+            [(ngModel)]="selectedModes">
+          </p-checkbox>
+  
+          <p-checkbox 
+            name="attendanceMode" 
+            label="FRS" 
+            value="FRS" 
+            [(ngModel)]="selectedModes">
+          </p-checkbox>
+        </div>
+      </div>
+  
+      <!-- ✅ Start Attendance Session -->
+      <p-button 
+        label="Start Attendance Session" 
+        icon="pi pi-check" 
+        class="p-button-success" 
+        (click)="startAttendanceSession()">
+      </p-button>
+    </div>
+  </p-card>
+  

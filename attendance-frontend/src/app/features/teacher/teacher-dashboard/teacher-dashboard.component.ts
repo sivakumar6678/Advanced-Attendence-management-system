@@ -12,9 +12,7 @@ import { MessageService } from 'primeng/api';
 export class TeacherDashboardComponent implements OnInit {
 timetable: any;
 students: any;
-  viewSubjectDetails(_t147: any) {
-    throw new Error('Method not implemented.');
-  }
+
   teacherProfile: any;
   activePage: string = 'home'; 
   currentTime: string = '';
@@ -47,7 +45,9 @@ students: any;
 
   // ✅ Active Section (Timetable, Attendance, or Students)
   activeSection: string = '';
-
+  
+  selectedSubjectForAttendance: any = null;
+  selectedSubjectForReport: any = null;
   // ✅ Section Tabs
   sectionTabs = [
     { key: 'timetable', label: 'Timetable' },
@@ -152,7 +152,7 @@ students: any;
     );
   }
 
-  loadSubjectsAndFaculties(crcId: number | null): void {
+loadSubjectsAndFaculties(crcId: number | null): void {
     if (crcId === null) {
       console.error("crcId is null, cannot load subjects.");
       return; // Early return if crcId is null
@@ -306,4 +306,19 @@ students: any;
   getEntries(batchKey: string, day: string, time: string): any[] {
     return (this.subjectTimetable[batchKey] || []).filter(entry => entry.day === day && entry.time_slot === time);
   }
+
+  goToAttendance(subject: any) {
+    this.selectedSubjectForAttendance = subject;
+    this.selectedSubjectForReport = null;  // Ensure report is not shown at the same time
+    this.activeSection = 'attendance';  // ✅ Mark attendance section as active
+  }
+  
+  // ✅ Show the Student Reports Component inside the dashboard
+  goToStudentReports(subject: any) {
+    this.selectedSubjectForReport = subject;
+    this.selectedSubjectForAttendance = null; // Ensure attendance is not shown at the same time
+    this.activeSection = 'students';  // ✅ Mark students section as active
+  }
+
+
 }

@@ -1,0 +1,22 @@
+.attendance-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  
+  .checkbox-group {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+  }
+  
+  p-button {
+    margin-top: 15px;
+  }
+  

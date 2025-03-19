@@ -1,1 +1,9 @@
-<p>students-report works!</p>
+<h3>Student Reports for Teacher ID: {{ teacherId }}</h3>
+<p>Branch: {{ branch }}</p>
+
+<h4>Select Subject to View Reports</h4>
+<ul>
+  <li *ngFor="let subject of subjects">
+    <button pButton class="p-button-info">{{ subject.subject_name }}</button>
+  </li>
+</ul>

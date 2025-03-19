@@ -60,6 +60,10 @@ import {DialogModule} from 'primeng/dialog';
 import { PanelModule } from 'primeng/panel';
 import { TieredMenuModule } from 'primeng/tieredmenu';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
+import { SelectButtonModule } from 'primeng/selectbutton';
+import { InputNumberModule } from 'primeng/inputnumber';
+
+
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 
@@ -80,7 +84,7 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
         TeacherAuthComponent,
         TeacherDashboardComponent,
         TeacherAttendanceComponent,
-        StudentAttendanceComponent,
+        StudentsReportComponent,
         
         CrcAuthComponent,
         CrcDashboardComponent,
@@ -123,6 +127,8 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
         PanelModule,
         TieredMenuModule,
         BreadcrumbModule,
+        SelectButtonModule,
+        InputNumberModule,
 
       
 

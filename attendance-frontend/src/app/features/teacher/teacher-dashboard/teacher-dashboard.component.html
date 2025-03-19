@@ -34,7 +34,7 @@
             <div class="profile-info">
               <h2>Welcome, {{ teacherProfile?.full_name }}</h2>
               <p>Email: {{ teacherProfile?.email }}</p>
-              <p>Department: {{ teacherProfile?.department }}</p>
+              <p>Department: {{ teacherProfile?.branch }}</p>
               <p><i class="pi pi-clock"></i> Current Time: {{ currentTime }}</p>
             </div>
           </div>
@@ -49,15 +49,15 @@
           <!-- ✅ Live Updates & Widgets -->
           <div class="dashboard-widgets">
             <p-card class="widget">
-              <h3><i class="pi pi-calendar"></i> Today's Classes</h3>
+              <h3><i class="fas fa-calendar"></i> Today's Classes</h3>
               <p>View your classes scheduled for today.</p>
             </p-card>
             <p-card class="widget">
-              <h3><i class="pi pi-bell"></i> Recent Notifications</h3>
+              <h3><i class="fas fa-bell"></i> Recent Notifications</h3>
               <p>Check latest updates from the administration.</p>
             </p-card>
             <p-card class="widget">
-              <h3><i class="pi pi-chart-line"></i> Attendance Trends</h3>
+              <h3><i class="fas fa-chart-line"></i> Attendance Trends</h3>
               <p>Analyze attendance trends for your classes.</p>
             </p-card>
           </div>
@@ -67,12 +67,9 @@
         <div *ngIf="activePage === 'timetable'">
           <p-card>
             <h3>Assigned Subjects</h3>
-            <p *ngIf="assignedSubjects.length === 0">No subjects assigned.</p>
-
-            
+            <p *ngIf="assignedSubjects.length === 0">No subjects assigned.</p>          
             <div *ngFor="let batchKey of groupedSubjects | keyvalue">
-              <h3>{{ batchKey.key }}</h3> <!-- ✅ Display batch title -->
-              
+              <h3>{{ batchKey.key }}</h3> <!-- ✅ Display batch title --> 
               <p-table [value]="groupedSubjects[batchKey.key]">
                 <ng-template pTemplate="header">
                   <tr>
@@ -90,8 +87,7 @@
                         class="p-button-info" 
                         (click)="loadPublicTimetable(subject)">
                       </button>
-                    </td>
-                    
+                    </td>   
                   </tr>
                 </ng-template>
               </p-table>
@@ -134,35 +130,83 @@
         <div *ngIf="activePage === 'attendance'">
           <p-card>
             <h3>Assigned Subjects</h3>
-                <p *ngIf="assignedSubjects.length === 0">No subjects assigned.</p>
+            <p *ngIf="assignedSubjects.length === 0">No subjects assigned.</p>
+            <p-button 
+              *ngIf="selectedSubjectForAttendance"
 
-                <p-table [value]="assignedSubjects">
-                    <ng-template pTemplate="header">
-                    <tr>
-                        <th>Subject Name</th>
-                        <th>Actions</th>
-                    </tr>
-                    </ng-template>
-                    <ng-template pTemplate="body" let-subject>
-                    <tr>
-                        <td>{{ subject.subject_name }}</td>
-                        <td>
-                        <button pButton label="View Details" class="p-button-info" (click)="viewSubjectDetails(subject)"></button>
-                        </td>
-                    </tr>
-                    </ng-template>
-                </p-table>
-            
+              label="Back" 
+              icon="fas fa-arrow-left" 
+              class="p-button-secondary" 
+              (click)="selectedSubjectForAttendance = null">
+            </p-button>
+           
+            <p-table [value]="assignedSubjects" *ngIf="!selectedSubjectForAttendance" >
+              <ng-template pTemplate="header">
+                <tr>
+                  <th>Subject Name</th>
+                  <th>Actions</th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-subject>
+                <tr>
+                  <td>{{ subject.subject_name }}</td>
+                  <td>
+                    <!-- ✅ Instead of navigating, it will now update the component -->
+                    <button 
+                      pButton 
+                      label="View Attendance" 
+                      class="p-button-info" 
+                      (click)="goToAttendance(subject)">
+                    </button>
+                  </td>
+                </tr>
+              </ng-template>
+            </p-table>
+             <!-- ✅ Show Attendance Component only when a subject is selected -->
+             <app-teacher-attendance 
+             *ngIf="selectedSubjectForAttendance"
+             [selectedSubject]="selectedSubjectForAttendance">
+           </app-teacher-attendance>
           </p-card>
         </div>
-  
+
+          
         <!-- ✅ Student Management Section -->
         <div *ngIf="activePage === 'students'">
           <p-card>
             <h3>Student Management</h3>
             <p>View and manage student details and attendance.</p>
+
+            <!-- ✅ Show Student Reports Component only when a subject is selected -->
+            <app-students-report 
+              *ngIf="selectedSubjectForReport"
+              [selectedSubject]="selectedSubjectForReport">
+            </app-students-report>
+
+            <p-table [value]="assignedSubjects">
+              <ng-template pTemplate="header">
+                <tr>
+                  <th>Subject Name</th>
+                  <th>Actions</th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-subject>
+                <tr>
+                  <td>{{ subject.subject_name }}</td>
+                  <td>
+                    <button 
+                      pButton 
+                      label="View Report" 
+                      class="p-button-warning" 
+                      (click)="goToStudentReports(subject)">
+                    </button>
+                  </td>
+                </tr>
+              </ng-template>
+            </p-table>
           </p-card>
         </div>
+
       </div>
     </div>
   </div>
