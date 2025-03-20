@@ -32,17 +32,18 @@ class AttendanceSession(models.Model):
     branch = models.CharField(max_length=50)
     year = models.IntegerField()
     semester = models.IntegerField()
-    modes = models.JSONField()
+    modes = models.JSONField()  # ✅ Store GPS/FRS mode selection
     session_duration = models.IntegerField()
     start_time = models.DateTimeField()
     day = models.CharField(max_length=20)
-    periods = models.TextField()
+    periods = models.JSONField()  # ✅ Store multiple periods
     latitude = models.FloatField(null=True, blank=True)
     longitude = models.FloatField(null=True, blank=True)
+    is_active = models.BooleanField(default=True)  # ✅ Active session check
 
     def __str__(self):
-        return f"{self.get_subject().name} - {self.day} ({self.start_time})"
-
+        return f"{self.subject.name} - {self.start_time} ({'Active' if self.is_active else 'Ended'})"
+    
     def get_subject(self):
         """✅ Get Subject instance lazily"""
         Subject = apps.get_model('crc', 'Subject')  # ✅ Lazy import of Subject

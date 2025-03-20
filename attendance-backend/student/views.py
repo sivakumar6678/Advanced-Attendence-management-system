@@ -9,6 +9,9 @@ from core.models import Branch, AcademicYear
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.shortcuts import get_object_or_404
+from teacher.models import AttendanceSession
+from django.utils.timezone import now
+from teacher.models import AttendanceSession
 class RegisterStudent(APIView):
     def post(self, request, *args, **kwargs):
         try:
@@ -136,3 +139,65 @@ class StudentDashboardView(APIView):
 
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+class ActiveAttendanceSessionsView(APIView):
+    def get(self, request, student_id):
+        try:
+            student = Student.objects.get(id=student_id)
+
+            # ✅ Fetch only active sessions for student's branch/year/semester
+            active_sessions = AttendanceSession.objects.filter(
+                branch=student.branch,
+                year=student.year,
+                semester=student.semester,
+                is_active=True
+            )
+
+            sessions_data = [
+                {
+                    "session_id": session.id,
+                    "subject_name": session.subject.name,
+                    "day": session.day,
+                    "periods": session.periods,
+                    "modes": session.modes,
+                    "start_time": session.start_time,
+                }
+                for session in active_sessions
+            ]
+
+            return Response(sessions_data, status=status.HTTP_200_OK)
+
+        except Student.DoesNotExist:
+            return Response({"error": "Student not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+class MarkAttendanceView(APIView):
+    def post(self, request):
+        data = request.data
+        student_id = data.get('student_id')
+        session_id = data.get('session_id')
+        student_latitude = data.get('latitude')
+        student_longitude = data.get('longitude')
+
+        try:
+            session = AttendanceSession.objects.get(id=session_id, is_active=True)
+        except AttendanceSession.DoesNotExist:
+            return Response({"error": "Invalid or expired session"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # ✅ Match attendance mode
+        if "GPS" in session.modes:
+            # Compare student's GPS with faculty's GPS
+            faculty_latitude = session.latitude
+            faculty_longitude = session.longitude
+
+            if abs(student_latitude - faculty_latitude) > 0.001 or abs(student_longitude - faculty_longitude) > 0.001:
+                return Response({"error": "GPS location mismatch"}, status=status.HTTP_403_FORBIDDEN)
+
+        # ✅ Mark attendance
+        StudentAttendance.objects.create(
+            student_id=student_id,
+            session=session,
+            timestamp=now(),
+            status="Present"
+        )
+
+        return Response({"message": "Attendance marked successfully!"}, status=status.HTTP_200_OK)

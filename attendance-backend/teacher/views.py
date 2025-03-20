@@ -148,31 +148,31 @@ class StartAttendanceSessionView(APIView):
         faculty_id = data.get('faculty_id')
         subject_id = data.get('subject_id')
 
-        # ✅ Ensure Faculty exists
+        # ✅ Ensure Faculty and Subject exist
         try:
             faculty = Faculty.objects.get(id=faculty_id)
-        except Faculty.DoesNotExist:
-            return Response({"error": "Faculty not found"}, status=status.HTTP_404_NOT_FOUND)
-
-        # ✅ Ensure Subject exists
-        try:
             subject = Subject.objects.get(id=subject_id)
-        except Subject.DoesNotExist:
-            return Response({"error": "Subject not found"}, status=status.HTTP_404_NOT_FOUND)
+        except (Faculty.DoesNotExist, Subject.DoesNotExist):
+            return Response({"error": "Invalid Faculty or Subject"}, status=status.HTTP_404_NOT_FOUND)
 
-        # ✅ Mock response (Replace with actual attendance logic)
+        # ✅ Create and save attendance session
+        attendance_session = AttendanceSession.objects.create(
+            faculty=faculty,
+            subject=subject,
+            branch=data.get("branch"),
+            year=data.get("year"),
+            semester=data.get("semester"),
+            modes=data.get("modes"),
+            session_duration=data.get("session_duration"),
+            start_time=data.get("start_time"),
+            day=data.get("day"),
+            periods=data.get("periods"),
+            latitude=data.get("latitude"),
+            longitude=data.get("longitude"),
+            is_active=True  # ✅ Mark session as active
+        )
+
         return Response({
             "message": "Attendance session started successfully!",
-            "faculty_id": faculty.id,
-            "subject_id": subject.id,
-            "branch": data.get("branch"),
-            "year": data.get("year"),
-            "semester": data.get("semester"),
-            "modes": data.get("modes"),
-            "session_duration": data.get("session_duration"),
-            "start_time": data.get("start_time"),
-            "day": data.get("day"),
-            "periods": data.get("periods"),
-            "latitude": data.get("latitude"),
-            "longitude": data.get("longitude"),
-        }, status=status.HTTP_200_OK)
+            "session_id": attendance_session.id
+        }, status=status.HTTP_201_CREATED)
