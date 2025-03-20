@@ -122,5 +122,11 @@ export class UserService {
       headers: this.getAuthHeaders(),
     });
   }
+
+  startAttendanceSession(sessionData: any) {
+    return this.http.post(`${this.baseUrl}/faculty/start-attendance/`, sessionData);
+}
+
+  
   
 }

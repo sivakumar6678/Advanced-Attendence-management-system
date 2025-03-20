@@ -62,7 +62,8 @@ import { TieredMenuModule } from 'primeng/tieredmenu';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { InputNumberModule } from 'primeng/inputnumber';
-
+import { MultiSelectModule } from 'primeng/multiselect';
+import {RadioButtonModule} from 'primeng/radiobutton';
 
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
@@ -129,6 +130,8 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
         BreadcrumbModule,
         SelectButtonModule,
         InputNumberModule,
+        MultiSelectModule,
+        RadioButtonModule,
 
       
 

@@ -4,11 +4,13 @@ from rest_framework import status
 from django.contrib.auth.hashers import make_password, check_password
 from rest_framework_simplejwt.tokens import RefreshToken
 from core.models import Faculty as CoreFaculty  # Reference faculty added by SuperAdmin
-from .models import Faculty
+from .models import Faculty,AttendanceSession
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from crc.models import Subject,Timetable,TimetableEntry
 from crc.serializers import SubjectSerializer
+from django.utils.timezone import now
+
 class FacultyRegisterView(APIView):
     def post(self, request):
         data = request.data
@@ -138,3 +140,39 @@ class FacultyAssignedSubjectsView(APIView):
 
         except Faculty.DoesNotExist:
             return Response({"error": "Faculty not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+
+class StartAttendanceSessionView(APIView):
+    def post(self, request):
+        data = request.data
+        faculty_id = data.get('faculty_id')
+        subject_id = data.get('subject_id')
+
+        # ✅ Ensure Faculty exists
+        try:
+            faculty = Faculty.objects.get(id=faculty_id)
+        except Faculty.DoesNotExist:
+            return Response({"error": "Faculty not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        # ✅ Ensure Subject exists
+        try:
+            subject = Subject.objects.get(id=subject_id)
+        except Subject.DoesNotExist:
+            return Response({"error": "Subject not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        # ✅ Mock response (Replace with actual attendance logic)
+        return Response({
+            "message": "Attendance session started successfully!",
+            "faculty_id": faculty.id,
+            "subject_id": subject.id,
+            "branch": data.get("branch"),
+            "year": data.get("year"),
+            "semester": data.get("semester"),
+            "modes": data.get("modes"),
+            "session_duration": data.get("session_duration"),
+            "start_time": data.get("start_time"),
+            "day": data.get("day"),
+            "periods": data.get("periods"),
+            "latitude": data.get("latitude"),
+            "longitude": data.get("longitude"),
+        }, status=status.HTTP_200_OK)

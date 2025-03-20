@@ -163,10 +163,17 @@
               </ng-template>
             </p-table>
              <!-- ✅ Show Attendance Component only when a subject is selected -->
-             <app-teacher-attendance 
+             <!-- <app-teacher-attendance 
              *ngIf="selectedSubjectForAttendance"
              [selectedSubject]="selectedSubjectForAttendance">
-           </app-teacher-attendance>
+           </app-teacher-attendance> -->
+           <app-teacher-attendance 
+              *ngIf="activeSection === 'attendance'"
+              [selectedSubject]="selectedSubjectForAttendance" 
+              [subjectTimetable]="selectedSubjectTimetable"
+              [facultyId]="selectedFacultyId"
+              >
+            </app-teacher-attendance>
           </p-card>
         </div>
 

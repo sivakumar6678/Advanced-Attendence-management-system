@@ -1,64 +1,87 @@
 <p-card *ngIf="selectedSubject">
-    <h3>Attendance Session - {{ selectedSubject.subject_name }}</h3>
-    <p>Branch: {{ branch }} | <b>{{ year }}</b> Year <b>{{ sem }}</b> Sem</p>
-  
-    <div class="attendance-form">
-      <!-- ✅ Select Number of Periods -->
-      <div class="form-group">
-        <label for="periods">Number of Periods:</label>
-        <p-dropdown 
-          id="periods"
-          [options]="periodOptions"
-          [(ngModel)]="numberOfPeriods"
-          placeholder="Select Number of Periods">
-        </p-dropdown>
-      </div>
-  
-      <!-- ✅ Select Specific Period -->
-      <div class="form-group">
-        <label for="period">Select Period:</label>
-        <p-dropdown 
-          id="period"
-          [options]="periodTimings"
-          optionLabel="label"
-          [(ngModel)]="selectedPeriod"
-          placeholder="Select Period">
-        </p-dropdown>
-      </div>
-  
-      <!-- ✅ Set Attendance Duration -->
-      <div class="form-group">
-        <label for="duration">Attendance Duration (minutes):</label>
-        <p-inputNumber id="duration" [(ngModel)]="sessionDuration" [min]="5" [max]="60"></p-inputNumber>
-      </div>
-  
-      <!-- ✅ Attendance Mode Selection -->
-      <div class="form-group">
-        <label>Attendance Mode:</label>
-        <div class="checkbox-group">
-          <p-checkbox 
-            name="attendanceMode" 
-            label="GPS" 
-            value="GPS" 
-            [(ngModel)]="selectedModes">
-          </p-checkbox>
-  
-          <p-checkbox 
-            name="attendanceMode" 
-            label="FRS" 
-            value="FRS" 
-            [(ngModel)]="selectedModes">
-          </p-checkbox>
-        </div>
-      </div>
-  
-      <!-- ✅ Start Attendance Session -->
-      <p-button 
-        label="Start Attendance Session" 
-        icon="pi pi-check" 
-        class="p-button-success" 
-        (click)="startAttendanceSession()">
-      </p-button>
+  <h3>Attendance Session - <b>{{ selectedSubject.subject_name }}</b></h3>
+  <p>Branch: <b>{{ branch }}</b> | <b>{{ year }}</b> Year <b>{{ sem }}</b> Sem</p>
+
+  <!-- ✅ Attendance Mode Selection -->
+  <div class="form-group mode-selection">
+    <label><b>Attendance Mode:</b></label>
+    <div class="mode-buttons">
+      <p-radioButton 
+        name="mode" 
+        value="auto" 
+        [(ngModel)]="selectionMode" 
+        label="Auto (From Timetable)" 
+        (onChange)="handleModeChange()">
+      </p-radioButton>
+
+      <p-radioButton 
+        name="mode" 
+        value="manual" 
+        [(ngModel)]="selectionMode" 
+        label="Manual Selection" 
+        (onChange)="handleModeChange()">
+      </p-radioButton>
     </div>
+  </div>
+
+  <!-- ✅ Auto Mode - Show Pre-Filled Details -->
+  <p-card *ngIf="selectionMode === 'auto'" class="auto-mode-card">
+    <h4><i class="pi pi-calendar"></i> Auto-Selected Timetable</h4>
+    <p><b>Day:</b> {{ autoSelectedDay || 'N/A' }}</p>
+    <p><b>Period:</b> {{ autoSelectedPeriod || 'N/A' }}</p>
+    <p><b>Timing:</b> {{ autoSelectedTiming || 'N/A' }}</p>
   </p-card>
-  
+
+  <!-- ✅ Manual Mode - User Selects Day & Period(s) -->
+  <div *ngIf="selectionMode === 'manual'" class="manual-mode">
+    <p-card>
+      <h4><i class="pi pi-cog"></i> Manual Selection</h4>
+
+      <div class="form-group">
+        <label for="day"><b>Select Day:</b></label>
+        <p-dropdown id="day" [options]="days" [(ngModel)]="selectedDay" placeholder="Select Day"></p-dropdown>
+      </div>
+
+      <div class="form-group">
+        <label for="periods"><b>Select Period(s):</b></label>
+        <p-multiSelect 
+            id="periods"
+            [options]="timeSlots"
+            [(ngModel)]="selectedPeriods"
+            optionLabel="label"
+            placeholder="Select Period(s)">
+        </p-multiSelect>
+      </div>
+    </p-card>
+  </div>
+
+  <!-- ✅ Attendance Mode Selection (GPS/FRS) -->
+  <div class="form-group attendance-mode">
+    <label><b>Attendance Mode:</b></label>
+    <div class="checkbox-group">
+      <p-checkbox 
+        name="attendanceMode" 
+        label="GPS" 
+        value="GPS" 
+        [(ngModel)]="selectedModes">
+      </p-checkbox>
+
+      <p-checkbox 
+        name="attendanceMode" 
+        label="FRS" 
+        value="FRS" 
+        [(ngModel)]="selectedModes">
+      </p-checkbox>
+    </div>
+  </div>
+
+  <!-- ✅ Attendance Duration -->
+  <div class="form-group duration-selection">
+    <label for="duration"><b>Attendance Duration (minutes):</b></label>
+    <p-inputNumber id="duration" [(ngModel)]="sessionDuration" [min]="5" [max]="60"></p-inputNumber>
+  </div>
+
+  <!-- ✅ Start Attendance Button -->
+  <p-button label="Start Attendance Session" icon="pi pi-check" class="p-button-success start-session-btn" (click)="startAttendanceSession()">
+  </p-button>
+</p-card>

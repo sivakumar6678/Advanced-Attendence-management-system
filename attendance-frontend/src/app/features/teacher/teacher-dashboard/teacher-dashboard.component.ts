@@ -48,12 +48,14 @@ students: any;
   
   selectedSubjectForAttendance: any = null;
   selectedSubjectForReport: any = null;
+  selectedSubjectTimetable: any[] = [];
   // ✅ Section Tabs
   sectionTabs = [
     { key: 'timetable', label: 'Timetable' },
     { key: 'attendance', label: 'Attendance' },
     { key: 'students', label: 'Students' }
   ];
+  selectedFacultyId: any;
 
   constructor(
     private teacherDashboardService: UserService,
@@ -195,7 +197,7 @@ loadSubjectsAndFaculties(crcId: number | null): void {
     console.log("Grouped Subjects by Batch:", this.groupedSubjects);
   }
 
-  loadPublicTimetable(subject: any): void {
+  loadPublicTimetable(subject: any, callback?: () => void): void {
     console.log("Fetching timetable for:", subject);
     
     if (!subject.year || !subject.semester || !subject.branch || !subject.academic_year) {
@@ -223,12 +225,21 @@ loadSubjectsAndFaculties(crcId: number | null): void {
             console.warn("No timetable found for subject:", subject.subject_name);
             this.subjectTimetable[batchKey] = [];
           }
+
+          // ✅ Call callback after fetching timetable
+          if (callback) {
+            callback();
+          }
         },
         (error) => {
           console.error("Error fetching public timetable:", error);
+          if (callback) {
+            callback();
+          }
         }
       );
 }
+
 
   
   
@@ -306,12 +317,32 @@ loadSubjectsAndFaculties(crcId: number | null): void {
   getEntries(batchKey: string, day: string, time: string): any[] {
     return (this.subjectTimetable[batchKey] || []).filter(entry => entry.day === day && entry.time_slot === time);
   }
-
   goToAttendance(subject: any) {
     this.selectedSubjectForAttendance = subject;
     this.selectedSubjectForReport = null;  // Ensure report is not shown at the same time
     this.activeSection = 'attendance';  // ✅ Mark attendance section as active
-  }
+
+    const batchKey = `${subject.year} Year - Sem ${subject.semester} (${subject.branch}, ${subject.academic_year})`;
+
+    // ✅ Check if timetable is already loaded
+    if (this.subjectTimetable[batchKey] && this.subjectTimetable[batchKey].length > 0) {
+        this.selectedSubjectTimetable = this.subjectTimetable[batchKey];
+        console.log("✅ Passing Timetable to Attendance:", this.selectedSubjectTimetable);
+    } else {
+        console.warn("⚠️ Timetable not found. Fetching from server...");
+        
+        // ✅ Fetch timetable before setting it in attendance
+        this.loadPublicTimetable(subject, () => {
+            this.selectedSubjectTimetable = this.subjectTimetable[batchKey] || [];
+            console.log("✅ Timetable Loaded & Passed to Attendance:", this.selectedSubjectTimetable);
+        });
+    }
+    this.selectedFacultyId = this.teacherProfile.id;  
+}
+
+
+
+
   
   // ✅ Show the Student Reports Component inside the dashboard
   goToStudentReports(subject: any) {
