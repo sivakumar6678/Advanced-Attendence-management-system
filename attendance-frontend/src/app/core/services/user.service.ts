@@ -125,7 +125,15 @@ export class UserService {
 
   startAttendanceSession(sessionData: any) {
     return this.http.post(`${this.baseUrl}/faculty/start-attendance/`, sessionData);
-}
+  }
+  getActiveAttendanceSessions(studentId: string): Observable<any> {
+    return this.http.get(`${this.baseUrl}/students/active-sessions/${studentId}/`);
+  }
+
+  markAttendance(data: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/students/mark-attendance/`, data);
+  }
+
 
   
   

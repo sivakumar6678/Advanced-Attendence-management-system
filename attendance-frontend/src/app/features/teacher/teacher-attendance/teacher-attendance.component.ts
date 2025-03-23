@@ -126,15 +126,20 @@ export class TeacherAttendanceComponent implements OnInit {
   }
 
   startAttendanceSession() {
+    // Determine the final day and periods based on the selection mode
     let finalDay = this.selectionMode === 'auto' ? this.autoSelectedDay : this.selectedDay;
-    let finalPeriods = this.selectionMode === 'auto' ? [{ time_slot: this.autoSelectedPeriod }] : this.selectedPeriods;
+    let finalPeriods = this.selectionMode === 'auto' 
+        ? [{ time_slot: this.autoSelectedPeriod }] 
+        : this.selectedPeriods.map(period => ({ time_slot: period }));
 
-    if (!finalDay || finalPeriods.length === 0) {
-        console.error('❌ Cannot start session: No period selected.');
+    // Validate that both day and periods are selected
+    if (!finalDay || finalPeriods.length === 0 || finalPeriods.some(p => !p.time_slot)) {
+        console.error('❌ Cannot start session: No day or period selected.');
+        alert("⚠️ Please select a day and at least one valid period to start the session.");
         return;
     }
 
-    // 🔥 Check if GPS mode is selected
+    // Check if GPS mode is selected
     if (this.selectedModes.includes("GPS")) {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
@@ -152,7 +157,7 @@ export class TeacherAttendanceComponent implements OnInit {
             alert("⚠️ Geolocation is not supported in this browser.");
         }
     } else {
-        // 🔥 If GPS is not selected, send session without location
+        // If GPS is not selected, send session without location
         this.sendSessionToBackend(finalDay, finalPeriods);
     }
 }
@@ -187,9 +192,4 @@ sendSessionToBackend(finalDay: string, finalPeriods: any[], latitude?: number, l
         }
     );
 }
-
-
-  
-  
-  
 }

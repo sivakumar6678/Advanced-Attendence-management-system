@@ -35,6 +35,7 @@ class AttendanceSession(models.Model):
     modes = models.JSONField()  # ["GPS", "FRS"]
     session_duration = models.IntegerField()  # In minutes
     start_time = models.DateTimeField(auto_now_add=True)  # ✅ Ensure this is a DateTimeField
+    end_time = models.DateTimeField(null=True, blank=True)  # ✅ Add end_time field
     is_active = models.BooleanField(default=True)
     day = models.CharField(max_length=10)
     periods = models.JSONField()

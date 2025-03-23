@@ -1,12 +1,36 @@
-<div *ngIf="activeAttendanceSession" class="card attendance-session">
-    <h2>Ongoing Attendance Session</h2>
-    <p><strong>Subject:</strong> {{ activeAttendanceSession.subject }}</p>
-    <p><strong>Faculty:</strong> {{ activeAttendanceSession.faculty }}</p>
-    <button class="mark-btn" (click)="markAttendance()">✅ Mark Attendance</button>
-  </div>
-  
-  <div *ngIf="!activeAttendanceSession" class="card no-session">
-    <h2>No Active Attendance Sessions</h2>
-    <p>Check back later.</p>
-  </div>
-  
+<p-table [value]="activeSessions">
+  <ng-template pTemplate="header">
+      <tr>
+          <th>Subject</th>
+          <th>Day</th>
+          <th>Periods</th>
+          <th>Actions</th>
+      </tr>
+  </ng-template>
+
+  <ng-template pTemplate="body" let-session>
+      <tr>
+          <td>{{ session.subject_name }}</td>
+          <td>{{ session.day }}</td>
+          <td>{{ session.periods?.length ? session.periods.join(', ') : 'N/A' }}</td>  <!-- ✅ Ensure periods display correctly -->
+          <td>
+              <button *ngIf="!session.marked" pButton 
+                  label="Mark Attendance" class="p-button-success" 
+                  (click)="markAttendance(session.session_id)">
+              </button>
+              <span *ngIf="session.marked" class="attendance-marked" style="color: green; font-weight: bold;">
+                  ✅ Attendance Marked
+              </span>
+          </td>
+      </tr>
+  </ng-template>
+
+  <!-- ✅ Show message if no active sessions exist -->
+  <ng-template pTemplate="emptymessage">
+      <tr>
+          <td colspan="4" style="text-align: center; color: red; font-weight: bold;">
+              ❌ No Active Sessions Available
+          </td>
+      </tr>
+  </ng-template>
+</p-table>

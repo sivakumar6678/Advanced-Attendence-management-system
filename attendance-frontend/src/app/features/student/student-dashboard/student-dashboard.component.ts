@@ -37,6 +37,7 @@ export class StudentDashboardComponent implements OnInit {
     setTimeout(() => {
       this.activeAttendanceSession = { subject: "CNS", faculty: "Dr. Smith" };
     }, 3000);
+    // console.log('Student ID:', this.studentProfile);
   }
   
 
@@ -114,4 +115,6 @@ export class StudentDashboardComponent implements OnInit {
     localStorage.removeItem('access_token');
     this.router.navigate(['/student/login']);
   }
+
+  
 }

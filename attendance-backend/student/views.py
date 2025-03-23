@@ -143,24 +143,26 @@ class StudentDashboardView(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
+
+
 class ActiveAttendanceSessionsView(APIView):
     def get(self, request, student_id):
         try:
             student = Student.objects.get(student_id=student_id)  # ✅ Fetch student using student_id
 
-            # ✅ Fetch ONLY active sessions
+            # ✅ Mark expired sessions as inactive
+            AttendanceSession.objects.filter(is_active=True, end_time__lte=now()).update(is_active=False)
+
+            # ✅ Fetch only active sessions
             active_sessions = AttendanceSession.objects.filter(
                 branch=student.branch,
                 year=student.year,
                 semester=student.semester,
-                is_active=True  # ✅ Only fetch active sessions
+                is_active=True  # ✅ Ensures only active sessions are fetched
             )
 
-            # ✅ Debugging logs
-            print(f"🔍 Active Sessions Found for {student.name}: {active_sessions.count()} sessions")
-
             if not active_sessions.exists():
-                return Response({"message": "No active attendance sessions found."}, status=status.HTTP_200_OK)
+                return Response({"message": "No Active Sessions Available"}, status=status.HTTP_200_OK)
 
             sessions_data = [
                 {
@@ -170,12 +172,9 @@ class ActiveAttendanceSessionsView(APIView):
                     "periods": session.periods,
                     "modes": session.modes,
                     "start_time": session.start_time,
-                    "is_active": session.is_active  # ✅ Ensure frontend receives is_active
                 }
                 for session in active_sessions
             ]
-
-            print(f"📤 Sending Active Sessions Data: {sessions_data}")  # ✅ Debugging log
 
             return Response(sessions_data, status=status.HTTP_200_OK)
 

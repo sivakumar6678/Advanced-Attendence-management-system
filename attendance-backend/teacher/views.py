@@ -9,7 +9,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from crc.models import Subject,Timetable,TimetableEntry
 from crc.serializers import SubjectSerializer
-from django.utils.timezone import now
+from django.utils.timezone import now, timedelta
 
 class FacultyRegisterView(APIView):
     def post(self, request):
@@ -142,6 +142,8 @@ class FacultyAssignedSubjectsView(APIView):
             return Response({"error": "Faculty not found"}, status=status.HTTP_404_NOT_FOUND)
         
 
+
+
 class StartAttendanceSessionView(APIView):
     def post(self, request):
         data = request.data
@@ -155,7 +157,18 @@ class StartAttendanceSessionView(APIView):
         except (Faculty.DoesNotExist, Subject.DoesNotExist):
             return Response({"error": "Invalid Faculty or Subject"}, status=status.HTTP_404_NOT_FOUND)
 
-        # ✅ Create and save attendance session
+        session_duration = data.get("session_duration")
+        if not session_duration:
+            return Response({"error": "Session duration is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # ✅ Mark expired sessions as inactive
+        AttendanceSession.objects.filter(is_active=True, end_time__lte=now()).update(is_active=False)
+
+        # ✅ Calculate session end time
+        start_time = now()
+        end_time = start_time + timedelta(minutes=int(session_duration))
+
+        # ✅ Create and save new attendance session
         attendance_session = AttendanceSession.objects.create(
             faculty=faculty,
             subject=subject,
@@ -163,8 +176,9 @@ class StartAttendanceSessionView(APIView):
             year=data.get("year"),
             semester=data.get("semester"),
             modes=data.get("modes"),
-            session_duration=data.get("session_duration"),
-            start_time=data.get("start_time"),
+            session_duration=session_duration,
+            start_time=start_time,
+            end_time=end_time,  # ✅ Add end_time
             day=data.get("day"),
             periods=data.get("periods"),
             latitude=data.get("latitude"),
@@ -174,5 +188,6 @@ class StartAttendanceSessionView(APIView):
 
         return Response({
             "message": "Attendance session started successfully!",
-            "session_id": attendance_session.id
+            "session_id": attendance_session.id,
+            "end_time": attendance_session.end_time  # ✅ Return end time
         }, status=status.HTTP_201_CREATED)

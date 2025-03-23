@@ -41,7 +41,8 @@
   </div>
 
   <div *ngIf="activeSection === 'attendance'">
-    <app-student-attendance></app-student-attendance>
+    <app-student-attendance [studentId]="studentProfile.student_id" ></app-student-attendance>
+
   </div>
 
   <div *ngIf="activeSection === 'reports'">
