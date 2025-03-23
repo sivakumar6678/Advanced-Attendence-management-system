@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.core.validators import RegexValidator
 from core.models import Branch, AcademicYear,User
+from teacher.models import AttendanceSession
 
 class Student(User):  # Inherit from User
     name = models.CharField(max_length=100)
@@ -38,3 +39,16 @@ class Device(models.Model):
 
     def __str__(self):
         return f"{self.student.name} - {self.device_name}"
+    
+
+class StudentAttendance(models.Model):
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    session = models.ForeignKey(AttendanceSession, on_delete=models.CASCADE)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=10, choices=[("Present", "Present"), ("Absent", "Absent")])
+    
+    class Meta:
+        unique_together = ('student', 'session')  # ✅ Prevent duplicate attendance
+
+    def __str__(self):
+        return f"{self.student.name} - {self.session.subject.name} - {self.status}"

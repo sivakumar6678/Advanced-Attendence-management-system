@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Faculty
+from .models import Faculty,AttendanceSession
 # Register your models here.
 @admin.register(Faculty)
 class FacultyAdmin(admin.ModelAdmin):
@@ -7,3 +7,10 @@ class FacultyAdmin(admin.ModelAdmin):
     search_fields = ('full_name', 'email', 'branch')
     list_filter = ('branch', 'is_active')
     ordering = ('branch', 'full_name')
+
+@admin.register(AttendanceSession)
+class AttendanceSessionAdmin(admin.ModelAdmin):
+    list_display = ('id', 'faculty', 'subject', 'branch', 'year', 'semester', 'is_active','start_time','day')
+    search_fields = ('faculty', 'subject')
+    list_filter = ('branch', 'is_active')
+    ordering = ('branch', 'faculty')
