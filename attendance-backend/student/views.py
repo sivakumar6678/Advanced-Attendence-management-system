@@ -14,6 +14,7 @@ from teacher.models import AttendanceSession
 from django.utils.timezone import now
 from teacher.models import AttendanceSession
 from django.utils.timezone import now
+from django.utils import timezone
 class RegisterStudent(APIView):
     def post(self, request, *args, **kwargs):
         try:
@@ -145,15 +146,21 @@ class StudentDashboardView(APIView):
 class ActiveAttendanceSessionsView(APIView):
     def get(self, request, student_id):
         try:
-            student = Student.objects.get(student_id=student_id)
+            student = Student.objects.get(student_id=student_id)  # ✅ Fetch student using student_id
 
             # ✅ Fetch ONLY active sessions
             active_sessions = AttendanceSession.objects.filter(
                 branch=student.branch,
                 year=student.year,
                 semester=student.semester,
-                is_active=True
+                is_active=True  # ✅ Only fetch active sessions
             )
+
+            # ✅ Debugging logs
+            print(f"🔍 Active Sessions Found for {student.name}: {active_sessions.count()} sessions")
+
+            if not active_sessions.exists():
+                return Response({"message": "No active attendance sessions found."}, status=status.HTTP_200_OK)
 
             sessions_data = [
                 {
@@ -163,51 +170,55 @@ class ActiveAttendanceSessionsView(APIView):
                     "periods": session.periods,
                     "modes": session.modes,
                     "start_time": session.start_time,
+                    "is_active": session.is_active  # ✅ Ensure frontend receives is_active
                 }
                 for session in active_sessions
             ]
+
+            print(f"📤 Sending Active Sessions Data: {sessions_data}")  # ✅ Debugging log
 
             return Response(sessions_data, status=status.HTTP_200_OK)
 
         except Student.DoesNotExist:
             return Response({"error": "Student not found"}, status=status.HTTP_404_NOT_FOUND)
 
-
 class MarkAttendanceView(APIView):
     def post(self, request):
         data = request.data
-        student_id = data.get('student_id')
+        student_id = data.get('student_id')  # ✅ Student ID received from frontend
         session_id = data.get('session_id')
         student_latitude = data.get('latitude')
         student_longitude = data.get('longitude')
 
         try:
+            # ✅ Fetch student using `student_id` (which is a string) instead of `id`
             student = Student.objects.get(student_id=student_id)
+
+            # ✅ Fetch the session
             session = AttendanceSession.objects.get(id=session_id, is_active=True)
-        except (Student.DoesNotExist, AttendanceSession.DoesNotExist):
-            return Response({"error": "Invalid student or expired session"}, status=status.HTTP_400_BAD_REQUEST)
 
-        # ✅ Check if session is still valid (within session duration)
-        session_end_time = session.start_time + timedelta(minutes=session.session_duration)
-        if now() > session_end_time:
-            session.is_active = False
-            session.save()
-            return Response({"error": "Session expired"}, status=status.HTTP_400_BAD_REQUEST)
+        except Student.DoesNotExist:
+            return Response({"error": "Student not found"}, status=status.HTTP_404_NOT_FOUND)
+        except AttendanceSession.DoesNotExist:
+            return Response({"error": "Invalid or expired session"}, status=status.HTTP_400_BAD_REQUEST)
 
-        # ✅ Validate attendance mode
+        # ✅ Ensure session is on the correct day
+        from datetime import datetime
+        today = datetime.today().strftime('%A')  # Get today's day name (e.g., "Monday")
+        if session.day != today:
+            return Response({"error": "Attendance session is not active today"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # ✅ Match attendance mode
         if "GPS" in session.modes:
             faculty_latitude = session.latitude
             faculty_longitude = session.longitude
+
             if abs(student_latitude - faculty_latitude) > 0.001 or abs(student_longitude - faculty_longitude) > 0.001:
                 return Response({"error": "GPS location mismatch"}, status=status.HTTP_403_FORBIDDEN)
 
-        # ✅ Prevent duplicate attendance
-        if StudentAttendance.objects.filter(student=student, session=session).exists():
-            return Response({"error": "Attendance already marked"}, status=status.HTTP_409_CONFLICT)
-
         # ✅ Mark attendance
         StudentAttendance.objects.create(
-            student=student,
+            student=student,  # ✅ Use the fetched student object
             session=session,
             timestamp=now(),
             status="Present"
