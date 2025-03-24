@@ -15,6 +15,7 @@ from django.utils.timezone import now
 from teacher.models import AttendanceSession
 from django.utils.timezone import now
 from django.utils import timezone
+from datetime import datetime
 from .frs_utils import verify_face
 class RegisterStudent(APIView):
     def post(self, request, *args, **kwargs):
@@ -182,6 +183,8 @@ class ActiveAttendanceSessionsView(APIView):
         except Student.DoesNotExist:
             return Response({"error": "Student not found"}, status=status.HTTP_404_NOT_FOUND)
 
+from datetime import datetime, timezone  # ✅ Import timezone for proper datetime handling
+
 class MarkAttendanceView(APIView):
     def post(self, request):
         data = request.data
@@ -197,9 +200,14 @@ class MarkAttendanceView(APIView):
         except (Student.DoesNotExist, AttendanceSession.DoesNotExist):
             return Response({"error": "Invalid student or session"}, status=status.HTTP_404_NOT_FOUND)
 
-        # ✅ Check if already marked attendance
+        # ✅ Check if attendance is already marked
         if StudentAttendance.objects.filter(student=student, session=session).exists():
             return Response({"message": "Attendance already marked!"}, status=status.HTTP_200_OK)
+
+        # ✅ Ensure attendance is only marked on the session's scheduled day
+        today = datetime.now(timezone.utc).strftime('%A')  # ✅ Ensure correct timezone
+        if session.day != today:
+            return Response({"error": "Attendance session is not active today"}, status=status.HTTP_400_BAD_REQUEST)
 
         # ✅ Check Faculty's Selected Modes
         requires_gps = "GPS" in session.modes
@@ -209,15 +217,19 @@ class MarkAttendanceView(APIView):
         if requires_gps:
             faculty_latitude = session.latitude
             faculty_longitude = session.longitude
+            if student_latitude is None or student_longitude is None:
+                return Response({"error": "GPS coordinates missing"}, status=status.HTTP_400_BAD_REQUEST)
+
+            # ✅ Calculate distance between faculty and student
             distance = abs(student_latitude - faculty_latitude) + abs(student_longitude - faculty_longitude)
-            if distance > 0.0001:  # ✅ 10 meters tolerance (approx. 0.0001 degrees)
+            if distance > 0.001:  # ✅ ~100 meters tolerance
                 return Response({"error": "GPS location mismatch"}, status=status.HTTP_403_FORBIDDEN)
 
         # ✅ Verify FRS if enabled
         if requires_frs:
             if not live_face_descriptor:
                 return Response({"error": "FRS verification required!"}, status=status.HTTP_400_BAD_REQUEST)
-            
+
             stored_face_descriptor = student.face_descriptor
             if not verify_face(stored_face_descriptor, live_face_descriptor):
                 return Response({"error": "Face recognition failed"}, status=status.HTTP_403_FORBIDDEN)
@@ -226,7 +238,7 @@ class MarkAttendanceView(APIView):
         StudentAttendance.objects.create(
             student=student,
             session=session,
-            timestamp=now(),
+            timestamp=datetime.now(timezone.utc),  # ✅ Ensure correct timestamp
             status="Present"
         )
 
