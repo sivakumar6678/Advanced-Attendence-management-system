@@ -174,6 +174,7 @@ class ActiveAttendanceSessionsView(APIView):
                     "periods": session.periods,
                     "modes": session.modes,
                     "start_time": session.start_time,
+                    "end_time": session.end_time
                 }
                 for session in active_sessions
             ]

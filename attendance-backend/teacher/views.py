@@ -10,6 +10,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from crc.models import Subject,Timetable,TimetableEntry
 from crc.serializers import SubjectSerializer
 from django.utils.timezone import now, timedelta
+from datetime import datetime, timedelta, timezone
 
 class FacultyRegisterView(APIView):
     def post(self, request):
@@ -165,8 +166,8 @@ class StartAttendanceSessionView(APIView):
         AttendanceSession.objects.filter(is_active=True, end_time__lte=now()).update(is_active=False)
 
         # ✅ Calculate session end time
-        start_time = now()
-        end_time = start_time + timedelta(minutes=int(session_duration))
+        start_time = datetime.now(timezone.utc)  # ✅ Set start time
+        end_time = start_time + timedelta(minutes=5)  # ✅ Set end time to 5 minutes later
 
         # ✅ Create and save new attendance session
         attendance_session = AttendanceSession.objects.create(
@@ -189,5 +190,5 @@ class StartAttendanceSessionView(APIView):
         return Response({
             "message": "Attendance session started successfully!",
             "session_id": attendance_session.id,
-            "end_time": attendance_session.end_time  # ✅ Return end time
+            "end_time": attendance_session.end_time.isoformat()  # ✅ Return end time
         }, status=status.HTTP_201_CREATED)

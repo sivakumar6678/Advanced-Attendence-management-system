@@ -43,18 +43,20 @@ class AttendanceSession(models.Model):
     longitude = models.FloatField(null=True, blank=True)
 
     def has_expired(self):
-        """Check if the session has expired based on its duration."""
-        if isinstance(self.start_time, str):  # ✅ Convert to datetime if it's a string
-            self.start_time = datetime.fromisoformat(self.start_time)
-
-        end_time = self.start_time + timedelta(minutes=self.session_duration)
-        return datetime.now(timezone.utc) > end_time  # ✅ FIXED timezone.now() issue
+        """✅ Check if the session has expired."""
+        if self.end_time and datetime.now(timezone.utc) > self.end_time:
+            return True
+        return False
 
     def save(self, *args, **kwargs):
-        """Automatically deactivate the session if expired."""
+        """✅ Set `end_time` based on `start_time` when creating a session."""
+        if not self.end_time:
+            self.end_time = self.start_time + timedelta(minutes=5)  # 🔥 Default to 30 mins if not provided
+
         if self.has_expired():
-            self.is_active = False
+            self.is_active = False  # 🔥 Auto deactivate expired session
+
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.subject.name} - {self.day} ({self.start_time})"
+        return f"{self.subject.name} - {self.day} ({self.start_time} to {self.end_time})"
