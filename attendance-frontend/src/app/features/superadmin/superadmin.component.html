@@ -1,79 +1,143 @@
-<p-toolbar class="home-sticky-header" 
-           [style]="{'background-color': 'var(--primary-color)', 'padding' : '0.5rem 2rem', 'margin-bottom' : 0}">
-  <div class="p-toolbar-group-start proj-title">
-    <span>SuperAdmin Portal</span>
-  </div>
-  <div class="p-toolbar-group-end navbar-links">
-    <div class="nav-links">
-      <a pButton label="Home" routerLink="/" fragment="home"></a>
+<!-- Main Container -->
+<div class="superadmin-container">
+  <!-- Toolbar -->
+  <p-toolbar class="home-sticky-header" 
+             [style]="{'background-color': 'var(--primary-color)', 'padding' : '0.75rem 2rem', 'margin-bottom' : 0}">
+    <div class="p-toolbar-group-start proj-title">
+      <i class="pi pi-user-shield"></i>
+      <span>SuperAdmin Portal</span>
     </div>
-  </div>
-</p-toolbar>
+    <div class="p-toolbar-group-end navbar-links">
+      <div class="nav-links">
+        <a pButton label="Home" routerLink="/" fragment="home" icon="pi pi-home"></a>
+      </div>
+    </div>
+  </p-toolbar>
 
-<div class="crc-auth">
-  <div class="crc-auth-container">
+  <!-- Main Content -->
+  <div class="crc-auth">
     <!-- Login Section -->
-    <div *ngIf="!isLoggedIn" class="form-container">
-      <h3>SuperAdmin Login</h3>
-      <div class="input-group">
-        <label for="email">Email</label>
-        <input pInputText id="email" type="email" placeholder="Email" [(ngModel)]="email" required />
+    <div *ngIf="!isLoggedIn" class="crc-auth-container login-section">
+      <div class="form-container">
+        <div class="login-header">
+          <i class="pi pi-user-shield"></i>
+          <h3>SuperAdmin Login</h3>
+        </div>
+        <div class="input-group">
+          <label for="email">Email</label>
+          <span class="p-input-icon-left">
+            <i class="pi pi-envelope"></i>
+            <input pInputText id="email" type="email" placeholder="Enter your email" [(ngModel)]="email" required />
+          </span>
+        </div>
+        <div class="input-group">
+          <label for="password">Password</label>
+          <p-password id="password" 
+                      [style]="{'width': '100%'}"            
+                      placeholder="Enter your password" 
+                      [(ngModel)]="password" 
+                      [toggleMask]="true"
+                      required>
+          </p-password>
+        </div>
+        <p-button label="Login" (click)="login()" styleClass="submit-button" icon="pi pi-sign-in"></p-button>
+        <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
       </div>
-      <div class="input-group">
-        <label for="password">Password</label>
-        <p-password id="password" 
-                    [style]="{'width': '100%'}"            
-                    placeholder="Password" 
-                    [(ngModel)]="password" 
-                    [toggleMask]="true"
-                    required>
-        </p-password>
-      </div>
-      <p-button label="Login" (click)="login()" class="submit-button"></p-button>
-      <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
     </div>
 
     <!-- SuperAdmin Dashboard -->
-    <div *ngIf="isLoggedIn" class="dashboard-container">
-      <p-button label="Logout" (click)="logout()" class="logout-button"></p-button>
+    <div *ngIf="isLoggedIn" class="admin-dashboard">
+      <div class="dashboard-header">
+        <div class="header-content">
+          <i class="pi pi-user-shield"></i>
+          <h2>SuperAdmin Dashboard</h2>
+        </div>
+        <div class="header-actions">
+          <p-button label="Logout" (click)="logout()" styleClass="logout-button" icon="pi pi-sign-out"></p-button>
+        </div>
+      </div>
 
-      <!-- Faculty List -->
-      <h3>Faculty List</h3>
-      <p-table [value]="facultyList" [responsive]="true">
-        <ng-template pTemplate="header">
-          <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Employee ID</th>
-            <th>Registered</th>
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="body" let-faculty>
-          <tr>
-            <td>{{ faculty.name }}</td>
-            <td>{{ faculty.email }}</td>
-            <td>{{ faculty.employee_id }}</td>
-            <td>{{ faculty.registered ? 'Yes' : 'No' }}</td>
-          </tr>
-        </ng-template>
-      </p-table>
+      <!-- Section Toggle -->
+      <div class="section-toggle">
+        <p-button 
+          [label]="activeSection === 'add' ? 'Add Faculty' : 'View Faculty'" 
+          (click)="toggleSection()" 
+          [styleClass]="'toggle-button ' + (activeSection === 'add' ? 'p-button-primary' : 'p-button-secondary')"
+          [icon]="activeSection === 'add' ? 'pi pi-plus' : 'pi pi-list'">
+        </p-button>
+      </div>
 
-      <!-- Add Faculty -->
-      <h3>Add Faculty</h3>
-      <div class="form-container">
-        <div class="input-group">
-          <label for="facultyName">Name</label>
-          <input pInputText id="facultyName" type="text" placeholder="Name" [(ngModel)]="newFaculty.name" required />
+      <!-- Add Faculty Section -->
+      <div class="section-card add-faculty" *ngIf="activeSection === 'add'">
+        <div class="section-header">
+          <i class="pi pi-user-plus"></i>
+          <h3>Add New Faculty</h3>
+          <span class="section-description">Create new faculty accounts with required information</span>
         </div>
-        <div class="input-group">
-          <label for="facultyEmail">Email</label>
-          <input pInputText id="facultyEmail" type="email" placeholder="Email" [(ngModel)]="newFaculty.email" required />
+        <div class="form-container">
+          <div class="input-group">
+            <label for="facultyName">Name</label>
+            <span class="p-input-icon-left">
+              <i class="pi pi-user"></i>
+              <input pInputText id="facultyName" type="text" placeholder="Enter faculty name" [(ngModel)]="newFaculty.name" required />
+            </span>
+          </div>
+          <div class="input-group">
+            <label for="facultyEmail">Email</label>
+            <span class="p-input-icon-left">
+              <i class="pi pi-envelope"></i>
+              <input pInputText id="facultyEmail" type="email" placeholder="Enter faculty email" [(ngModel)]="newFaculty.email" required />
+            </span>
+          </div>
+          <div class="input-group">
+            <label for="facultyEmployeeId">Employee ID</label>
+            <span class="p-input-icon-left">
+              <i class="pi pi-id-card"></i>
+              <input pInputText id="facultyEmployeeId" type="text" placeholder="Enter employee ID" [(ngModel)]="newFaculty.employee_id" required />
+            </span>
+          </div>
+          <p-button label="Add Faculty" (click)="addFaculty()" styleClass="submit-button" icon="pi pi-plus"></p-button>
         </div>
-        <div class="input-group">
-          <label for="facultyEmployeeId">Employee ID</label>
-          <input pInputText id="facultyEmployeeId" type="text" placeholder="Employee ID" [(ngModel)]="newFaculty.employee_id" required />
+      </div>
+
+      <!-- Faculty List Section -->
+      <div class="section-card view-faculty" *ngIf="activeSection === 'view'">
+        <div class="section-header">
+          <i class="pi pi-users"></i>
+          <h3>Faculty List</h3>
+          <span class="section-description">View and manage faculty members in the system</span>
         </div>
-        <p-button label="Add Faculty" (click)="addFaculty()" class="submit-button"></p-button>
+        <div class="table-container">
+          <p-table [value]="facultyList" [responsive]="true" styleClass="faculty-table">
+            <ng-template pTemplate="header">
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Employee ID</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-faculty>
+              <tr>
+                <td>{{ faculty.name }}</td>
+                <td>{{ faculty.email }}</td>
+                <td>{{ faculty.employee_id }}</td>
+                <td>
+                  <span class="status-badge" [class.registered]="faculty.registered">
+                    {{ faculty.registered ? 'Registered' : 'Pending' }}
+                  </span>
+                </td>
+                <td>
+                  <div class="action-buttons">
+                    <button pButton icon="pi pi-pencil" class="p-button-rounded p-button-info p-button-sm" pTooltip="Edit"></button>
+                    <button pButton icon="pi pi-trash" class="p-button-rounded p-button-danger p-button-sm" pTooltip="Delete"></button>
+                  </div>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
       </div>
 
       <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>

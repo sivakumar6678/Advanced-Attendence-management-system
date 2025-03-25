@@ -96,7 +96,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'attendance_system_db',
         'USER' : 'root',
-        'PASSWORD' : 'CSKsiva@66',
+        'PASSWORD' : '1234',
         'HOST' : 'localhost',
         'PORT' : '3306'
     }
