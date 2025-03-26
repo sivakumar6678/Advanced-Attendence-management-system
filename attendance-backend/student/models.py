@@ -52,3 +52,4 @@ class StudentAttendance(models.Model):
 
     def __str__(self):
         return f"{self.student.name} - {self.session.subject.name} - {self.status}"
+

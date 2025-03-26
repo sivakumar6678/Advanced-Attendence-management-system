@@ -244,3 +244,12 @@ class MarkAttendanceView(APIView):
         )
 
         return Response({"message": "Attendance marked successfully!"}, status=status.HTTP_200_OK)
+
+class GetAttendanceCountView(APIView):
+    def get(self, request, session_id):
+        try:
+            session = AttendanceSession.objects.get(id=session_id)
+            present_count = StudentAttendance.objects.filter(session=session, status="Present").count()
+            return Response({"present_count": present_count}, status=status.HTTP_200_OK)
+        except AttendanceSession.DoesNotExist:
+            return Response({"error": "Session not found"}, status=status.HTTP_404_NOT_FOUND)

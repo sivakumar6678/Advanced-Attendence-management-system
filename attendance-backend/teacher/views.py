@@ -192,3 +192,16 @@ class StartAttendanceSessionView(APIView):
             "session_id": attendance_session.id,
             "end_time": attendance_session.end_time.isoformat()  # ✅ Return end time
         }, status=status.HTTP_201_CREATED)
+
+class EndAttendanceSessionView(APIView):
+    def post(self, request, session_id):  # ✅ Receive session_id from URL
+        try:
+            session = AttendanceSession.objects.get(id=session_id, is_active=True)
+            session.is_active = False  # ✅ Mark session as inactive
+            session.end_time = datetime.now(timezone.utc)  # ✅ Set end time
+            session.save()
+
+            return Response({"message": "Attendance session ended successfully!"}, status=status.HTTP_200_OK)
+        
+        except AttendanceSession.DoesNotExist:
+            return Response({"error": "Session not found or already ended"}, status=status.HTTP_404_NOT_FOUND)

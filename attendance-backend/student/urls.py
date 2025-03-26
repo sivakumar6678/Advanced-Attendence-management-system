@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import RegisterStudent, LoginStudent,  StudentDashboardView, ActiveAttendanceSessionsView, MarkAttendanceView
+from .views import RegisterStudent, LoginStudent,  StudentDashboardView, ActiveAttendanceSessionsView, MarkAttendanceView, GetAttendanceCountView
 
 urlpatterns = [
     path('register/', RegisterStudent.as_view(), name='register-student'),
@@ -7,4 +7,6 @@ urlpatterns = [
     path('dashboard/', StudentDashboardView.as_view(), name='student-dashboard'),
     path('active-sessions/<str:student_id>/', ActiveAttendanceSessionsView.as_view(), name='active-sessions'),
     path('mark-attendance/', MarkAttendanceView.as_view(), name='mark-attendance'),
+    path('attendance-count/<int:session_id>/', GetAttendanceCountView.as_view(), name='attendance-count'),
+
 ]
