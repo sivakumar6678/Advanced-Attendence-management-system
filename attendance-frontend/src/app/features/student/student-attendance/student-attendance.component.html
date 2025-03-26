@@ -4,6 +4,7 @@
           <th>Subject</th>
           <th>Day</th>
           <th>Periods</th>
+          <th>Time Left</th> 
           <th>Actions</th>
       </tr>
   </ng-template>
@@ -12,25 +13,32 @@
       <tr>
           <td>{{ session.subject_name }}</td>
           <td>{{ session.day }}</td>
-          <td>{{ session.periods?.length ? session.periods.join(', ') : 'N/A' }}</td>  <!-- ✅ Ensure periods display correctly -->
+          <td>{{ session.periods?.join(', ') || 'N/A' }}</td>
+          <td>
+            <span *ngIf="session.remainingTime">
+              ⏳ {{ session.remainingTime }}
+            </span>
+            <span *ngIf="session.remainingTime === '0:00'" style="color: red;">
+              ❌ Expired
+            </span>
+        </td>
+        
           <td>
               <button *ngIf="!session.marked" pButton 
                   label="Mark Attendance" class="p-button-success" 
-                  (click)="markAttendance(session.session_id)">
+                  (click)="markAttendance(session)">
               </button>
-              <span *ngIf="session.marked" class="attendance-marked" style="color: green; font-weight: bold;">
+              <span *ngIf="session.marked" class="attendance-marked">
                   ✅ Attendance Marked
               </span>
           </td>
       </tr>
   </ng-template>
-
-  <!-- ✅ Show message if no active sessions exist -->
-  <ng-template pTemplate="emptymessage">
-      <tr>
-          <td colspan="4" style="text-align: center; color: red; font-weight: bold;">
-              ❌ No Active Sessions Available
-          </td>
-      </tr>
-  </ng-template>
 </p-table>
+
+
+<!-- ✅ Capture Face UI -->
+<div *ngIf="capturingFace" class="capture-box">
+  <h3>🔵 Please Look at the Camera</h3>
+  <video id="faceVideo" autoplay></video>
+</div>

@@ -51,7 +51,7 @@ class AttendanceSession(models.Model):
     def save(self, *args, **kwargs):
         """✅ Set `end_time` based on `start_time` when creating a session."""
         if not self.end_time:
-            self.end_time = self.start_time + timedelta(minutes=5)  # 🔥 Default to 30 mins if not provided
+            self.end_time = self.start_time + timedelta(minutes=self.session_duration)  # 🔥 Use actual session duration
 
         if self.has_expired():
             self.is_active = False  # 🔥 Auto deactivate expired session

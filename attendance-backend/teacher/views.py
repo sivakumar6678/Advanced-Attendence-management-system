@@ -167,7 +167,7 @@ class StartAttendanceSessionView(APIView):
 
         # ✅ Calculate session end time
         start_time = datetime.now(timezone.utc)  # ✅ Set start time
-        end_time = start_time + timedelta(minutes=5)  # ✅ Set end time to 5 minutes later
+        end_time = start_time + timedelta(minutes=session_duration)  # ✅ Use dynamic session duration
 
         # ✅ Create and save new attendance session
         attendance_session = AttendanceSession.objects.create(
@@ -205,3 +205,26 @@ class EndAttendanceSessionView(APIView):
         
         except AttendanceSession.DoesNotExist:
             return Response({"error": "Session not found or already ended"}, status=status.HTTP_404_NOT_FOUND)
+
+
+class GetActiveAttendanceSessionView(APIView):
+    def get(self, request, faculty_id):
+        """✅ Fetch the active session for a faculty if it exists."""
+        try:
+            faculty = Faculty.objects.get(id=faculty_id)
+        except Faculty.DoesNotExist:
+            return Response({"error": "Faculty not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        # ✅ Get active session for faculty
+        active_session = AttendanceSession.objects.filter(faculty=faculty, is_active=True, end_time__gt=now()).first()
+
+        if not active_session:
+            return Response({"message": "No active session"}, status=status.HTTP_200_OK)
+
+        return Response({
+            "session_id": active_session.id,
+            "subject_name": active_session.subject.name,
+            "start_time": active_session.start_time,
+            "end_time": active_session.end_time,
+            "is_active": active_session.is_active
+        }, status=status.HTTP_200_OK)

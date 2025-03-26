@@ -10,7 +10,7 @@ class FacultyAdmin(admin.ModelAdmin):
 
 @admin.register(AttendanceSession)
 class AttendanceSessionAdmin(admin.ModelAdmin):
-    list_display = ('id', 'faculty', 'subject', 'branch', 'year', 'semester', 'is_active','start_time','day')
+    list_display = ('id', 'faculty', 'subject', 'branch', 'year', 'semester', 'is_active','start_time','end_time','day')
     search_fields = ('faculty', 'subject')
     list_filter = ('branch', 'is_active')
     ordering = ('branch', 'faculty')
