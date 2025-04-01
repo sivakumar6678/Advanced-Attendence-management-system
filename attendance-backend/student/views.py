@@ -17,6 +17,8 @@ from django.utils.timezone import now
 from django.utils import timezone
 from datetime import datetime
 from .frs_utils import verify_face
+from datetime import datetime, timezone  # ✅ Import timezone for proper datetime handling
+
 class RegisterStudent(APIView):
     def post(self, request, *args, **kwargs):
         try:
@@ -150,17 +152,20 @@ class StudentDashboardView(APIView):
 class ActiveAttendanceSessionsView(APIView):
     def get(self, request, student_id):
         try:
-            student = Student.objects.get(student_id=student_id)  # ✅ Fetch student using student_id
+            student = Student.objects.get(student_id=student_id)
 
             # ✅ Mark expired sessions as inactive
             AttendanceSession.objects.filter(is_active=True, end_time__lte=now()).update(is_active=False)
 
-            # ✅ Fetch only active sessions
+            # ✅ Automatically activate sessions when their start time is reached
+            AttendanceSession.objects.filter(is_active=False, start_time__lte=now(), end_time__gte=now()).update(is_active=True)
+
+            # ✅ Fetch only active sessions for the student's branch & semester
             active_sessions = AttendanceSession.objects.filter(
                 branch=student.branch,
                 year=student.year,
                 semester=student.semester,
-                is_active=True  # ✅ Ensures only active sessions are fetched
+                is_active=True
             )
 
             if not active_sessions.exists():
@@ -183,8 +188,8 @@ class ActiveAttendanceSessionsView(APIView):
 
         except Student.DoesNotExist:
             return Response({"error": "Student not found"}, status=status.HTTP_404_NOT_FOUND)
+    
 
-from datetime import datetime, timezone  # ✅ Import timezone for proper datetime handling
 
 class MarkAttendanceView(APIView):
     def post(self, request):
@@ -193,20 +198,40 @@ class MarkAttendanceView(APIView):
         session_id = data.get('session_id')
         student_latitude = data.get('latitude')
         student_longitude = data.get('longitude')
-        live_face_descriptor = data.get('face_descriptor')  # ✅ Live face descriptor from frontend
+        live_face_descriptor = data.get('face_descriptor')  # Face descriptor from frontend
+
+        # ✅ Validate required fields
+        if not student_id or not session_id:
+            return Response({"error": "Student ID and Session ID are required"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             student = Student.objects.get(student_id=student_id)
             session = AttendanceSession.objects.get(id=session_id, is_active=True)
-        except (Student.DoesNotExist, AttendanceSession.DoesNotExist):
-            return Response({"error": "Invalid student or session"}, status=status.HTTP_404_NOT_FOUND)
+        except Student.DoesNotExist:
+            return Response({"error": "Student not found"}, status=status.HTTP_404_NOT_FOUND)
+        except AttendanceSession.DoesNotExist:
+            return Response({"error": "Invalid or inactive session"}, status=status.HTTP_404_NOT_FOUND)
+
+        current_time = timezone.now()
+
+        # ✅ Check if the session has already ended
+        if session.end_time < current_time:
+            # Auto-mark as absent if not already marked
+            if not StudentAttendance.objects.filter(student=student, session=session).exists():
+                StudentAttendance.objects.create(
+                    student=student,
+                    session=session,
+                    timestamp=current_time,
+                    status="Absent"
+                )
+            return Response({"message": "Session has ended, attendance marked as absent."}, status=status.HTTP_200_OK)
 
         # ✅ Check if attendance is already marked
         if StudentAttendance.objects.filter(student=student, session=session).exists():
             return Response({"message": "Attendance already marked!"}, status=status.HTTP_200_OK)
 
-        # ✅ Ensure attendance is only marked on the session's scheduled day
-        today = datetime.now(timezone.utc).strftime('%A')  # ✅ Ensure correct timezone
+        # ✅ Ensure attendance is marked only on the session's scheduled day
+        today = current_time.strftime('%A')  # Ensuring correct day format
         if session.day != today:
             return Response({"error": "Attendance session is not active today"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -214,19 +239,20 @@ class MarkAttendanceView(APIView):
         requires_gps = "GPS" in session.modes
         requires_frs = "FRS" in session.modes
 
-        # ✅ Verify GPS Location if enabled
+        # ✅ Verify GPS Location if required
         if requires_gps:
             faculty_latitude = session.latitude
             faculty_longitude = session.longitude
+
             if student_latitude is None or student_longitude is None:
                 return Response({"error": "GPS coordinates missing"}, status=status.HTTP_400_BAD_REQUEST)
 
-            # ✅ Calculate distance between faculty and student
-            distance = abs(student_latitude - faculty_latitude) + abs(student_longitude - faculty_longitude)
-            if distance > 0.001:  # ✅ ~100 meters tolerance
+            # More accurate distance check
+            distance = ((student_latitude - faculty_latitude) ** 2 + (student_longitude - faculty_longitude) ** 2) ** 0.5
+            if distance > 0.001:  # ~100 meters tolerance
                 return Response({"error": "GPS location mismatch"}, status=status.HTTP_403_FORBIDDEN)
 
-        # ✅ Verify FRS if enabled
+        # ✅ Verify Face Recognition if required
         if requires_frs:
             if not live_face_descriptor:
                 return Response({"error": "FRS verification required!"}, status=status.HTTP_400_BAD_REQUEST)
@@ -239,12 +265,11 @@ class MarkAttendanceView(APIView):
         StudentAttendance.objects.create(
             student=student,
             session=session,
-            timestamp=datetime.now(timezone.utc),  # ✅ Ensure correct timestamp
+            timestamp=current_time,
             status="Present"
         )
 
         return Response({"message": "Attendance marked successfully!"}, status=status.HTTP_200_OK)
-
 class GetAttendanceCountView(APIView):
     def get(self, request, session_id):
         try:
@@ -255,9 +280,9 @@ class GetAttendanceCountView(APIView):
             return Response({"error": "Session not found"}, status=status.HTTP_404_NOT_FOUND)
 
 class GetAttendanceHistoryView(APIView):
-    def get(self, request, student_id):  # ✅ Ensure student_id is received as a string
+    def get(self, request, student_id):  # Ensure student_id is received as a string
         try:
-            student = Student.objects.get(student_id=student_id)  # ✅ Lookup by student_id (string)
+            student = Student.objects.get(student_id=student_id)  # Lookup by student_id (string)
             attendance_records = StudentAttendance.objects.filter(student=student).order_by('-timestamp')
 
             if not attendance_records.exists():
