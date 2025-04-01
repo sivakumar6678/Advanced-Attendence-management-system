@@ -9,6 +9,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from crc.models import Subject,Timetable,TimetableEntry
 from crc.serializers import SubjectSerializer
+from student.models import Student,StudentAttendance
 from django.utils.timezone import now, timedelta
 from datetime import datetime, timedelta, timezone
 
@@ -205,7 +206,6 @@ class EndAttendanceSessionView(APIView):
         
         except AttendanceSession.DoesNotExist:
             return Response({"error": "Session not found or already ended"}, status=status.HTTP_404_NOT_FOUND)
-
 
 class GetActiveAttendanceSessionView(APIView):
     def get(self, request, faculty_id):
