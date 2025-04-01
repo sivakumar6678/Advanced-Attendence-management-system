@@ -253,3 +253,27 @@ class GetAttendanceCountView(APIView):
             return Response({"present_count": present_count}, status=status.HTTP_200_OK)
         except AttendanceSession.DoesNotExist:
             return Response({"error": "Session not found"}, status=status.HTTP_404_NOT_FOUND)
+
+class GetAttendanceHistoryView(APIView):
+    def get(self, request, student_id):  # ✅ Ensure student_id is received as a string
+        try:
+            student = Student.objects.get(student_id=student_id)  # ✅ Lookup by student_id (string)
+            attendance_records = StudentAttendance.objects.filter(student=student).order_by('-timestamp')
+
+            if not attendance_records.exists():
+                return Response({"message": "No attendance records found"}, status=status.HTTP_200_OK)
+
+            records_data = [
+                {
+                    "session_id": record.session.id,
+                    "subject_name": record.session.subject.name,
+                    "timestamp": record.timestamp,
+                    "status": record.status
+                }
+                for record in attendance_records
+            ]
+
+            return Response(records_data, status=status.HTTP_200_OK)
+
+        except Student.DoesNotExist:
+            return Response({"error": "Student not found"}, status=status.HTTP_404_NOT_FOUND)
