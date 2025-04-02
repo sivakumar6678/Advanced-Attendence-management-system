@@ -73,10 +73,10 @@ Our system overcomes these limitations with a **secure, automated, and real-time
 
 
 ## Home Page
-![Home](./HomePage.png)
+![Home](./Home.png)
 
 ## Login Roles
-![Login](./LoginPage.png)
+![Login](./Login.png)
 
 
 ## Contributing
