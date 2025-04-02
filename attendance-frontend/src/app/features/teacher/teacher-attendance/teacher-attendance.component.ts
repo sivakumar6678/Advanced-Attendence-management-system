@@ -368,35 +368,36 @@ resetTimer() {
   this.sessionTimer = 0;
 }
 endSession() {
-    if (!this.sessionId) return;
-    clearInterval(this.timerInterval);
-    this.isSessionActive = false;
-    this.sessionTimer = 0;
-    this.userService.endAttendanceSession(this.sessionId).subscribe(
-      (response) => {
-        console.log("✅ Attendance session ended:", response);
-        alert("✅ Session has ended!");
-  
-        // ✅ Reset UI & Clear Data
-        this.sessionId = null;
-        this.isSessionActive = false;
-        this.sessionTimer = 0;
-        this.selectedModes = ['GPS']; // Reset selection
-        this.selectedPeriods = [];
-        this.selectedDay = null;
-        // ✅ Stop real-time attendance fetching
-        if (this.attendanceFetchInterval) {
-          clearInterval(this.attendanceFetchInterval);
-          this.attendanceFetchInterval = null;
-        }  
-      },
-      (error) => {
-        console.error("❌ Error ending attendance session:", error);
-        alert("⚠️ Failed to end session. Try again.");
+  if (!this.sessionId) return;
+  clearInterval(this.timerInterval);
+  this.isSessionActive = false;
+  this.sessionTimer = 0;
+  console.log("session id ", this.sessionId);
+  this.userService.endAttendanceSession(this.sessionId).subscribe(
+    (response) => {
+      console.log("✅ Attendance session ended:", response);
+      alert("✅ Session has ended!");
 
-      }
-    );
-  }
+      // ✅ Reset UI & Clear Data
+      this.sessionId = null;
+      this.isSessionActive = false;
+      this.sessionTimer = 0;
+      this.selectedModes = ['GPS']; // Reset selection
+      this.selectedPeriods = [];
+      this.selectedDay = null;
+      // ✅ Stop real-time attendance fetching
+      if (this.attendanceFetchInterval) {
+        clearInterval(this.attendanceFetchInterval);
+        this.attendanceFetchInterval = null;
+      }  
+    },
+    (error) => {
+      console.error("❌ Error ending attendance session:", error);
+      alert("⚠️ Failed to end session. Try again.");
+    }
+  );
+}
+
  
 getFormattedTime(sessionTimer: number): string {
   const minutes = Math.floor(sessionTimer / 60);

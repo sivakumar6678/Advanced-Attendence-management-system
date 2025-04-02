@@ -46,15 +46,30 @@
   </div>
 
   <div *ngIf="activeSection === 'reports'">
-    <!-- Attendance Reports -->
-    <div class="card reports">
-      <h2>Attendance Reports</h2>
-      <div class="report-list">
-        <div *ngFor="let record of attendanceReports" class="report-item">
-          <p><strong>{{ record.date }}</strong>: {{ record.status }}</p>
-        </div>
-      </div>
-    </div>
+    <p-card>
+      <h3>📌 Student Attendance Records</h3>
+      <p-table [value]="attendanceRecords" [paginator]="true" [rows]="5">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Subject</th>
+            <th>Timestamp</th>
+            <th>Status</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-record>
+          <tr>
+            <td>{{ record.subject_name }}</td>
+            <td>{{ record.timestamp | date:'short' }}</td>
+            <td>
+              <span [ngClass]="{'present': record.status === 'Present', 'absent': record.status === 'Absent'}">
+                {{ record.status }}
+              </span>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </p-card>
+    
   </div>
 
   <!-- Bottom Navigation Bar -->

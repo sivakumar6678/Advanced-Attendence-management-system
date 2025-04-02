@@ -142,7 +142,10 @@ export class UserService {
   getActiveAttendanceSession(facultyId: number): Observable<any> {
     return this.http.get(`${this.baseUrl}/faculty/active-session/${facultyId}/`);
   }
-
+  getAttendanceDetails(studentId: number): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/students/attendance-details/${studentId}/`);
+  }
+  
   
   
 }

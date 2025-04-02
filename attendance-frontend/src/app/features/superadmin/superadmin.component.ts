@@ -13,6 +13,7 @@ export class SuperadminComponent implements OnInit {
   facultyList: any[] = [];
   newFaculty = { name: '', email: '', employee_id: '' };
   errorMessage = '';
+  activeSection: 'add' | 'view' = 'add';
 
   constructor(private http: HttpClient) {}
 
@@ -21,6 +22,10 @@ export class SuperadminComponent implements OnInit {
       this.isLoggedIn = true;
       this.getFacultyList();
     }
+  }
+
+  toggleSection() {
+    this.activeSection = this.activeSection === 'add' ? 'view' : 'add';
   }
 
   login() {
@@ -55,6 +60,7 @@ export class SuperadminComponent implements OnInit {
         res => {
           this.getFacultyList();
           this.newFaculty = { name: '', email: '', employee_id: '' };
+          this.activeSection = 'view'; // Switch to view section after adding
         },
         err => {
           this.errorMessage = err.error.error || 'Failed to add faculty';

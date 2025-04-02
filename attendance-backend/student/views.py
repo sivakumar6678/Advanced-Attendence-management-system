@@ -212,7 +212,7 @@ class MarkAttendanceView(APIView):
         except AttendanceSession.DoesNotExist:
             return Response({"error": "Invalid or inactive session"}, status=status.HTTP_404_NOT_FOUND)
 
-        current_time = timezone.now()
+        current_time = now()
 
         # ✅ Check if the session has already ended
         if session.end_time < current_time:

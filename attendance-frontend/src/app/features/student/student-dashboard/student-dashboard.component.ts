@@ -26,6 +26,7 @@ export class StudentDashboardComponent implements OnInit {
   semester: number | null = null;
   academicYear: string | null = null;
   branch: string | null = null;
+  attendanceRecords: any[] = [];
 
   constructor(
     private userService: UserService,
@@ -37,6 +38,7 @@ export class StudentDashboardComponent implements OnInit {
     setTimeout(() => {
       this.activeAttendanceSession = { subject: "CNS", faculty: "Dr. Smith" };
     }, 3000);
+    // this.fetchAttendance();
     // console.log('Student ID:', this.studentProfile);
   }
   
@@ -52,6 +54,8 @@ export class StudentDashboardComponent implements OnInit {
         this.semester = this.studentProfile.semester;
         this.academicYear = this.studentProfile.academic_year;
         this.branch = this.studentProfile.branch;
+
+        this.fetchAttendance();
   
         // ✅ Call loadPublicTimetable() only after student data is set
         if (this.year && this.semester && this.academicYear && this.branch) {
@@ -115,6 +119,25 @@ export class StudentDashboardComponent implements OnInit {
     localStorage.removeItem('access_token');
     this.router.navigate(['/student/login']);
   }
-
+  fetchAttendance(): void {
+    if (!this.studentProfile || !this.studentProfile.student_id) {
+      console.error('Student profile not loaded. Cannot fetch attendance.');
+      return;
+    }
+  
+    const studentId = this.studentProfile.student_id;  // ✅ Get student ID from profile
+    this.userService.getAttendanceDetails(studentId).subscribe(
+      data => {
+        this.attendanceRecords = data;
+        console.log('Attendance Records:', this.attendanceRecords);
+      },
+      error => {
+        console.error('Error fetching attendance:', error);
+      }
+    );
+  }
+  
+  
+  
   
 }

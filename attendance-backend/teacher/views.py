@@ -12,6 +12,8 @@ from crc.serializers import SubjectSerializer
 from student.models import Student,StudentAttendance
 from django.utils.timezone import now, timedelta
 from datetime import datetime, timedelta, timezone
+from django.db.models import Q
+from .models import AttendanceSession
 
 class FacultyRegisterView(APIView):
     def post(self, request):
@@ -198,14 +200,47 @@ class EndAttendanceSessionView(APIView):
     def post(self, request, session_id):  # ✅ Receive session_id from URL
         try:
             session = AttendanceSession.objects.get(id=session_id, is_active=True)
-            session.is_active = False  # ✅ Mark session as inactive
-            session.end_time = datetime.now(timezone.utc)  # ✅ Set end time
+
+            # ✅ Get the subject assigned to this session
+            subject = session.subject
+
+            # ✅ Fetch academic details from CRCProfile
+            crc = subject.crc  # ✅ Get CRCProfile linked to the subject
+
+            # ✅ Step 1: Find all students in the same academic structure as this subject
+            registered_students = Student.objects.filter(
+                academic_year=crc.academic_year, 
+                branch=crc.branch, 
+                year=crc.year, 
+                semester=crc.semester
+            )
+
+            # ✅ Step 2: Get students who were already marked present
+            marked_students = StudentAttendance.objects.filter(session=session).values_list('student_id', flat=True)
+
+            # ✅ Step 3: Find students who were NOT marked (unmarked = absent)
+            absent_students = registered_students.exclude(id__in=marked_students)
+
+            # ✅ Step 4: Mark them as absent
+            for student in absent_students:
+                StudentAttendance.objects.create(
+                    student=student,
+                    session=session,
+                    status="Absent",  # Assuming 'status' field exists in Attendance model
+                    timestamp=datetime.now(timezone.utc)
+                )
+
+            # ✅ Step 5: Mark session as inactive
+            session.is_active = False
+            session.end_time = datetime.now(timezone.utc)
             session.save()
 
-            return Response({"message": "Attendance session ended successfully!"}, status=status.HTTP_200_OK)
-        
+            return Response({"message": "Attendance session ended, absent students marked."}, status=status.HTTP_200_OK)
+
         except AttendanceSession.DoesNotExist:
             return Response({"error": "Session not found or already ended"}, status=status.HTTP_404_NOT_FOUND)
+
+
 
 class GetActiveAttendanceSessionView(APIView):
     def get(self, request, faculty_id):
