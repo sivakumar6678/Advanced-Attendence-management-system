@@ -70,11 +70,7 @@ Our system overcomes these limitations with a **secure, automated, and real-time
    ```
 4. Configure the MySQL database in the `settings.py` file.
 5. Access the application in your browser at `http://localhost:4200/`.
-## Home Page
-![System Architecture](./Home.png)
 
-## Login Roles
-![UI Mockup](./Login.png)
 
 ## Contributing
 Contributions are welcome! Please follow these steps:
