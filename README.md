@@ -72,11 +72,7 @@ Our system overcomes these limitations with a **secure, automated, and real-time
 5. Access the application in your browser at `http://localhost:4200/`.
 
 
-## Home Page
-![Home](./Home.png)
 
-## Login Roles
-![Login](./Login.png)
 
 
 ## Contributing
