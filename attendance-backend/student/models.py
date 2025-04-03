@@ -45,6 +45,7 @@ class StudentAttendance(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     session = models.ForeignKey(AttendanceSession, on_delete=models.CASCADE)
     timestamp = models.DateTimeField(auto_now_add=True)
+    period = models.CharField(max_length=50)  # ✅ Store period as string (e.g., "2:30 PM - 3:30 PM")
     status = models.CharField(max_length=10, choices=[("Present", "Present"), ("Absent", "Absent")])
     
     class Meta:

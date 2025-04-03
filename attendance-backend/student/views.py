@@ -199,6 +199,7 @@ class MarkAttendanceView(APIView):
         student_latitude = data.get('latitude')
         student_longitude = data.get('longitude')
         live_face_descriptor = data.get('face_descriptor')  # Face descriptor from frontend
+        period = data.get('period')  # ✅ Get period from request
 
         # ✅ Validate required fields
         if not student_id or not session_id:
@@ -222,6 +223,7 @@ class MarkAttendanceView(APIView):
                     student=student,
                     session=session,
                     timestamp=current_time,
+                    period=session.periods[0] if session.periods else "Unknown Period",  # ✅ Ensure period is set                    
                     status="Absent"
                 )
             return Response({"message": "Session has ended, attendance marked as absent."}, status=status.HTTP_200_OK)
@@ -234,6 +236,8 @@ class MarkAttendanceView(APIView):
         today = current_time.strftime('%A')  # Ensuring correct day format
         if session.day != today:
             return Response({"error": "Attendance session is not active today"}, status=status.HTTP_400_BAD_REQUEST)
+
+        periods = session.periods[0]
 
         # ✅ Check Faculty's Selected Modes
         requires_gps = "GPS" in session.modes
@@ -266,6 +270,7 @@ class MarkAttendanceView(APIView):
             student=student,
             session=session,
             timestamp=current_time,
+            period=period,
             status="Present"
         )
 
@@ -293,6 +298,7 @@ class GetAttendanceHistoryView(APIView):
                     "session_id": record.session.id,
                     "subject_name": record.session.subject.name,
                     "timestamp": record.timestamp,
+                    "period" : record.period,
                     "status": record.status
                 }
                 for record in attendance_records
