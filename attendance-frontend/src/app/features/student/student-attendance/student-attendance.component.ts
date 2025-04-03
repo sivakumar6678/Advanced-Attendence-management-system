@@ -3,7 +3,7 @@ import { UserService } from '../../../core/services/user.service';
 import * as faceapi from 'face-api.js';  // ✅ Load FRS Library
 
 // ✅ Define session type
-interface AttendanceSession {
+export interface AttendanceSession {
   session_id: number;
   subject_name: string;
   day: string;
@@ -12,20 +12,33 @@ interface AttendanceSession {
   end_time: string;
   modes: string[];
   remainingTime?: string;
-  marked?: boolean;  // ✅ Track if attendance is marked
+  marked?: boolean;
 }
+
+// ✅ Mapping time slots to period numbers
+const periodMapping: { [key: string]: number } = {
+  "9:15 AM - 10:15 AM": 1,
+  "10:15 AM - 11:15 AM": 2,
+  "11:30 AM - 12:30 PM": 3,
+  "1:30 PM - 2:30 PM": 4,
+  "2:30 PM - 3:30 PM": 5,
+  "3:30 PM - 4:30 PM": 6
+};
+
 @Component({
   selector: 'app-student-attendance',
   templateUrl: './student-attendance.component.html',
   styleUrls: ['./student-attendance.component.css']
 })
 export class StudentAttendanceComponent implements OnInit, OnDestroy {
-  @Input() studentId!: string; // ✅ Receive student ID as string
-  activeSessions: any[] = [];
-  capturingFace: boolean = false; // ✅ Show UI when capturing face
-  modelLoaded: boolean = false;   // ✅ Ensure model is loaded before inference
+  @Input() studentId!: string;
+  
+  activeSessions: AttendanceSession[] = [];
+  capturingFace = false;
+  modelLoaded = false;
   timers: { [key: number]: any } = {}; // ✅ Store timers for each session
   
+
   constructor(private userService: UserService) {}
 
   async ngOnInit() {
@@ -36,10 +49,10 @@ export class StudentAttendanceComponent implements OnInit, OnDestroy {
       console.error("❌ Student ID is undefined or null");
     }
 
-    // ✅ Refresh session list every 30 seconds
+    // ✅ Refresh session list every 50 seconds
     setInterval(() => {
       this.fetchActiveAttendanceSessions();
-    }, 50000);
+    }, 120000);
 
     await this.loadFaceRecognitionModels();  // ✅ Load models on initialization
   }
@@ -52,25 +65,30 @@ export class StudentAttendanceComponent implements OnInit, OnDestroy {
     this.userService.getActiveAttendanceSessions(this.studentId).subscribe(
       (sessions: AttendanceSession[]) => {
         console.log("✅ Active Attendance Sessions:", sessions);
-
-        this.activeSessions = sessions.map(session => ({
-          ...session,
-          periods: Array.isArray(session.periods) ? session.periods : [],
-          marked: this.isAttendanceMarked(session.session_id) // ✅ Persist attendance status
-        }));
-
-        this.activeSessions.forEach(session => this.startTimer(session));
+        
+        if (sessions.length > 0) {
+          this.activeSessions = sessions.map(session => ({
+            ...session,
+            periods: Array.isArray(session.periods) ? session.periods : [],
+            marked: this.isAttendanceMarked(session.session_id)
+          }));
+  
+          this.activeSessions.forEach(session => this.startTimer(session));
+        } else {
+          this.activeSessions = [];
+        }
       },
       (error) => {
         console.error("❌ Error fetching active attendance sessions:", error);
       }
     );
   }
+  
 
   startTimer(session: AttendanceSession) {
     if (!session.end_time) return; // ✅ Ensure end_time is available
 
-    const sessionEndTime = new Date(session.end_time).getTime(); // ✅ Use `end_time` from backend
+    const sessionEndTime = new Date(session.end_time).getTime();
 
     this.timers[session.session_id] = setInterval(() => {
         const timeLeft = Math.max(0, sessionEndTime - Date.now());
@@ -84,12 +102,10 @@ export class StudentAttendanceComponent implements OnInit, OnDestroy {
         const minutes = Math.floor(timeLeft / 60000);
         const seconds = Math.floor((timeLeft % 60000) / 1000);
         
-        session.remainingTime = `${minutes}:${seconds.toString().padStart(2, '0')}`; // ✅ Store as MM:SS
+        session.remainingTime = `${minutes}:${seconds.toString().padStart(2, '0')}`;
     }, 1000);
-}
+  }
 
-
-  // ✅ Check if Attendance is Already Marked (Persistent)
   isAttendanceMarked(sessionId: number): boolean {
     return localStorage.getItem(`attendance_${sessionId}`) === 'marked';
   }
@@ -146,9 +162,13 @@ export class StudentAttendanceComponent implements OnInit, OnDestroy {
   }
 
   sendAttendanceRequest(session: AttendanceSession, faceData: any | null, studentLocation: any | null) {
+    // ✅ Convert period time to period number
+    const period = session.periods.length > 0 ? this.getPeriodNumber(session.periods[0]) : "Unknown Period";
+
     const attendanceData: any = {
       student_id: this.studentId,
       session_id: session.session_id,
+      period: period, // ✅ Now sends period number
       ...(faceData && { face_descriptor: faceData }), 
       ...(studentLocation && { 
         latitude: studentLocation.latitude, 
@@ -161,14 +181,18 @@ export class StudentAttendanceComponent implements OnInit, OnDestroy {
         console.log("✅ Attendance marked successfully!", response);
         alert("🎉 Attendance marked successfully!");
 
-        session.marked = true; // ✅ Update UI immediately
-        localStorage.setItem(`attendance_${session.session_id}`, 'marked'); // ✅ Persist status
+        session.marked = true; 
+        localStorage.setItem(`attendance_${session.session_id}`, 'marked'); 
       },
       (error) => {
         console.error("❌ Error marking attendance:", error);
         alert("⚠️ Failed to mark attendance. Try again.");
       }
     );
+  }
+
+  getPeriodNumber(periodTime: string): number | string {
+    return periodMapping[periodTime] || periodTime;
   }
 
   async captureFace() {
@@ -181,9 +205,9 @@ export class StudentAttendanceComponent implements OnInit, OnDestroy {
     return new Promise((resolve) => {
       setTimeout(async () => {
         const detections = await faceapi.detectSingleFace(video).withFaceLandmarks().withFaceDescriptor();
-        stream.getTracks().forEach(track => track.stop()); // ✅ Stop video stream
+        stream.getTracks().forEach(track => track.stop()); 
         resolve(detections?.descriptor || null);
-      }, 2000);  // ✅ Reduced timeout for faster detection
+      }, 2000);
     });
   }
 
@@ -200,6 +224,4 @@ export class StudentAttendanceComponent implements OnInit, OnDestroy {
       );
     });
   }
-
-
 }

@@ -1,82 +1,164 @@
-<div class="dashboard-container">
-  <!-- Header -->
-  <div class="header">
-    <div class="card profile" *ngIf="studentProfile">
-      <div class="profile-details">
-        <h1>Student Dashboard</h1>
-        <p><strong>{{ studentProfile.name }}</strong></p>
-        <p>Roll No: {{ studentProfile.student_id }}Branch: {{ studentProfile.branch }}</p>
-        <p>Year : {{ studentProfile.year }} | Sem : {{ studentProfile.semester }}</p>
-        <button class="logout-btn" (click)="logout()" aria-label="Logout">🚪 Logout</button>
+  <div class="dashboard-container">
+      <!-- Header -->
+      <div class="header text-center">
+          <div class="card profile" *ngIf="studentProfile">
+              <div class="profile-header">
+                  <div class="user-greeting">
+                      <p>Hello, {{ studentProfile.name }}</p>
+                      <img src="assets/prfl.jpg" alt="Profile" class="pp">
+                  </div>
+              </div>
+              
+              <div class="trip-selection">
+                  <div class="student-info">
+                      <h4>Roll No: {{ studentProfile.student_id }}</h4>
+                  </div>
+                  <div class="button-row">
+                      <button class="nav-button active">
+                          <span class="btn-icon">🎓</span>
+                          <span class="btn-text">{{ studentProfile.branch }}</span>
+                      </button>
+                      <button class="nav-button active">
+                          <span class="btn-icon">📚</span>
+                          <span class="btn-text">{{ studentProfile.year }}-{{ studentProfile.semester }}</span>
+                      </button>
+                      <button class="nav-button logout" (click)="logout()">
+                          <span class="btn-icon">🚪</span>
+                          <span class="btn-text">Logout</span>
+                      </button>
+                  </div>
+              </div>
+          </div>
+      </div>
+  
+      <!-- Dynamic Sections -->
+      <div *ngIf="activeSection === 'dashboard'">
+        <div class="card attendance">
+          <h2>Attendance</h2>
+          <div>
+            <h3>Subject-wise Attendance</h3>
+            <canvas id="barChart"></canvas>
+          </div>
+          
+          <div>
+            <h3>Overall Attendance</h3>
+            <canvas id="pieChart"></canvas>
+          </div>
+          
+        
+          <p>Overall: <span class="percentage">{{ attendancePercentage }}%</span></p>
+      
+          <h3>Ongoing Attendance Session</h3>
+          <div *ngIf="isOnline">
+            <h3>🎯 Active Attendance Session</h3>
+            <div *ngIf="activeAttendanceSession; else noSession">
+              <p><strong>Subject:</strong> {{ activeAttendanceSession.subject_name }}</p>
+              <p><strong>Faculty:</strong> {{ activeAttendanceSession.faculty }}</p>
+              <p><strong>Time Left:</strong> {{ sessionRemainingTime }}</p>
+              <button (click)="setActiveSection('attendance')">Go to Attendance</button>
+            </div>
+            <ng-template #noSession>
+              <p>🚀 No Active Attendance Sessions</p>
+            </ng-template>
+          </div>
+          
         </div>
       </div>
-  </div>
-
-  <!-- Profile Section (Only for Dashboard) -->
-
-  <!-- Dynamic Sections -->
-  <div *ngIf="activeSection === 'dashboard'">
-    <!-- Attendance Overview -->
-    <div class="card attendance">
-      <h2>Attendance</h2>
-      <p>Today's Status: <span class="status">{{ attendanceStatus }}</span></p>
-      <p>Overall: <span class="percentage">{{ attendancePercentage }}%</span></p>
-    </div>
-  </div>
-
-  <div *ngIf="activeSection === 'timetable'">
-    <!-- Public Timetable -->
-    <div class="public-timetable-container">
-      <h2>Public Timetable</h2>
-      <div class="timetable-list">
-        <div *ngFor="let entry of publicTimetable" class="timetable-item">
-          <p><strong>{{ entry.day }}</strong></p>
-          <p>Time: {{ entry.time_slot }}</p>
-          <p>Subject: {{ getSubjectName(entry.subject_id) }}</p>
-          <p>Faculty: {{ getFacultyName(entry.faculty_id) }}</p>
-        </div>
-        <p *ngIf="publicTimetable.length === 0">No timetable available.</p>
-      </div>
-    </div>
-  </div>
-
-  <div *ngIf="activeSection === 'attendance'">
-    <app-student-attendance [studentId]="studentProfile.student_id" ></app-student-attendance>
-
-  </div>
-
-  <div *ngIf="activeSection === 'reports'">
-    <p-card>
-      <h3>📌 Student Attendance Records</h3>
-      <p-table [value]="attendanceRecords" [paginator]="true" [rows]="5">
-        <ng-template pTemplate="header">
-          <tr>
-            <th>Subject</th>
-            <th>Timestamp</th>
-            <th>Status</th>
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="body" let-record>
-          <tr>
-            <td>{{ record.subject_name }}</td>
-            <td>{{ record.timestamp | date:'short' }}</td>
-            <td>
-              <span [ngClass]="{'present': record.status === 'Present', 'absent': record.status === 'Absent'}">
-                {{ record.status }}
-              </span>
-            </td>
-          </tr>
-        </ng-template>
-      </p-table>
-    </p-card>
+      
     
-  </div>
+    
+    
+  
+      <div *ngIf="activeSection === 'timetable'">
+          <div class="public-timetable-container">
+              <h2>Public Timetable</h2>
+              <div class="table-responsive">
+                  <table class="timetable-table">
+                      <thead>
+                          <tr>
+                              <th>Day</th>
+                              <th>Time</th>
+                              <th>Subject</th>
+                              <th>Faculty</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          <tr *ngFor="let entry of publicTimetable">
+                              <td data-label="Day">{{ entry.day }}</td>
+                              <td data-label="Time">{{ entry.time_slot }}</td>
+                              <td data-label="Subject">{{ getSubjectName(entry.subject_id) }}</td>
+                              <td data-label="Faculty">{{ getFacultyName(entry.faculty_id) }}</td>
+                          </tr>
+                      </tbody>
+                  </table>
+              </div>
+              <p *ngIf="publicTimetable.length === 0" class="no-data">No timetable available.</p>
+          </div>
+      </div>
+  
+      <div *ngIf="activeSection === 'attendance'">
+          <app-student-attendance [studentId]="studentProfile.student_id"></app-student-attendance>
+      </div>
 
-  <!-- Bottom Navigation Bar -->
-  <div class="bottom-nav">
-    <button (click)="setActiveSection('dashboard')" class="nav-btn" [class.active]="activeSection === 'dashboard'" aria-label="Dashboard">🏠 Dashboard</button>
-    <button (click)="setActiveSection('timetable')" class="nav-btn" [class.active]="activeSection === 'timetable'" aria-label="Timetable">📅 Timetable</button>
-    <button (click)="setActiveSection('attendance')" class="nav-btn" [class.active]="activeSection === 'attendance'" aria-label="Attendance">📍 Attendance</button>
-    <button (click)="setActiveSection('reports')" class="nav-btn" [class.active]="activeSection === 'reports'" aria-label="Reports">📊 Reports</button>
+        <div *ngIf="activeSection === 'reports'">
+            <p-card>
+                <h3>📌 Student Attendance Records</h3>
+                <div class="table-responsive">
+                    <table class="attendance-table">
+                        <thead>
+                            <tr>
+                                <th>Date\Subject</th>
+                                <th *ngFor="let subject of uniqueSubjects">{{ subject }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let row of attendanceTableData">
+                                <td>{{ row.date }}</td>
+                                <td *ngFor="let subject of uniqueSubjects">
+                                    <span *ngIf="row[subject] !== '-'">
+                                        <span *ngFor="let periodAttendance of row[subject].split('|')">
+                                            ({{ getPeriodNumber(periodAttendance) }}) = <b> {{ getAttendanceStatus(periodAttendance) }} </b> <br>
+                                        </span>
+                                    </span>
+                                    <span *ngIf="row[subject] === '-'">-</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p *ngIf="attendanceTableData.length === 0" class="no-data">No attendance records available.</p>
+                </div>
+            </p-card>            
+        </div>
+        
+      <!-- Bottom Navigation Bar -->
+      <div class="bottom-nav">
+          <button (click)="setActiveSection('dashboard')" 
+                  class="nav-btn" 
+                  [class.active]="activeSection === 'dashboard'" 
+                  aria-label="Dashboard">
+              <span class="btn-icon">🏠</span>
+              <span class="btn-text">Dashboard</span>
+          </button>
+          <button (click)="setActiveSection('timetable')" 
+                  class="nav-btn" 
+                  [class.active]="activeSection === 'timetable'" 
+                  aria-label="Timetable">
+              <span class="btn-icon">📅</span>
+              <span class="btn-text">Timetable</span>
+          </button>
+          <button (click)="setActiveSection('attendance')" 
+                  class="nav-btn" 
+                  [class.active]="activeSection === 'attendance'" 
+                  aria-label="Attendance">
+              <span class="btn-icon">📍</span>
+              <span class="btn-text">Attendance</span>
+          </button>
+          <button (click)="setActiveSection('reports')" 
+                  class="nav-btn" 
+                  [class.active]="activeSection === 'reports'" 
+                  aria-label="Reports">
+              <span class="btn-icon">📊</span>
+              <span class="btn-text">Reports</span>
+          </button>
+      </div>
   </div>
-</div>
