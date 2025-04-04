@@ -12,7 +12,7 @@ from crc.serializers import SubjectSerializer
 from student.models import Student,StudentAttendance
 from django.utils.timezone import now, timedelta
 from datetime import datetime, timedelta, timezone
-from django.db.models import Q
+from django.db.models import Count, Q
 from .models import AttendanceSession
 
 class FacultyRegisterView(APIView):
@@ -263,3 +263,149 @@ class GetActiveAttendanceSessionView(APIView):
             "end_time": active_session.end_time,
             "is_active": active_session.is_active
         }, status=status.HTTP_200_OK)
+
+
+
+class SubjectAttendanceView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        subject_id = request.GET.get('subject_id')
+        from_date = request.GET.get('from_date')
+        to_date = request.GET.get('to_date')
+
+        if not subject_id:
+            return Response({"error": "subject_id is required"}, status=400)
+
+        try:
+            subject = Subject.objects.get(id=subject_id)
+        except Subject.DoesNotExist:
+            return Response({"error": "Subject not found"}, status=404)
+
+        # Ensure current faculty is teaching this subject
+        faculty = Faculty.objects.get(user_ptr=request.user)
+        if not faculty.assigned_subjects.filter(id=subject.id).exists():
+            return Response({"error": "Unauthorized access to this subject"}, status=403)
+
+        # Filter sessions by this subject and this faculty
+        sessions = AttendanceSession.objects.filter(
+            faculty=faculty,
+            subject=subject
+        )
+
+        # Filter sessions by date range
+        if from_date and to_date:
+            try:
+                from_dt = datetime.strptime(from_date, "%Y-%m-%d")
+                to_dt = datetime.strptime(to_date, "%Y-%m-%d")
+                sessions = sessions.filter(start_time__date__range=(from_dt, to_dt))
+            except ValueError:
+                return Response({"error": "Invalid date format. Use YYYY-MM-DD."}, status=400)
+
+        session_ids = sessions.values_list('id', flat=True)
+
+        # Get attendance grouped by student
+        student_attendance = StudentAttendance.objects.filter(
+            session_id__in=session_ids
+        ).values('student__id', 'student__name').annotate(
+            total_classes=Count('id'),
+            present=Count('id', filter=Q(status='Present')),
+            absent=Count('id', filter=Q(status='Absent'))
+        )
+
+        # Add attendance % calculation
+        result = []
+        for entry in student_attendance:
+            total = entry['total_classes']
+            present = entry['present']
+            percentage = (present / total) * 100 if total > 0 else 0
+            result.append({
+                'student_id': entry['student__id'],
+                'student_name': entry['student__name'],
+                'total_classes': total,
+                'present': present,
+                'absent': entry['absent'],
+                'attendance_percentage': round(percentage, 2)
+            })
+
+        return Response(result)
+
+class AttendanceMatrixView(APIView):
+    def get(self, request):
+        subject_id = request.GET.get("subject_id")
+        start_date = request.GET.get("start_date")
+        end_date = request.GET.get("end_date")
+
+        if not (subject_id and start_date and end_date):
+            return Response({"error": "Missing parameters"}, status=400)
+
+        sessions = AttendanceSession.objects.filter(
+            subject_id=subject_id,
+            start_time__date__range=(start_date, end_date)
+        ).order_by("start_time")
+
+        if not sessions.exists():
+            return Response({"headers": [], "students": []})  # No data found
+
+        session_headers = [
+            {
+                "session_id": s.id,
+                "date": s.start_time.strftime("%Y-%m-%d"),
+                "time": f"{s.start_time.strftime('%H:%M')} - {s.end_time.strftime('%H:%M')}"
+            }
+            for s in sessions
+        ]
+
+        reference_session = sessions.first()
+        students = Student.objects.filter(
+            branch__name=reference_session.branch,
+            year=reference_session.year,
+            semester=reference_session.semester
+        ).order_by("student_id")
+
+        student_data = []
+        for student in students:
+            attendance_map = {}
+            present_count = 0
+            for session in sessions:
+                attendance = StudentAttendance.objects.filter(
+                    student=student, session=session
+                ).first()
+                status_text = attendance.status if attendance else "Absent"
+                attendance_map[str(session.id)] = status_text
+                if status_text == "Present":
+                    present_count += 1
+
+            total_sessions = sessions.count()
+            percent = (present_count / total_sessions) * 100 if total_sessions > 0 else 0
+
+            student_data.append({
+                "student_id": student.id,
+                "roll_no": student.student_id,
+                "name": student.name,
+                "attendance": attendance_map,
+                "present": present_count,
+                "total": total_sessions,
+                "percentage": round(percent, 2)
+            })
+
+        return Response({
+            "headers": session_headers,
+            "students": student_data
+        })
+
+    def post(self, request):
+        updates = request.data.get("updates", [])
+        for item in updates:
+            student_id = item.get("student_id")
+            session_id = item.get("session_id")
+            status_val = item.get("status")
+
+            if student_id and session_id and status_val:
+                StudentAttendance.objects.update_or_create(
+                    student_id=student_id,
+                    session_id=session_id,
+                    defaults={"status": status_val}
+                )
+
+        return Response({"message": "Attendance updated successfully!"}, status=status.HTTP_200_OK)
