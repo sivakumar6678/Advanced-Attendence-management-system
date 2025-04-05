@@ -3,6 +3,8 @@ import { UserService } from '../../../core/services/user.service';
 import { HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 @Component({
   selector: 'app-teacher-dashboard',
@@ -65,6 +67,9 @@ timetable: any;
   students: any[] = [];
   editedAttendance: { student_id: number; session_id: number; status: string }[] = [];
   editMode: boolean = false;
+
+  displayDownloadDialog = false;
+  downloadFileName: string = 'Attendance_Report';
 
   constructor(
     private teacherDashboardService: UserService,
@@ -405,4 +410,27 @@ filterByDateRange() {
     });
   }
 
+  showDownloadDialog() {
+    this.displayDownloadDialog = true;
+  }
+  downloadPDFReport() {
+    const doc = new jsPDF();
+  
+    doc.text('Attendance Report for ', 14, 16);
+    autoTable(doc, {
+      startY: 20,
+      head: [['Roll No', 'Name', 'Present / Total', 'Percentage %']],
+      body: this.students.map(s => [
+        s.roll_no,
+        s.name,
+        `${s.present} / ${s.total}`,
+        `${s.percentage.toFixed(2)}%`
+      ])
+    });
+  
+    const filename = this.downloadFileName?.trim() || 'Attendance_Report';
+    doc.save(`${filename}.pdf`);
+    this.displayDownloadDialog = false;
+  }
+  
 }

@@ -61,32 +61,22 @@
                 </ng-template>
             </div>
           <h2>Attendance Over view </h2>
-          <div>
+          <div *ngIf="chartsReady">
             <h3>Subject-wise Attendance</h3>
-            <canvas id="barChart"></canvas>
+            <canvas #barChartCanvas></canvas>
+            <!-- <canvas #barCanvas ></canvas> -->
           </div>
           
-          <div>
+          <div *ngIf="chartsReady">
             <h3>Overall Attendance</h3>
-            <canvas id="pieChart"></canvas>
+            <!-- <canvas #pieCanvas></canvas> -->
+            <canvas #pieChartCanvas></canvas>
           </div>
           
         
           <p>Overall: <span class="percentage">{{ attendancePercentage }}%</span></p>
       
-          <h3>Ongoing Attendance Session</h3>
-          <div *ngIf="isOnline">
-            <h3>🎯 Active Attendance Session</h3>
-            <div *ngIf="activeAttendanceSession; else noSession">
-              <p><strong>Subject:</strong> {{ activeAttendanceSession.subject_name }}</p>
-              <p><strong>Faculty:</strong> {{ activeAttendanceSession.faculty }}</p>
-              <p><strong>Time Left:</strong> {{ sessionRemainingTime }}</p>
-              <button (click)="setActiveSection('attendance')">Go to Attendance</button>
-            </div>
-            <ng-template #noSession>
-              <p>🚀 No Active Attendance Sessions</p>
-            </ng-template>
-          </div>
+         
           
         </div>
       </div>

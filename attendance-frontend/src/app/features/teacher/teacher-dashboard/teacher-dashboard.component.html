@@ -175,8 +175,8 @@
 
           <p-card header="📚 Student Management" class="p-mb-4 shadow-3">
             <p class="p-text-secondary">View and manage student details and attendance.</p>
-
-            <p-table [value]="assignedSubjects" class="p-mt-3" [responsiveLayout]="'scroll'">
+            
+            <p-table *ngIf="!selectedSubjectForReport" [value]="assignedSubjects" class="p-mt-3" [responsiveLayout]="'scroll'">
               <ng-template pTemplate="header">
                 <tr>
                   <th>Subject Name</th>
@@ -201,6 +201,14 @@
           </p-card>
 
           <div *ngIf="selectedSubjectForReport" class="p-mt-4">
+            <p-button 
+              *ngIf="selectedSubjectForReport"
+
+              label="Back" 
+              icon="fas fa-arrow-left" 
+              class="p-button-secondary" 
+              (click)="selectedSubjectForReport  = !selectedSubjectForReport">
+            </p-button>
             <p-card header="📊 Attendance Report: {{ selectedSubjectForReport.subject_name }}" class="shadow-3">
               
               <div *ngIf="students.length === 0" class="p-text-center p-mb-2">❌ No students found.</div>
@@ -220,7 +228,7 @@
                 <div class="p-field p-col-12 p-md-4 p-d-flex p-ai-end">
                   <button 
                     pButton 
-                    label="🔍 Get Details" 
+                    label="Get Details" 
                     icon="fas fa-search" 
                     class="p-button-success" 
                     (click)="filterByDateRange()">
@@ -240,6 +248,14 @@
                   (click)="selectedSubjectForReport = null;">
                 </button>
                 </div>
+               
+                <!-- <button (click)="downloadReport()">Download Report</button> -->
+                
+              </div>
+              <div class="p-grid p-formgrid p-fluid "> 
+                <div class="p-field p-col-12 p-md-4 p-d-flex p-ai-end">
+                  <button pButton label="Download PDF" icon="fas fa-download" (click)="showDownloadDialog()"></button>
+                </div>
                 <div class="p-field p-col-12 p-md-4 p-d-flex p-ai-end">
                   <button 
                     *ngIf="editMode" 
@@ -250,7 +266,22 @@
                     (click)="saveChanges()">
                   </button>
                 </div>
+
               </div>
+              
+              <p-dialog header="Download Report" [(visible)]="displayDownloadDialog" [modal]="true">
+                <div class="p-fluid">
+                  <div class="p-field">
+                    <label for="filename">Enter file name:</label>
+                    <input id="filename" type="text" [(ngModel)]="downloadFileName" />
+                  </div>
+                </div>
+                <ng-template pTemplate="footer">
+                  <button pButton label="Cancel" (click)="displayDownloadDialog=false"></button>
+                  <button pButton label="Download" (click)="downloadPDFReport()"></button>
+                </ng-template>
+              </p-dialog>
+              
 
               
               <p-table [value]="students" [responsiveLayout]="'scroll'" class="p-datatable-sm" [sortMode]="'multiple'">
@@ -262,7 +293,7 @@
                       {{ header.date }}<br /><span class="p-text-secondary">{{ header.time }}</span>
                     </th>
                     <th>Present / Total</th>
-                    <th pSortableColumn="percentage">% <p-sortIcon field="percentage"></p-sortIcon> </th>
+                    <th pSortableColumn="percentage"> Percentage (% ) <p-sortIcon field="percentage"></p-sortIcon> </th>
                   </tr>
                 </ng-template>
 

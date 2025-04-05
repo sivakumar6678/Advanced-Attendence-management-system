@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild, ElementRef,ChangeDetectorRef } from '@angular/core';
 import { UserService } from '../../../core/services/user.service';
 import { Router } from '@angular/router';
 import { HttpHeaders } from '@angular/common/http';
@@ -19,7 +19,15 @@ const periodMapping: { [key: string]: number } = {
   templateUrl: './student-dashboard.component.html',
   styleUrls: ['./student-dashboard.component.css']
 })
-export class StudentDashboardComponent implements OnInit {
+export class StudentDashboardComponent implements OnInit,AfterViewInit {
+
+  @ViewChild('barCanvas') barCanvas!: ElementRef;
+  @ViewChild('pieCanvas') pieCanvas!: ElementRef;
+
+  @ViewChild('barChartCanvas') barChartCanvas!: ElementRef;
+  @ViewChild('pieChartCanvas') pieChartCanvas!: ElementRef;
+
+
   studentProfile: any;
   attendanceStatus = "Present";
   attendancePercentage = 85;
@@ -47,11 +55,18 @@ export class StudentDashboardComponent implements OnInit {
   isOnline: boolean = navigator.onLine; // ✅ Check if the user is online
   
   chart!: Chart;
+  chartsReady: boolean = false;
+
+
+  barChart: any;
+  pieChart: any;
+
   
   constructor(
     private userService: UserService,
     private router: Router,
-    private messageService: MessageService // Assuming you have a message service for notifications
+    private messageService: MessageService ,
+    private cdRef: ChangeDetectorRef // ✅ Add this
   ) {}
 
   ngOnInit(): void {
@@ -75,6 +90,18 @@ export class StudentDashboardComponent implements OnInit {
     Chart.register(...registerables);
 
 }
+
+ngAfterViewInit(): void {
+  if (this.activeSection === 'dashboard') {
+    setTimeout(() => {
+      this.prepareChartData();
+    }, 100); // small delay to ensure canvas is in DOM
+  }
+}
+
+
+
+
   checkOnlineStatus(): void {
     this.isOnline = navigator.onLine;
     console.log('Online status checked:', this.isOnline);
@@ -141,9 +168,18 @@ export class StudentDashboardComponent implements OnInit {
 
 
 
+
+
   setActiveSection(section: string): void {
     this.activeSection = section;
+  
+    if (section === 'dashboard') {
+      setTimeout(() => {
+        this.prepareChartData();
+      }, 100);
+    }
   }
+  
   getSubjectName(subjectId: number | null): string {
     if (!subjectId) return 'Unknown';
     return `Subject ${subjectId}`;  // Replace this with a real lookup if needed
@@ -169,7 +205,6 @@ export class StudentDashboardComponent implements OnInit {
     this.router.navigate(['/student-auth']);
     }, 3000);
   }
-
   fetchAttendance(): void {
     if (!this.studentProfile || !this.studentProfile.student_id) {
       console.error('Student profile not loaded. Cannot fetch attendance.');
@@ -185,7 +220,6 @@ export class StudentDashboardComponent implements OnInit {
 
         this.calculateOverallAttendance(); // 🔥 Calculate attendance percentage
         this.calculateStreak(); // 🔥 Calculate attendance streak
-        // this.updateChartData(); // 🔥 Update chart data dynamically
 
         this.prepareChartData();
       },
@@ -194,6 +228,7 @@ export class StudentDashboardComponent implements OnInit {
       }
     );
 }
+
 getPeriodNumber(periodAttendance: string): number | string {
   const timeRange = periodAttendance.match(/\d{1,2}:\d{2} [APM]+ - \d{1,2}:\d{2} [APM]+/g);
   return timeRange ? periodMapping[timeRange[0]] || "?" : "?"; // 🔥 Default to "?" if not found
@@ -328,6 +363,7 @@ calculateStreak(): void {
   this.attendanceStreak = streak;
 }
 
+
 prepareChartData(): void {
   const subjectAttendance: { [subject: string]: { present: number, total: number } } = {};
 
@@ -350,23 +386,26 @@ prepareChartData(): void {
   const totalClasses = Object.values(subjectAttendance).reduce((sum, sub) => sum + sub.total, 0);
   const totalPresent = Object.values(subjectAttendance).reduce((sum, sub) => sum + sub.present, 0);
   const overallPercentage = (totalPresent / totalClasses) * 100;
+  this.chartsReady = true;
 
   this.updateCharts(subjects, attendancePercentages, overallPercentage);
 }
 
 
 updateCharts(subjects: string[], attendanceData: number[], overallPercentage: number): void {
-  const barCtx = document.getElementById('barChart') as HTMLCanvasElement;
-  const pieCtx = document.getElementById('pieChart') as HTMLCanvasElement;
+  const barCtx = this.barChartCanvas?.nativeElement?.getContext('2d');
+  const pieCtx = this.pieChartCanvas?.nativeElement?.getContext('2d');
 
-  // Set Colors Based on Attendance
-  const presentColors = attendanceData.map(percent => 
-    percent >= 40 ? 'green' : 'yellow'
-  );
+  
+
+  if (this.barChart) this.barChart.destroy();
+  if (this.pieChart) this.pieChart.destroy();
+  
+  const presentColors = attendanceData.map(percent => percent >= 40 ? 'green' : 'yellow');
   const absentColor = 'red';
 
-  // Bar Chart (Stacked: Present + Absent in One Bar)
-  new Chart(barCtx, {
+  // Bar chart
+  this.barChart = new Chart(barCtx, {
     type: 'bar',
     data: {
       labels: subjects,
@@ -378,7 +417,7 @@ updateCharts(subjects: string[], attendanceData: number[], overallPercentage: nu
         },
         {
           label: 'Absent (%)',
-          data: subjects.map((_, i) => 100 - attendanceData[i]), // Remaining %
+          data: subjects.map((_, i) => 100 - attendanceData[i]),
           backgroundColor: absentColor
         }
       ]
@@ -391,9 +430,7 @@ updateCharts(subjects: string[], attendanceData: number[], overallPercentage: nu
         }
       },
       scales: {
-        x: {
-          stacked: true
-        },
+        x: { stacked: true },
         y: {
           stacked: true,
           beginAtZero: true,
@@ -403,17 +440,16 @@ updateCharts(subjects: string[], attendanceData: number[], overallPercentage: nu
     }
   });
 
-  // Determine Pie Chart Color (Yellow if < 75%, otherwise Blue)
-  const overallColor = overallPercentage >= 75 ? '#36A2EB' : '#FFCE56';
+  // Pie chart
+  const overallColor = overallPercentage >= 75 ? '#36A2EB' : 'yellow';
 
-  // Pie Chart for Overall Attendance
-  new Chart(pieCtx, {
+  this.pieChart = new Chart(pieCtx, {
     type: 'pie',
     data: {
       labels: ['Present', 'Absent'],
       datasets: [{
         data: [overallPercentage, 100 - overallPercentage],
-        backgroundColor: [overallColor, '#FF6384'] // Present, Absent
+        backgroundColor: [overallColor, '#FF6384']
       }]
     },
     options: {
@@ -421,9 +457,4 @@ updateCharts(subjects: string[], attendanceData: number[], overallPercentage: nu
     }
   });
 }
-
-
-
-
-
 }
