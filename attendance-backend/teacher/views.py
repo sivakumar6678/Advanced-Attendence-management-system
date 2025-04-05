@@ -169,7 +169,7 @@ class StartAttendanceSessionView(APIView):
         AttendanceSession.objects.filter(is_active=True, end_time__lte=now()).update(is_active=False)
 
         # ✅ Calculate session end time
-        start_time = datetime.now(timezone.utc)  # ✅ Set start time
+        start_time = datetime.now()  # ✅ Set start time
         end_time = start_time + timedelta(minutes=session_duration)  # ✅ Use dynamic session duration
 
         # ✅ Create and save new attendance session
@@ -227,12 +227,12 @@ class EndAttendanceSessionView(APIView):
                     student=student,
                     session=session,
                     status="Absent",  # Assuming 'status' field exists in Attendance model
-                    timestamp=datetime.now(timezone.utc)
+                    timestamp=datetime.now()
                 )
 
             # ✅ Step 5: Mark session as inactive
             session.is_active = False
-            session.end_time = datetime.now(timezone.utc)
+            session.end_time = datetime.now()
             session.save()
 
             return Response({"message": "Attendance session ended, absent students marked."}, status=status.HTTP_200_OK)

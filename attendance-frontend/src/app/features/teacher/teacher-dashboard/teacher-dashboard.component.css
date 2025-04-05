@@ -49,29 +49,6 @@
     overflow: hidden;
   }
   
-  /* Sidebar Navigation */
-  .expand-sidebar-btn {
-    position: fixed;
-    top: 80px;
-    left: 10px;
-    background-color: var(--primary-color);
-    color: white;
-    border: none;
-    padding: 10px;
-    cursor: pointer;
-    border-radius: 50%; /* ✅ Make it circular */
-    font-size: 18px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px; /* ✅ Set fixed width & height */
-    height: 40px;
-    z-index: 1000;
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); /* ✅ Add a slight shadow */
-}
-
-
-
   .sidebar {
     width: 250px;
     background: #ffffff;
@@ -99,6 +76,31 @@
   .highlight-faculty {
     color: #4CAF50;  /* ✅ Green for faculty */
     font-weight: bold;
+  }
+  
+  .present-status {
+    color: black;
+    font-weight: bold;
+    box-shadow: inset 0 0 5px green;
+    background: linear-gradient(to right, #ccffcc, #99ff99);
+    padding: 5px;
+    border-radius: 5px;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px #00ff00;
+    transition: all 0.3s ease;
+  }
+  
+  .absent-status {
+    /* color: red; */
+    font-weight: bold;
+    box-shadow: inset 0 0 5px red;
+    background: linear-gradient(to right, #ffcccc, #ff9999);
+    padding: 5px;
+    border-radius: 5px;
+    color: black;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px #ff0000;
+    transition: all 0.3s ease;
   }
   
   /* Main Content Section */
@@ -162,39 +164,44 @@
   }
   
   .widget:hover {
-    transform: scale(1.05);
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
   }
+  
   
   /* Breadcrumb */
   .p-breadcrumb {
     margin-bottom: 15px;
   }
   
-  /* Responsive Styles */
-  @media (max-width: 1024px) {
-    .sidebar {
-      width: 100%;
-    }
-  
-    .sidebar.hidden {
-      display: none;
-    }
-  
-    .content {
-      padding: 15px;
-    }
-  
-    .profile-section {
-      flex-direction: column;
-      text-align: center;
-    }
-  
-    .dashboard-widgets {
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    }
-  }
+
   
   @media (max-width: 768px) {
+    .main-content-wrapper {
+      flex-direction: column;
+    }
+    .sidebar {
+      width: 100%;
+      position: relative;
+      box-shadow: none;
+    }
+    .expand-sidebar-btn {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      width: 40px;
+      height: 40px;
+    }
+    .expand-sidebar-btn i {
+      font-size: 20px;
+    }
+    .profile-section {
+      flex-direction: column;
+      align-items: center;
+    }
+    .profile-avatar {
+      margin-bottom: 10px;
+    }
     .quick-actions {
       flex-direction: column;
       align-items: center;
@@ -204,3 +211,47 @@
       max-width: 100%;
     }
   }
+
+ /* Custom styles for the form section */
+ .p-field {
+  margin: 1rem;
+  display: flex;  
+}
+.p-field label {
+  font-size: 1rem;
+  margin:10px;
+  font-weight: bold;
+  color: var(--primary-color);
+  align-content: center;
+}
+
+.p-button-lg {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+}
+
+.p-button-secondary {
+  background-color: #f4f4f4;
+  color: #333;
+  border: 1px solid #ccc;
+}
+
+.p-button-secondary:hover {
+  background-color: #e0e0e0;
+  border-color: #bbb;
+}
+
+.p-button-danger {
+  background-color: #d32f2f;
+  color: #fff;
+}
+
+.p-button-danger:hover {
+  background-color: #b71c1c;
+}
+
+.p-grid.p-formgrid{
+  display: flex;
+  /* width: 30%; */
+  margin-bottom: 1rem;
+}

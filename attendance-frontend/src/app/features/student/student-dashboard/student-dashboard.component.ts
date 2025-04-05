@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { UserService } from '../../../core/services/user.service';
 import { Router } from '@angular/router';
 import { HttpHeaders } from '@angular/common/http';
+import { MessageService } from 'primeng/api'; // Assuming you're using PrimeNG for notifications
 import { AttendanceSession } from '../student-attendance/student-attendance.component';
 import { Chart, registerables } from 'chart.js';
 // ✅ Mapping time slots to period numbers
@@ -49,7 +50,8 @@ export class StudentDashboardComponent implements OnInit {
   
   constructor(
     private userService: UserService,
-    private router: Router
+    private router: Router,
+    private messageService: MessageService // Assuming you have a message service for notifications
   ) {}
 
   ngOnInit(): void {
@@ -154,9 +156,18 @@ export class StudentDashboardComponent implements OnInit {
 
 
 
-  logout(): void {
+  logout(){
+    this.messageService.add({
+      key:'main-toast',
+      severity: 'success',
+      summary: 'Logout Successful',
+      detail: 'You have been logged out successfully.',
+      life: 3000
+    });
+    setTimeout(() => {
     localStorage.removeItem('access_token');
-    this.router.navigate(['/student/login']);
+    this.router.navigate(['/student-auth']);
+    }, 3000);
   }
 
   fetchAttendance(): void {

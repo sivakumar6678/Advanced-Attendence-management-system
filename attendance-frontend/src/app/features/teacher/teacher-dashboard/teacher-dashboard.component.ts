@@ -11,12 +11,11 @@ import { MessageService } from 'primeng/api';
 })
 export class TeacherDashboardComponent implements OnInit {
 timetable: any;
-students: any;
+// students: any;
 
   teacherProfile: any;
   activePage: string = 'home'; 
   currentTime: string = '';
-  sidebarHidden: boolean = false;  
   publicTimetable: any[] = [];
 
   year: number | null = null;
@@ -57,6 +56,16 @@ students: any;
   ];
   selectedFacultyId: any;
 
+  subjectId = 0; // Change dynamically as needed
+  startDate = '2025-04-01';
+  endDate = '2025-04-30';
+  
+
+  headers: any[] = [];
+  students: any[] = [];
+  editedAttendance: { student_id: number; session_id: number; status: string }[] = [];
+  editMode: boolean = false;
+
   constructor(
     private teacherDashboardService: UserService,
     private router: Router,
@@ -67,6 +76,7 @@ students: any;
     this.loadDashboard();
     this.fetchTimetableConfig();  
     this.updateTime();
+    this.fetchMatrix();
     setInterval(() => this.updateTime(), 60000);
   }
 
@@ -220,7 +230,6 @@ loadSubjectsAndFaculties(crcId: number | null): void {
           if (data.length > 0 && data[0].entries) {
             this.subjectTimetable[batchKey] = data[0].entries;
             this.activeBatch = batchKey;
-            this.sidebarHidden = true; // ✅ Auto-hide sidebar
           } else {
             console.warn("No timetable found for subject:", subject.subject_name);
             this.subjectTimetable[batchKey] = [];
@@ -240,9 +249,6 @@ loadSubjectsAndFaculties(crcId: number | null): void {
       );
 }
 
-
-  
-  
   toggleTimetable(batchKey: string): void {
     this.activeBatch = this.activeBatch === batchKey ? null : batchKey;
   }
@@ -280,9 +286,7 @@ loadSubjectsAndFaculties(crcId: number | null): void {
     this.currentTime = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   }
 
-  toggleSidebar() {
-    this.sidebarHidden = !this.sidebarHidden;
-  }
+  
 
   setActivePage(page: string) {
     this.activePage = page;
@@ -317,6 +321,7 @@ loadSubjectsAndFaculties(crcId: number | null): void {
   getEntries(batchKey: string, day: string, time: string): any[] {
     return (this.subjectTimetable[batchKey] || []).filter(entry => entry.day === day && entry.time_slot === time);
   }
+  
   goToAttendance(subject: any) {
     this.selectedSubjectForAttendance = subject;
     this.selectedSubjectForReport = null;  // Ensure report is not shown at the same time
@@ -341,15 +346,63 @@ loadSubjectsAndFaculties(crcId: number | null): void {
 }
 
 
+filterByDateRange() {
+  if (this.startDate && this.endDate && this.selectedSubjectForReport) {
+    const formattedStartDate = new Date(this.startDate).toISOString().split('T')[0];
+    const formattedEndDate = new Date(this.endDate).toISOString().split('T')[0];
+
+    const subjectId = this.selectedSubjectForReport.id;
+
+    this.fetchMatrix(subjectId, formattedStartDate, formattedEndDate);
+    console.log("Filtered Attendance Matrix:", this.headers, this.students);
+  }
+}
 
 
-  
+  toggleEditMode() {
+  this.editMode = !this.editMode;
+}
   // ✅ Show the Student Reports Component inside the dashboard
   goToStudentReports(subject: any) {
     this.selectedSubjectForReport = subject;
+    console.log("Selected Subject for Report:", this.selectedSubjectForReport);
     this.selectedSubjectForAttendance = null; // Ensure attendance is not shown at the same time
     this.activeSection = 'students';  // ✅ Mark students section as active
+    this.editMode = false; // Ensure edit mode is off when viewing reports
+    this.fetchMatrix(subject.subject_id); // Fetch the attendance matrix for the selected subject
   }
 
+  fetchMatrix(subject_id: number = this.subjectId, formattedStartDate: string = this.startDate, formattedEndDate: string = this.endDate) {
+    this.subjectId = subject_id; // Update the subject ID
+    this.teacherDashboardService.getAttendanceMatrix(this.subjectId, formattedStartDate, formattedEndDate).subscribe((data: any) => {
+      this.headers = data.headers;
+      this.students = data.students;
+    });
+  }
+
+  updateStatus(studentId: number, sessionId: number, newStatus: string) {
+    const index = this.editedAttendance.findIndex(
+      record => record.student_id === studentId && record.session_id === sessionId
+    );
+
+    if (index > -1) {
+      this.editedAttendance[index].status = newStatus;
+    } else {
+      this.editedAttendance.push({ student_id: studentId, session_id: sessionId, status: newStatus });
+    }
+  }
+
+  saveChanges() {
+    this.teacherDashboardService.updateAttendanceMatrix(this.editedAttendance).subscribe(() => {
+      alert('Attendance updated successfully!');
+      this.editedAttendance = [];
+      this.fetchMatrix(); // refresh after save
+      setTimeout(() => {
+      this.toggleEditMode(); // exit edit mode
+      }
+      , 1000); // Delay to allow user to see the message
+
+    });
+  }
 
 }

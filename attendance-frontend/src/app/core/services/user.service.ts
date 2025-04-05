@@ -145,7 +145,18 @@ export class UserService {
   getAttendanceDetails(studentId: number): Observable<any> {
     return this.http.get<any>(`${this.baseUrl}/students/attendance-details/${studentId}/`);
   }
-  
+  getAttendanceMatrix(subjectId: number, startDate: string, endDate: string) {
+    return this.http.get<any>(
+      `${this.baseUrl}/faculty/attendance/matrix/?subject_id=${subjectId}&start_date=${startDate}&end_date=${endDate}`
+    );
+  }
+
+  updateAttendanceMatrix(updates: any[]) {
+    return this.http.post<any>(
+      `${this.baseUrl}/faculty/attendance/matrix/`,
+      { updates }
+    );
+  }
   
   
 }

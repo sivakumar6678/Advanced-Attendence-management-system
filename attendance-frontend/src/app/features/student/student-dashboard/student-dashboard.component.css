@@ -35,24 +35,6 @@
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-.logout-btn {
-  background: #ff4081;
-  color: white;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 30px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(255, 64, 129, 0.3);
-}
-
-.logout-btn:hover {
-  background: #f50057;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(255, 64, 129, 0.4);
-}
 
 /* Profile Card */
 .profile {
@@ -127,7 +109,7 @@
   background: rgba(255, 255, 255, 0.2);
   color: white;
   min-width: 0;
-  white-space: nowrap;
+  /* white-space: nowrap; */
 }
 
 .trip-btn.active {
@@ -159,7 +141,7 @@
   justify-content: center;
   gap: 4px;
   padding: 6px 10px;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(245, 14, 14, 0.2);
   border: none;
   border-radius: 12px;
   color: white;
@@ -176,9 +158,9 @@
 }
 
 .nav-button .btn-text {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  /* white-space: nowrap; */
+  /* overflow: hidden; */
+  /* text-overflow: ellipsis; */
   max-width: 100%;
 }
 
@@ -187,13 +169,12 @@
   color: #333;
 }
 
-.nav-button:not(.active):hover {
-  background: rgba(255, 255, 255, 0.3);
-  transform: translateY(-2px);
-}
+
 
 .nav-button.logout {
+  cursor: pointer;
   background: rgba(255, 64, 129, 0.2);
+  z-index: 1;
 }
 
 .nav-button.logout:hover {
@@ -212,26 +193,6 @@
   opacity: 0.9;
 }
 
-/* Logout Button */
-.logout-btn {
-  margin-top: 16px;
-  padding: 10px 20px;
-  background: rgba(255, 255, 255, 0.2);
-  border: none;
-  border-radius: 24px;
-  color: white;
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.logout-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
-}
 
 /* Card Styling */
 
@@ -250,7 +211,7 @@
   width: 100%;
   padding: 10px;
   position: relative;
-  overflow: hidden;
+  /* overflow: hidden; */
 }
 
 .profile::before {
@@ -269,7 +230,7 @@
 .profile-details {
   margin-bottom: 20px;
   position: relative;
-  z-index: 1;
+  z-index: 0;
 }
 
 .profile-details p {

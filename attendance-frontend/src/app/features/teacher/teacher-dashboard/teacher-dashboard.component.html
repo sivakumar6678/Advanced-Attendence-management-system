@@ -11,12 +11,9 @@
     <!-- ✅ Main Content Wrapper -->
     <div class="main-content-wrapper">
       <!-- ✅ Sidebar Navigation -->
-      <div class="sidebar" [ngClass]="{ 'hidden': sidebarHidden }">
+      <div class="sidebar" >
         <p-menubar [model]="menuItems"></p-menubar>
-        <button *ngIf="sidebarHidden" (click)="toggleSidebar()" class="expand-sidebar-btn">
-          <i class="fas fa-bars"></i>
-          
-        </button>
+        
       </div>
     
       <!-- ✅ Main Content Section -->
@@ -162,11 +159,7 @@
                 </tr>
               </ng-template>
             </p-table>
-             <!-- ✅ Show Attendance Component only when a subject is selected -->
-             <!-- <app-teacher-attendance 
-             *ngIf="selectedSubjectForAttendance"
-             [selectedSubject]="selectedSubjectForAttendance">
-           </app-teacher-attendance> -->
+             
            <app-teacher-attendance 
               *ngIf="activeSection === 'attendance'"
               [selectedSubject]="selectedSubjectForAttendance" 
@@ -177,20 +170,13 @@
           </p-card>
         </div>
 
-          
-        <!-- ✅ Student Management Section -->
-        <div *ngIf="activePage === 'students'">
-          <p-card>
-            <h3>Student Management</h3>
-            <p>View and manage student details and attendance.</p>
+          <!-- ✅ Student Management Section -->
+        <div *ngIf="activePage === 'students'" class="p-mt-4 p-px-4">
 
-            <!-- ✅ Show Student Reports Component only when a subject is selected -->
-            <app-students-report 
-              *ngIf="selectedSubjectForReport"
-              [selectedSubject]="selectedSubjectForReport">
-            </app-students-report>
+          <p-card header="📚 Student Management" class="p-mb-4 shadow-3">
+            <p class="p-text-secondary">View and manage student details and attendance.</p>
 
-            <p-table [value]="assignedSubjects">
+            <p-table [value]="assignedSubjects" class="p-mt-3" [responsiveLayout]="'scroll'">
               <ng-template pTemplate="header">
                 <tr>
                   <th>Subject Name</th>
@@ -203,8 +189,9 @@
                   <td>
                     <button 
                       pButton 
+                      icon="fas fa-chart-bar"
                       label="View Report" 
-                      class="p-button-warning" 
+                      class="p-button-sm p-button p-button-warning" 
                       (click)="goToStudentReports(subject)">
                     </button>
                   </td>
@@ -212,7 +199,111 @@
               </ng-template>
             </p-table>
           </p-card>
-        </div>
+
+          <div *ngIf="selectedSubjectForReport" class="p-mt-4">
+            <p-card header="📊 Attendance Report: {{ selectedSubjectForReport.subject_name }}" class="shadow-3">
+              
+              <div *ngIf="students.length === 0" class="p-text-center p-mb-2">❌ No students found.</div>
+              <div *ngIf="students.length > 0" class="p-mb-3">👥 Total Students: <strong>{{ students.length }}</strong></div>
+
+              <div class="p-grid p-formgrid p-fluid ">
+                <div class="p-field  p-md-4">
+                  <label for="startDate">Start Date</label>
+                  <p-calendar id="startDate" [(ngModel)]="startDate" dateFormat="yy-mm-dd" showIcon></p-calendar>
+                </div>
+
+                <div class="p-field  p-md-4">
+                  <label for="endDate">End Date</label>
+                  <p-calendar id="endDate" [(ngModel)]="endDate" dateFormat="yy-mm-dd" showIcon></p-calendar>
+                </div>
+
+                <div class="p-field p-col-12 p-md-4 p-d-flex p-ai-end">
+                  <button 
+                    pButton 
+                    label="🔍 Get Details" 
+                    icon="fas fa-search" 
+                    class="p-button-success" 
+                    (click)="filterByDateRange()">
+                  </button>
+                </div>
+                <div class="p-field p-col-12 p-md-4 p-d-flex p-ai-end">
+                  <button pButton 
+                  [label]="editMode ? '🔒 Disable Edit' : '✏️ Enable Edit'" 
+                  class="p-button-secondary p-button-sm" 
+                  (click)="toggleEditMode()">
+                </button>
+                </div>
+                <div class="p-field p-col-12 p-md-4 p-d-flex p-ai-end">
+                  <button pButton 
+                  label="❌ Close" 
+                  class="p-button-danger p-button-sm" 
+                  (click)="selectedSubjectForReport = null;">
+                </button>
+                </div>
+                <div class="p-field p-col-12 p-md-4 p-d-flex p-ai-end">
+                  <button 
+                    *ngIf="editMode" 
+                    pButton 
+                    label="💾 Save Changes" 
+                    icon="pi pi-save" 
+                    class="p-button-success p-button p-button-sm"
+                    (click)="saveChanges()">
+                  </button>
+                </div>
+              </div>
+
+              
+              <p-table [value]="students" [responsiveLayout]="'scroll'" class="p-datatable-sm" [sortMode]="'multiple'">
+                <ng-template pTemplate="header">
+                  <tr>
+                    <th pSortableColumn="roll_no">Roll No <p-sortIcon field="roll_no"></p-sortIcon></th>
+                    <th pSortableColumn="name">Name <p-sortIcon field="name"></p-sortIcon></th>
+                    <th *ngFor="let header of headers">
+                      {{ header.date }}<br /><span class="p-text-secondary">{{ header.time }}</span>
+                    </th>
+                    <th>Present / Total</th>
+                    <th pSortableColumn="percentage">% <p-sortIcon field="percentage"></p-sortIcon> </th>
+                  </tr>
+                </ng-template>
+
+                <ng-template pTemplate="body" let-student>
+                  <tr>
+                    <td>{{ student.roll_no }}</td>
+                    <td>{{ student.name }}</td>
+
+                    <td *ngFor="let header of headers">
+                      <ng-container *ngIf="editMode; else showStatus">
+                        <p-dropdown 
+                          [options]="[{ label: 'P', value: 'Present' }, { label: 'A', value: 'Absent' }]" 
+                          [(ngModel)]="student.attendance[header.session_id]" 
+                          (onChange)="updateStatus(student.student_id, header.session_id, $event.value)"
+                          styleClass="p-inputtext-sm">
+                        </p-dropdown>
+                      </ng-container>
+                      <ng-template #showStatus>
+                        <span 
+                          [ngClass]="{
+                            'present-status': student.attendance[header.session_id] === 'Present',
+                            'absent-status': student.attendance[header.session_id] === 'Absent'
+                          }">
+                          {{ student.attendance[header.session_id] || '-' }}
+                        </span>
+                      </ng-template>
+                      
+                    </td>
+
+                    <td>{{ student.present }} / {{ student.total }}</td>
+                    <td>{{ student.percentage | number: '1.0-2' }}%</td>
+                  </tr>
+                </ng-template>
+              </p-table>
+
+              
+            </p-card>
+          </div>
+  </div>
+
+        
 
       </div>
     </div>

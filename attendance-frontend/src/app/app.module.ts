@@ -25,7 +25,7 @@ import { StudentAttendanceComponent } from './features/student/student-attendanc
 import { TeacherAuthComponent } from './features/teacher/teacher-auth/teacher-auth.component';
 import { TeacherDashboardComponent } from './features/teacher/teacher-dashboard/teacher-dashboard.component';
 import { TeacherAttendanceComponent } from './features/teacher/teacher-attendance/teacher-attendance.component';
-import { StudentsReportComponent } from './features/teacher/students-report/students-report.component';
+import { StudentsReportComponent } from './features/crc/students-report/students-report.component';
 
 import { CrcAuthComponent } from './features/crc/crc-auth/crc-auth.component';
 import { CrcDashboardComponent } from './features/crc/crc-dashboard/crc-dashboard.component';
@@ -64,6 +64,7 @@ import { SelectButtonModule } from 'primeng/selectbutton';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { MultiSelectModule } from 'primeng/multiselect';
 import {RadioButtonModule} from 'primeng/radiobutton';
+import { Calendar, CalendarModule } from 'primeng/calendar';
 
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
@@ -132,6 +133,7 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
         InputNumberModule,
         MultiSelectModule,
         RadioButtonModule,
+        CalendarModule,
 
       
 

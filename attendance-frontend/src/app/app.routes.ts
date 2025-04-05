@@ -13,7 +13,7 @@ import { CrcTimetableComponent } from './features/crc/crc-timetable/crc-timetabl
 import { authGuard } from './core/guards/auth.guard';
 import { roleGuard } from './core/guards/role.guard';
 import { SuperadminComponent } from './features/superadmin/superadmin.component';
-import { StudentsReportComponent } from './features/teacher/students-report/students-report.component';
+import { StudentsReportComponent } from './features/crc/students-report/students-report.component';
 
 
 export const routes: Routes = [

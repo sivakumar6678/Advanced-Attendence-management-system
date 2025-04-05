@@ -22,19 +22,45 @@
                           <span class="btn-icon">📚</span>
                           <span class="btn-text">{{ studentProfile.year }}-{{ studentProfile.semester }}</span>
                       </button>
-                      <button class="nav-button logout" (click)="logout()">
+                      <button class="nav-button  logout " (click)="logout()" > 
                           <span class="btn-icon">🚪</span>
                           <span class="btn-text">Logout</span>
                       </button>
                   </div>
               </div>
-          </div>
+            </div>
+           
       </div>
   
       <!-- Dynamic Sections -->
       <div *ngIf="activeSection === 'dashboard'">
         <div class="card attendance">
-          <h2>Attendance</h2>
+            <div class="intro-section">
+                <h1>Welcome to Your Student Dashboard</h1>
+                <p>This page provides you with all the essential tools and information to manage your academic journey effectively. Here, you can:</p>
+                <ul>
+                    <li>Track your attendance and view subject-wise statistics.</li>
+                    <li>Access your public timetable for class schedules.</li>
+                    <li>Review detailed attendance reports for each subject.</li>
+                    <li>Stay updated with ongoing attendance sessions.</li>
+                </ul>
+                <p>Navigate through the sections using the bottom navigation bar to explore more features.</p>
+            </div>
+
+            <h3>Ongoing Attendance Session</h3>
+            <div *ngIf="isOnline">
+                <h3>🎯 Active Attendance Session</h3>
+                <div *ngIf="activeAttendanceSession; else noSession">
+                    <p><strong>Subject:</strong> {{ activeAttendanceSession.subject_name }}</p>
+                    <p><strong>Faculty:</strong> {{ activeAttendanceSession.faculty }}</p>
+                    <p><strong>Time Left:</strong> {{ sessionRemainingTime }}</p>
+                    <button (click)="setActiveSection('attendance')">Go to Attendance</button>
+                </div>
+                <ng-template #noSession>
+                    <p>🚀 No Active Attendance Sessions</p>
+                </ng-template>
+            </div>
+          <h2>Attendance Over view </h2>
           <div>
             <h3>Subject-wise Attendance</h3>
             <canvas id="barChart"></canvas>
