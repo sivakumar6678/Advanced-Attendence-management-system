@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit,ViewChild } from '@angular/core';
 import { UserService } from '../../../core/services/user.service';
 import { HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { ConfirmationService } from 'primeng/api';
 
 @Component({
   selector: 'app-teacher-dashboard',
@@ -13,6 +14,8 @@ import autoTable from 'jspdf-autotable';
 })
 export class TeacherDashboardComponent implements OnInit {
 timetable: any;
+@ViewChild('dt') dt: any;
+
 // students: any;
 
   teacherProfile: any;
@@ -71,10 +74,18 @@ timetable: any;
   displayDownloadDialog = false;
   downloadFileName: string = 'Attendance_Report';
 
+  searchQuery: string = '';
+  minPercentage: number | null = null;
+  filteredStudents: any[] = [];
+  originalStudents: any[] = [];
+
+
   constructor(
     private teacherDashboardService: UserService,
     private router: Router,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private confirmationService: ConfirmationService
+
   ) {}
 
   ngOnInit(): void {
@@ -396,7 +407,22 @@ filterByDateRange() {
       this.editedAttendance.push({ student_id: studentId, session_id: sessionId, status: newStatus });
     }
   }
-
+ confirmSave() {
+    this.confirmationService.confirm({
+      message: 'Are you sure you want to save the changes?',
+      header: 'Confirm Save',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Yes',
+      rejectLabel: 'No',
+      accept: () => {
+        this.saveChanges();  // This is your existing save method
+      },
+      reject: () => {
+        // Optional: Show toast or console message
+        console.log("Changes not saved.");
+      }
+    });
+  }
   saveChanges() {
     this.teacherDashboardService.updateAttendanceMatrix(this.editedAttendance).subscribe(() => {
       alert('Attendance updated successfully!');
@@ -432,5 +458,20 @@ filterByDateRange() {
     doc.save(`${filename}.pdf`);
     this.displayDownloadDialog = false;
   }
+  applyFilters() {
+    this.filteredStudents = this.students.filter(student => {
+      const matchQuery = !this.searchQuery || 
+        student.name.toLowerCase().includes(this.searchQuery.toLowerCase()) || 
+        student.roll_no.toLowerCase().includes(this.searchQuery.toLowerCase());
   
+      const matchPercentage = this.minPercentage == null || 
+        student.percentage >= this.minPercentage;
+  
+      return matchQuery && matchPercentage;
+    });
+  }
+  getEventValue(event: Event): string {
+    return (event.target as HTMLInputElement).value;
+  }
 }
+ 

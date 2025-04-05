@@ -65,6 +65,8 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { MultiSelectModule } from 'primeng/multiselect';
 import {RadioButtonModule} from 'primeng/radiobutton';
 import { Calendar, CalendarModule } from 'primeng/calendar';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ConfirmationService } from 'primeng/api';
 
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
@@ -134,6 +136,7 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
         MultiSelectModule,
         RadioButtonModule,
         CalendarModule,
+        ConfirmDialogModule,
 
       
 
@@ -141,6 +144,7 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
     ],
     providers: [
         MessageService,
+        ConfirmationService,
         provideHttpClient(withInterceptorsFromDi()),  // HTTP client setup
         { provide: HTTP_INTERCEPTORS, useClass: LoadingInterceptor, multi: true },  // Loading interceptor
     ],
