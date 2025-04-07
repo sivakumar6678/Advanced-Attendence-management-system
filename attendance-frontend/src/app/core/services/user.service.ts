@@ -158,6 +158,12 @@ export class UserService {
       { updates }
     );
   }
+  getClassAttendanceReport(branch: number, year: number, semester: number, academic_year: number, from_date: string, to_date: string) {
+    return this.http.get<any>(`${this.baseUrl}/crc/class-attendance-report/`, {
+      params: { branch, year, semester, academic_year, from_date, to_date }
+    });
+  }
+  
   
   
 }

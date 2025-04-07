@@ -35,6 +35,24 @@
       <!-- Dynamic Sections -->
       <div *ngIf="activeSection === 'dashboard'">
         <div class="card attendance">
+            <div class="badge-container" *ngIf="attendancePercentage">
+                <div
+                  class="badge-display"
+                  [ngStyle]="{ 'background-color': getAttendanceBadge(attendancePercentage).color }"
+                >
+                  {{ getAttendanceBadge(attendancePercentage).emoji }}
+                  <span class="badge-label">
+                    {{ getAttendanceBadge(attendancePercentage).label }}
+                  </span>
+                </div>
+            </div>
+
+            <div class="streak-container" *ngIf="attendanceStreak !== null">
+                <i class="fas fa-fire streak-icon"></i>
+                <span class="streak-text">🔥 Streak: {{ attendanceStreak }} day{{ attendanceStreak > 1 ? 's' : '' }}</span>
+            </div>
+              
+              
             <div class="intro-section">
                 <h1>Welcome to Your Student Dashboard</h1>
                 <p>This page provides you with all the essential tools and information to manage your academic journey effectively. Here, you can:</p>
@@ -86,31 +104,39 @@
     
   
       <div *ngIf="activeSection === 'timetable'">
-          <div class="public-timetable-container">
-              <h2>Public Timetable</h2>
-              <div class="table-responsive">
-                  <table class="timetable-table">
-                      <thead>
-                          <tr>
-                              <th>Day</th>
-                              <th>Time</th>
-                              <th>Subject</th>
-                              <th>Faculty</th>
-                          </tr>
-                      </thead>
-                      <tbody>
-                          <tr *ngFor="let entry of publicTimetable">
-                              <td data-label="Day">{{ entry.day }}</td>
-                              <td data-label="Time">{{ entry.time_slot }}</td>
-                              <td data-label="Subject">{{ getSubjectName(entry.subject_id) }}</td>
-                              <td data-label="Faculty">{{ getFacultyName(entry.faculty_id) }}</td>
-                          </tr>
-                      </tbody>
-                  </table>
-              </div>
-              <p *ngIf="publicTimetable.length === 0" class="no-data">No timetable available.</p>
-          </div>
-      </div>
+        <div class="public-timetable-container">
+            <h2>Public Timetable</h2>
+            <div class="day-filter">
+                <label for="daySelect">Select Day:</label>
+                <p-dropdown 
+                    [options]="daysOfWeek" 
+                    [(ngModel)]="selectedDay" 
+                    (onChange)="filterTimetableByDay()" 
+                    placeholder="Select Day">
+                </p-dropdown>  </div>
+            <div class="table-responsive">
+                <table class="timetable-table">
+                    <thead>
+                        <tr>
+                            <th>Day</th>
+                            <th>Time</th>
+                            <th>Subject</th>
+                            <th>Faculty</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let entry of filteredTimetable">
+                            
+                            <td data-label="Time">{{ entry.time_slot }}</td>
+                            <td data-label="Subject">{{ getSubjectName(entry.subject_id) }}</td>
+                            <td data-label="Faculty">{{ getFacultyName(entry.faculty_id) }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p *ngIf="filteredTimetable.length === 0" class="no-data">No timetable available for selected day.</p>
+        </div>
+    </div>
   
       <div *ngIf="activeSection === 'attendance'">
           <app-student-attendance [studentId]="studentProfile.student_id"></app-student-attendance>

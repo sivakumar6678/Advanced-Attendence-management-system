@@ -30,7 +30,7 @@ export class StudentDashboardComponent implements OnInit,AfterViewInit {
 
   studentProfile: any;
   attendanceStatus = "Present";
-  attendancePercentage = 85;
+  attendancePercentage = 5;
   publicTimetable: any[] = [];
   activeSection: string = 'dashboard'; // Default section
 
@@ -43,6 +43,10 @@ export class StudentDashboardComponent implements OnInit,AfterViewInit {
 
   attendanceRecords: any[] = [];
   subjects: any[] = [];
+
+  selectedDay: string = 'all';
+  filteredTimetable: any[] = [];
+  daysOfWeek: string[] = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
   attendanceTableData: any[] = []; // New property for the table data
   uniqueSubjects: string[] = []; // New property for unique subjects
@@ -155,9 +159,11 @@ ngAfterViewInit(): void {
 
           if (data.length > 0 && data[0].entries) {
             this.publicTimetable = data[0].entries;  // ✅ Extract `entries` correctly
+            this.filteredTimetable = [...this.publicTimetable]; // Initialize filtered timetable
           } else {
             console.warn("No timetable found for the given details.");
             this.publicTimetable = [];  // ✅ Ensure array is empty if no data
+            this.filteredTimetable = [];
           }
         },
         (error) => {
@@ -165,9 +171,6 @@ ngAfterViewInit(): void {
         }
       );
   }
-
-
-
 
 
   setActiveSection(section: string): void {
@@ -188,6 +191,16 @@ ngAfterViewInit(): void {
   getFacultyName(facultyId: number | null): string {
     if (!facultyId) return 'Unknown';
     return `Faculty ${facultyId}`;  // Replace this with a real lookup if needed
+  }
+
+  filterTimetableByDay(): void {
+    if (this.selectedDay === 'all') {
+      this.filteredTimetable = [...this.publicTimetable];
+    } else {
+      this.filteredTimetable = this.publicTimetable.filter(entry => 
+        entry.day.toLowerCase() === this.selectedDay.toLowerCase()
+      );
+    }
   }
 
 
@@ -457,4 +470,19 @@ updateCharts(subjects: string[], attendanceData: number[], overallPercentage: nu
     }
   });
 }
+
+getAttendanceBadge(percentage: number): { label: string; color: string; emoji: string } {
+  if (percentage >= 90) {
+    return { label: 'Gold Badge', color: 'gold', emoji: '🥇' };
+  } else if (percentage >= 80) {
+    return { label: 'Silver Badge', color: 'silver', emoji: '🥈' };
+  } else if (percentage >= 70) {
+    return { label: 'Bronze Badge', color: '#cd7f32', emoji: '🥉' }; // Bronze color
+  } else {
+    return { label: 'No Badge', color: '#ccc', emoji: '❌' };
+  }
+}
+
+
+
 }

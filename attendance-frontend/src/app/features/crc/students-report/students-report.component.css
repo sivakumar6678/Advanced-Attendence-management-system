@@ -1,0 +1,83 @@
+.low-subject-attendance {
+    background-color: #ffe0e0;
+    color: #b30000;
+    font-weight: bold;
+  }
+  
+  .low-attendance-warning {
+    background-color: #fff3cd;
+    color: #856404;
+    font-weight: bold;
+  }
+  
+  .low-attendance-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+    font-weight: bold;
+  }
+  
+    
+  .filter-container {
+    margin-bottom: 1rem;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+  }
+  .low-attendance-warning {
+    background-color: #fff3cdc5;
+  }
+  .low-attendance-danger {
+    background-color: #f8d7dabb;
+  }
+  .low-subject-attendance {
+    background-color: rgba(255, 221, 221, 0.664);
+  }
+  .dark-green-bg {
+    background-color: #2e7d32; /* Dark Green */
+    color: white;
+  }
+  .light-green-bg {
+    background-color: #81c784; /* Light Green */
+    color: black;
+  }
+  .yellow-bg {
+    background-color: #fff176; /* Yellow */
+    color: black;
+  }
+  .red-bg {
+    background-color: #ef5350; /* Red */
+    color: white;
+  }
+  
+
+  .visual-summary {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    font-weight: bold;
+  }
+  
+  .badge {
+    padding: 6px 12px;
+    border-radius: 4px;
+    color: #fff;
+  }
+  
+  .badge.green {
+    background-color: #2e7d32;
+  }
+  
+  .badge.light-green {
+    background-color: #66bb6a;
+  }
+  
+  .badge.yellow {
+    background-color: #ffca28;
+    color: #000;
+  }
+  
+  .badge.red {
+    background-color: #ef5350;
+  }
+  
+  

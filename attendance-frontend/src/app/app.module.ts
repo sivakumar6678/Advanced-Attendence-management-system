@@ -68,6 +68,8 @@ import { Calendar, CalendarModule } from 'primeng/calendar';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 
+import { ChartModule } from 'primeng/chart';
+
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 
@@ -137,6 +139,7 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
         RadioButtonModule,
         CalendarModule,
         ConfirmDialogModule,
+        ChartModule,
 
       
 

@@ -27,6 +27,7 @@
     "@tensorflow/tfjs-core": "^4.22.0",
     "chart.js": "^4.4.8",
     "face-api.js": "^0.20.0",
+    "file-saver": "^2.0.5",
     "fingerprintjs2": "^2.1.4",
     "jspdf": "^3.0.1",
     "jspdf-autotable": "^5.0.2",
@@ -34,12 +35,14 @@
     "rxjs": "~7.8.0",
     "tfjs-image-recognition-base": "^0.6.0",
     "tslib": "^2.3.0",
+    "xlsx": "^0.18.5",
     "zone.js": "~0.14.10"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^18.2.0",
     "@angular/cli": "^18.2.0",
     "@angular/compiler-cli": "^18.2.0",
+    "@types/file-saver": "^2.0.7",
     "@types/jasmine": "~5.1.0",
     "@types/offscreencanvas": "^2019.7.3",
     "@types/webgl-ext": "^0.0.37",
