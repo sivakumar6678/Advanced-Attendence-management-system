@@ -1,11 +1,13 @@
-import datetime
+from datetime import datetime
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from .models import CRCProfile
 from core.models import Branch,AcademicYear
-from teacher.models import Faculty
+from teacher.models import AttendanceSession, Faculty
+from student.models import Student, StudentAttendance
+from django.db.models import Q
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -108,6 +110,7 @@ class CRCDashboardView(APIView):
                 "faculty_id": crc.faculty_ref.id,
                 "email": crc.faculty_ref.email,
                 "branch": crc.branch.name,  # ✅ Convert Branch object to a string
+                "branch_id": crc.branch.id,
                 "year": crc.year,
                 "semester": crc.semester,
                 "academic_year": f"{crc.academic_year.start_year}-{crc.academic_year.end_year}",  # ✅ Convert AcademicYear to string
@@ -227,6 +230,7 @@ class TimetableConfigView(APIView):
             ]
         }
         return Response(config)
+
 class TimetableView(APIView):
     def get(self, request):
         # Get all required parameters from the frontend
@@ -268,3 +272,103 @@ class FinalizeTimetableView(APIView):
         timetable.save()
         return Response({"message": "Timetable finalized successfully"}, status=status.HTTP_200_OK)
 
+
+class CRCClassAttendanceReportView(APIView):
+    def get(self, request):
+        branch_id = request.GET.get("branch")
+        year = request.GET.get("year")
+        semester = request.GET.get("semester")
+        from_date = request.GET.get("from_date")
+        to_date = request.GET.get("to_date")
+
+        if not all([branch_id, year, semester, from_date, to_date]):
+            return Response({"error": "Missing parameters"}, status=400)
+
+        # Get students in this class
+        students = Student.objects.filter(
+            branch_id=branch_id,
+            year=year,
+            semester=semester
+        ).order_by("student_id")
+
+        if not students.exists():
+            return Response({"error": "No students found"}, status=404)
+
+        # Get subjects under this class via CRCProfile
+        subjects = Subject.objects.filter(
+            crc__branch_id=branch_id,
+            crc__year=year,
+            crc__semester=semester
+        )
+
+        subject_ids = subjects.values_list("id", flat=True)
+        student_ids = students.values_list("id", flat=True)
+
+        sessions = AttendanceSession.objects.filter(
+            subject_id__in=subject_ids,
+            start_time__date__range=(from_date, to_date)
+        )
+
+        session_ids = sessions.values_list("id", flat=True)
+
+        attendance_qs = StudentAttendance.objects.filter(
+            session_id__in=session_ids,
+            student_id__in=student_ids
+        )
+
+        # Prepare student-wise and subject-wise attendance matrix
+        attendance_data = {
+            student.student_id: {
+                "name": student.name,
+                "attendance": [],
+                "total_classes": 0,
+                "total_present": 0
+            }
+            for student in students
+        }
+
+        for subject in subjects:
+            # Get sessions for this subject
+            subject_sessions = sessions.filter(subject=subject)
+            session_count = subject_sessions.count()
+
+            for student in students:
+                present_count = StudentAttendance.objects.filter(
+                    student=student,
+                    session__in=subject_sessions,
+                    status="Present"
+                ).count()
+
+                attendance_data[student.student_id]["attendance"].append({
+                    "subject": subject.name,
+                    "present": present_count,
+                    "total": session_count,
+                    "percentage": round((present_count / session_count) * 100, 2) if session_count > 0 else 0
+                })
+
+                attendance_data[student.student_id]["total_classes"] += session_count
+                attendance_data[student.student_id]["total_present"] += present_count
+
+        # Final formatting
+        results = []
+        for student_id, data in attendance_data.items():
+            overall_percentage = (
+                data["total_present"] / data["total_classes"] * 100
+                if data["total_classes"] > 0 else 0
+            )
+
+            results.append({
+                "student_id": student_id,
+                "name": data["name"],
+                "attendance": data["attendance"],
+                "total_classes": data["total_classes"],
+                "total_present": data["total_present"],
+                "overall_percentage": round(overall_percentage, 2)
+            })
+
+        return Response({
+            "students": results,
+            "subjects": [s.name for s in subjects],
+            "from_date": from_date,
+            "to_date": to_date
+        })
