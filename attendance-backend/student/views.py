@@ -17,7 +17,9 @@ from django.utils.timezone import now
 from django.utils import timezone
 from datetime import datetime
 from .frs_utils import verify_face
-from datetime import datetime, timezone  # ✅ Import timezone for proper datetime handling
+from django.core.mail import send_mail
+import os
+import requests
 
 class RegisterStudent(APIView):
     def post(self, request, *args, **kwargs):
@@ -312,3 +314,48 @@ class GetAttendanceHistoryView(APIView):
         except Student.DoesNotExist:
             return Response({"error": "Student not found"}, status=status.HTTP_404_NOT_FOUND)
         
+class NotifyStreakLossView(APIView):
+    def post(self, request):
+        student_id = request.data.get("student_id")
+        if not student_id:
+            return Response({"error": "student_id is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            student = Student.objects.get(student_id=student_id)
+
+            # Send Email or SMS
+            message = f"""
+Hi {student.name},
+
+We noticed that your attendance streak has been broken. Try to attend regularly to maintain a high attendance streak and unlock more rewards!
+
+Your Current Streak: 0 days
+
+Keep going strong! 💪
+"""
+
+            # ✅ Example: Sending Email
+            if student.email:
+                send_mail(
+                    subject="⚠️ Attendance Streak Broken",
+                    message=message,
+                    from_email=os.getenv("EMAIL_HOST_USER"),
+                    recipient_list=[student.email],
+                    fail_silently=False,
+                )
+                return Response({"message": "Email sent to student"}, status=status.HTTP_200_OK)
+
+            # ✅ Example: Sending SMS (Twilio or similar)
+            elif student.phone:
+                # Placeholder for Twilio / SMS code
+                requests.post("YOUR_SMS_API_URL", data={
+                    "to": student.phone,
+                    "message": message,
+                })
+                return Response({"message": "SMS sent to student"}, status=status.HTTP_200_OK)
+
+            return Response({"message": "No contact info found for student"}, status=status.HTTP_400_BAD_REQUEST)
+
+        except Student.DoesNotExist:
+            return Response({"error": "Student not found"}, status=status.HTTP_404_NOT_FOUND)
+

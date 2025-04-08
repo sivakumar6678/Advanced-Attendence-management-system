@@ -44,7 +44,7 @@ class AttendanceSession(models.Model):
 
     def has_expired(self):
         """✅ Check if the session has expired."""
-        if self.end_time and datetime.now(timezone.utc) > self.end_time:
+        if self.end_time and datetime.now() > self.end_time:
             return True
         return False
 

@@ -156,3 +156,11 @@ SIMPLE_JWT = {
     'USER_ID_FIELD': 'id',  # ✅ Ensure Django identifies user correctly
     'USER_ID_CLAIM': 'user_id',  # ✅ Store user_id in the JWT token
 }
+
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'chandragarisivakumar@gmail.com'
+EMAIL_HOST_PASSWORD = 'kjuv ohbr kcix dsvi'
