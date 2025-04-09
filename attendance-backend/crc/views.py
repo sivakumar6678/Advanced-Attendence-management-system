@@ -372,3 +372,65 @@ class CRCClassAttendanceReportView(APIView):
             "from_date": from_date,
             "to_date": to_date
         })
+def calculate_attendance_percentage(student, from_date, to_date, subjects):
+
+    total_present = 0
+    total_classes = 0
+
+    for subject in subjects:
+        subject_sessions = AttendanceSession.objects.filter(
+            subject=subject,
+            start_time__date__range=(from_date, to_date)
+        )
+        session_count = subject_sessions.count()
+
+        present_count = StudentAttendance.objects.filter(
+            student=student,
+            session__in=subject_sessions,
+            status="Present"
+        ).count()
+
+        total_present += present_count
+        total_classes += session_count
+
+    if total_classes == 0:
+        return 0
+    return round((total_present / total_classes) * 100, 2)
+
+class SendLowAttendanceSMSView(APIView):
+    def post(self, request):
+        branch = request.data.get('branch')
+        year = request.data.get('year')
+        semester = request.data.get('semester')
+        from_date = request.data.get('from_date')
+        to_date = request.data.get('to_date')
+
+        if not all([branch, year, semester, from_date, to_date]):
+            return Response({"error": "Missing parameters"}, status=400)
+
+        students = Student.objects.filter(branch__id=branch, year=year, semester=semester)
+        subjects = Subject.objects.filter(
+            crc__branch_id=branch,
+            crc__year=year,
+            crc__semester=semester
+        )
+
+        low_attendance_students = []
+
+        for student in students:
+            overall = calculate_attendance_percentage(student, from_date, to_date, subjects)
+            if overall < 65:
+                low_attendance_students.append({
+                    "name": student.name,
+                    # "mobile": student.parent_phone_number,
+                    "mobile": student.phone_number,
+                    "percentage": overall
+                })
+
+        for s in low_attendance_students:
+            print(f"📩 SMS to {s['name']} ({s['mobile']}): Your attendance is {s['percentage']}%. Please improve.")
+
+        return Response({
+            "message": f"{len(low_attendance_students)} SMS sent (simulated)",
+            "students": low_attendance_students  # optional for frontend preview
+        }, status=200)
