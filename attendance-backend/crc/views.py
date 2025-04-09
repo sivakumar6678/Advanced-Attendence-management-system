@@ -15,7 +15,7 @@ from rest_framework.generics import ListCreateAPIView, RetrieveUpdateAPIView
 from .models import Timetable, TimetableEntry, Subject
 from .serializers import TimetableSerializer, SubjectSerializer
 from rest_framework import generics
-from django.http import JsonResponse
+from django.core.mail import send_mail
 class RegisterCRC(APIView):
     def post(self, request):
         data = request.data
@@ -372,6 +372,7 @@ class CRCClassAttendanceReportView(APIView):
             "from_date": from_date,
             "to_date": to_date
         })
+
 def calculate_attendance_percentage(student, from_date, to_date, subjects):
 
     total_present = 0
@@ -397,7 +398,7 @@ def calculate_attendance_percentage(student, from_date, to_date, subjects):
         return 0
     return round((total_present / total_classes) * 100, 2)
 
-class SendLowAttendanceSMSView(APIView):
+class SendLowAttendanceEmailView(APIView):
     def post(self, request):
         branch = request.data.get('branch')
         year = request.data.get('year')
@@ -405,32 +406,52 @@ class SendLowAttendanceSMSView(APIView):
         from_date = request.data.get('from_date')
         to_date = request.data.get('to_date')
 
-        if not all([branch, year, semester, from_date, to_date]):
-            return Response({"error": "Missing parameters"}, status=400)
-
-        students = Student.objects.filter(branch__id=branch, year=year, semester=semester)
+        # ✅ Fetch subjects related to this class
         subjects = Subject.objects.filter(
-            crc__branch_id=branch,
+            crc__branch__id=branch,
             crc__year=year,
             crc__semester=semester
         )
 
         low_attendance_students = []
 
-        for student in students:
-            overall = calculate_attendance_percentage(student, from_date, to_date, subjects)
+        for student in Student.objects.filter(branch__id=branch, year=year, semester=semester):
+            overall = calculate_attendance_percentage(student, from_date, to_date, subjects)  # ✅ Now correct
             if overall < 65:
                 low_attendance_students.append({
                     "name": student.name,
-                    # "mobile": student.parent_phone_number,
-                    "mobile": student.phone_number,
+                    "email": student.email,
                     "percentage": overall
                 })
 
-        for s in low_attendance_students:
-            print(f"📩 SMS to {s['name']} ({s['mobile']}): Your attendance is {s['percentage']}%. Please improve.")
+        sent_count = 0
 
-        return Response({
-            "message": f"{len(low_attendance_students)} SMS sent (simulated)",
-            "students": low_attendance_students  # optional for frontend preview
-        }, status=200)
+        for s in low_attendance_students:
+            try:
+                send_mail(
+                    subject = '📉 Low Attendance Alert - Action Required',
+
+message = f"""
+Hi {s['name']},
+
+We hope you're doing well. This is a gentle reminder that your current attendance stands at **{s['percentage']}%**, which is below the required minimum of 65%.
+
+Consistent attendance is crucial for academic success and eligibility to appear in semester-end examinations. Please make sure to attend your upcoming classes regularly and reach out to your class coordinator or faculty if you need any support.
+
+🔔 Don't wait — it's never too late to get back on track!
+
+Best regards,  
+Academic Monitoring Team  
+Self Attendance Management System
+""",
+
+                    from_email=None,  # Uses DEFAULT_FROM_EMAIL if None
+                    recipient_list=[s['email']],
+                    fail_silently=False,
+                )
+                sent_count += 1
+            except Exception as e:
+                print(f"❌ Failed to send email to {s['email']}: {e}")
+
+        return Response({"message": f"{sent_count} warning emails sent to students"}, status=200)
+
