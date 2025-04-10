@@ -163,6 +163,22 @@ export class UserService {
       params: { branch, year, semester, academic_year, from_date, to_date }
     });
   }
+
+  notifyStreakLoss(studentId: string): Observable<any> {
+    return this.http.post(`${this.baseUrl}/students/notify-streak-loss/`, { student_id: studentId });
+  }
+  
+  sendLowAttendanceEmail(payload: {
+    branch: string;
+    year: string;
+    semester: string;
+    from_date: string;
+    to_date: string;
+  }): Observable<any> {
+    return this.http.post(`${this.baseUrl}/crc/send-low-attendance-email/`, payload);
+  }
+  
+  
   
   
   

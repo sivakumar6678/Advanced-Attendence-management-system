@@ -1,125 +1,202 @@
-<div class="filter-container">
-  <input type="text" pInputText placeholder="Search by name or roll no"
-         [(ngModel)]="searchTerm" (input)="applyFilters()" />
-
-  <p-dropdown
-    [options]="percentageFilters"
-    placeholder="Filter by Overall %"
-    [(ngModel)]="selectedPercentage"
-    styleClass="p-dropdown-sm"
-  ></p-dropdown>
-  
-  <button pButton type="button" label="Get Details" (click)="applyFilters()"></button>
-  <button pButton type="button" label="{{ isVisualized ? 'Hide Visualization' : 'Visualize' }}" 
-        (click)="toggleVisualization()" styleClass="p-button-secondary mb-2" > </button>
-        <button 
-        pButton 
-        label="Export PDF" 
-        icon="fas fa-file-pdf" 
-        class="p-button-danger" 
-        (click)="generatePDF()">
-      </button>
-      <button pButton label="Export to Excel" class="p-button-warning" icon="pi pi-file-excel"
-        (click)="exportToExcel()"></button>
-
-      
-  
-
-</div>
-<div  class="visual-summary mb-2">
-  <span class="badge green">90%+ : {{ getVisualizationSummary().high }}</span>
-  <span class="badge light-green">75–89% : {{ getVisualizationSummary().good }}</span>
-  <span class="badge yellow">60–74% : {{ getVisualizationSummary().warning }}</span>
-  <span class="badge red">Below 60% : {{ getVisualizationSummary().danger }}</span>
-</div>
-
-
-<p-table [value]="filteredStudents" responsiveLayout="scroll">
-  <ng-template pTemplate="caption">
-    <div class="table-caption">
-      <h2>Attendance Report</h2>
-      <p>Attendance report for the current semester.</p>
+<div class="report-container">
+  <div class="filter-section">
+    <div class="filter-input">
+      <input
+        type="text"
+        pInputText
+        class="w-full"
+        placeholder="Search by name or roll no"
+        [(ngModel)]="searchTerm"
+        (input)="applyFilters()"
+      />
     </div>
-    <div class="p-grid mb-3 align-items-end">
-      <div class="p-field p-col-12 p-md-4">
-        <label for="startDate">Start Date</label>
-        <p-calendar id="startDate" [(ngModel)]="fromDate" dateFormat="yy-mm-dd" showIcon></p-calendar>
-      </div>
-    
-      <div class="p-field p-col-12 p-md-4">
-        <label for="endDate">End Date</label>
-        <p-calendar id="endDate" [(ngModel)]="toDate" dateFormat="yy-mm-dd" showIcon></p-calendar>
-      </div>
-    
-      <div class="p-field p-col-12 p-md-4">
-        <button 
-          pButton 
-          label="Get Details" 
-          icon="fas fa-search" 
-          class="p-button-success" 
-          (click)="filterByDateRange()">
-        </button>
-      </div>
+
+    <div class="filter-dropdown">
+      <p-dropdown
+        [options]="percentageFilters"
+        placeholder="Filter by Overall %"
+        [(ngModel)]="selectedPercentage"
+        className="percentage-dropdown"
+        
+        
+      ></p-dropdown>
     </div>
-    
-  </ng-template>  
-  <ng-template pTemplate="header">
-    <!-- First header row -->
-    <tr>
-      <th rowspan="2">S.No</th>
-      <th rowspan="2">Roll No</th>
-      <th rowspan="2">Name</th>
-      <ng-container *ngFor="let subject of subjects">
-        <th colspan="2">{{ subject }}</th>
-      </ng-container>
-      <th rowspan="2">Total Classes</th>
-      <th rowspan="2">Attended</th>
-      <th rowspan="2">Overall %</th>
-      <th rowspan="2">Actions</th>
 
-    </tr>
+    <div class="filter-buttons">
+      <button
+        pButton
+        type="button"
+        label="{{ isVisualized ? 'Hide Visualization' : 'Visualize' }}"
+        (click)="toggleVisualization()"
+        styleClass="p-button-secondary"
+      ></button>
 
-    <!-- Second header row -->
-    <tr>
-      <ng-container *ngFor="let subject of subjects">
-        <th>Total: {{ getTotalClassesForSubject(subject) }}</th>
-        <th>100%</th>
-      </ng-container>
-    </tr>
-  </ng-template>
-  <ng-template pTemplate="body" let-student let-i="rowIndex">
-    <tr>
-      <td>{{ i + 1 }}</td>
-      <td>{{ student.student_id }}</td>
-      <td>{{ student.name }}</td>
+      <button
+        pButton
+        label="Export PDF"
+        icon="fas fa-file-pdf"
+        class="p-button-danger"
+        (click)="generatePDF()"
+      ></button>
 
-      <ng-container *ngFor="let subject of subjects">
-        <ng-container *ngIf="getSubjectAttendance(student.attendance, subject) as att">
-          <td> {{ att.present }}</td>
-          <td [ngClass]="{'low-subject-attendance': att.percentage < 40   ,'red-bg': isVisualized && att.percentage < 40}">
-            {{ att.percentage }}%
-          </td>
+      <button
+        pButton
+        label="Export to Excel"
+        icon="pi pi-file-excel"
+        class="p-button-warning"
+        (click)="exportToExcel()"
+      ></button>
+    </div>
+  </div>
+
+  <div class="summary-badges">
+    <span class="badge green">90%+ : {{ getVisualizationSummary().high }}</span>
+    <span class="badge light-green">75–89% : {{ getVisualizationSummary().good }}</span>
+    <span class="badge yellow">60–74% : {{ getVisualizationSummary().warning }}</span>
+    <span class="badge red">Below 60% : {{ getVisualizationSummary().danger }}</span>
+  </div>
+
+  <p-table
+    [value]="filteredStudents"
+    responsiveLayout="scroll"
+    [scrollable]="true"
+    scrollHeight="500px"
+  >
+    <ng-template pTemplate="caption">
+      <div class="table-caption">
+        <h2>Attendance Report</h2>
+        <p>Attendance report for the current semester.</p>
+      </div>
+
+      <div class="date-filters">
+        <div class="date-filter">
+          <label for="startDate">Start Date</label>
+          <p-calendar
+            id="startDate"
+            [(ngModel)]="fromDate"
+            dateFormat="yy-mm-dd"
+            showIcon
+            class="w-full"
+          ></p-calendar>
+        </div>
+
+        <div class="date-filter">
+          <label for="endDate">End Date</label>
+          <p-calendar
+            id="endDate"
+            [(ngModel)]="toDate"
+            dateFormat="yy-mm-dd"
+            showIcon
+            class="w-full"
+          ></p-calendar>
+        </div>
+
+        <div class="date-button">
+          <button
+            pButton
+            label="Get Details"
+            icon="fas fa-search"
+            class="p-button-success w-full"
+            (click)="filterByDateRange()"
+          ></button>
+        </div>
+
+        <div class="email-button">
+          <button
+            pButton
+            type="button"
+            icon="pi pi-envelope"
+            label="Send Low Attendance Emails"
+            class="p-button-warning"
+            (click)="confirmAndSendEmails()"
+          ></button>
+        </div>
+      </div>
+    </ng-template>
+
+    <ng-template pTemplate="header">
+      <tr>
+        <th rowspan="2">S.No</th>
+        <th rowspan="2">Roll No</th>
+        <th rowspan="2">Name</th>
+        <ng-container *ngFor="let subject of subjects">
+          <th colspan="2">{{ subject }}</th>
         </ng-container>
-      </ng-container>
+        <th rowspan="2">Total Classes</th>
+        <th rowspan="2">Attended</th>
+        <th rowspan="2">Overall %</th>
+        <th rowspan="2">Actions</th>
+      </tr>
+      <tr>
+        <ng-container *ngFor="let subject of subjects">
+          <th>Total: {{ getTotalClassesForSubject(subject) }}</th>
+          <th>100%</th>
+        </ng-container>
+      </tr>
+    </ng-template>
 
-      <td>{{ getOverallTotalClasses() }}</td>
-      <td>{{ student.total_present }}</td>
-      <td [ngClass]="{
-        'low-attendance-warning': student.overall_percentage < 75 && student.overall_percentage >= 65,
-        'low-attendance-danger': student.overall_percentage < 65,
-        'dark-green-bg': isVisualized && student.overall_percentage >= 90,
-        'light-green-bg': isVisualized && student.overall_percentage >= 75 && student.overall_percentage < 90,
-        'yellow-bg': isVisualized && student.overall_percentage >= 65 && student.overall_percentage < 75,
-        'red-bg': isVisualized && student.overall_percentage < 65
-      }">{{ student.overall_percentage }}%</td>
-      <td>
-        <button pButton type="button"  icon="fas fa-chart-bar"
-          (click)="showVisualization(student)"></button>
-      </td>
-      
-    </tr>
-  </ng-template>
-</p-table>
-<p-dialog header="Attendance Visualization" [(visible)]="showDialog" [modal]="true" [style]="{width: '500px'}">
-  <p-chart type="bar" [data]="chartData" [options]="chartOptions"></p-chart>
-</p-dialog>
+    <ng-template pTemplate="body" let-student let-i="rowIndex">
+      <tr>
+        <td>{{ i + 1 }}</td>
+        <td>{{ student.student_id }}</td>
+        <td>{{ student.name }}</td>
+
+        <ng-container *ngFor="let subject of subjects">
+          <ng-container *ngIf="getSubjectAttendance(student.attendance, subject) as att">
+            <td>{{ att.present }}</td>
+            <td
+              [ngClass]="{
+                'low-subject-attendance': att.percentage < 40,
+                'red-bg': isVisualized && att.percentage < 40
+              }"
+            >
+              {{ att.percentage }}%
+            </td>
+          </ng-container>
+        </ng-container>
+
+        <td>{{ getOverallTotalClasses() }}</td>
+        <td>{{ student.total_present }}</td>
+        <td
+          [ngClass]="{
+            'low-attendance-warning': student.overall_percentage < 75 && student.overall_percentage >= 65,
+            'low-attendance-danger': student.overall_percentage < 65,
+            'dark-green-bg': isVisualized && student.overall_percentage >= 90,
+            'light-green-bg': isVisualized && student.overall_percentage >= 75 && student.overall_percentage < 90,
+            'yellow-bg': isVisualized && student.overall_percentage >= 65 && student.overall_percentage < 75,
+            'red-bg': isVisualized && student.overall_percentage < 65
+          }"
+        >
+          {{ student.overall_percentage }}%
+        </td>
+        <td>
+          <button
+            pButton
+            type="button"
+            icon="fas fa-chart-bar"
+            (click)="showVisualization(student)"
+          ></button>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+  <p-dialog
+    header="Attendance Visualization"
+    [(visible)]="showDialog"
+    [modal]="true"
+    [style]="{ width: '500px' }"
+  >
+    <p-chart
+      type="bar"
+      [data]="chartData"
+      [options]="chartOptions"
+    ></p-chart>
+  </p-dialog>
+
+  <p-confirmDialog
+    header="Confirmation"
+    icon="fas fa-exclamation-triangle"
+    [style]="{ width: '350px' }"
+  ></p-confirmDialog>
+</div>

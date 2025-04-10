@@ -101,6 +101,11 @@ ngAfterViewInit(): void {
       this.prepareChartData();
     }, 100); // small delay to ensure canvas is in DOM
   }
+  const isMobile = window.innerWidth < 768;
+  if (!isMobile) {
+    alert("This module is available only on mobile devices.");
+    this.router.navigate(['/home']);
+  }
 }
 
 
@@ -355,26 +360,63 @@ calculateStreak(): void {
   let streak = 0;
   let previousDate = new Date();
   
-  // Sort records in descending order (most recent first)
   this.attendanceRecords.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
   for (const record of this.attendanceRecords) {
-      const recordDate = new Date(record.timestamp);
-      if (record.status === "Present") {
-          // If the record is from the previous day, increase streak
-          if (streak === 0 || (previousDate.getDate() - recordDate.getDate() === 1)) {
-              streak++;
-              previousDate = recordDate;
-          } else {
-              break; // Streak broken
-          }
+    const recordDate = new Date(record.timestamp);
+    if (record.status === "Present") {
+      if (streak === 0 || (previousDate.getDate() - recordDate.getDate() === 1)) {
+        streak++;
+        previousDate = recordDate;
       } else {
-          break; // Streak broken
+        break;
       }
+    } else {
+      break;
+    }
   }
 
   this.attendanceStreak = streak;
+
+  // 👇 Check if streak is broken
+  this.checkStreakLoss(streak);
 }
+checkStreakLoss(streak: number): void {
+  const today = new Date();
+  const lastRecordDate = new Date(this.attendanceRecords[0]?.timestamp);
+  const diffDays = Math.floor(
+    (today.getTime() - lastRecordDate.getTime()) / (1000 * 3600 * 24)
+  );
+
+  // 😢 If streak is 0 and missed attendance in last 1-2 days
+  if (streak === 0 && diffDays <= 2) {
+    if (!localStorage.getItem('streak-notified')) {
+      this.sendStreakLossNotification(); // 🔥 Trigger backend API
+      localStorage.setItem('streak-notified', 'true'); // 🔐 Avoid spam
+    }
+  } else {
+    localStorage.removeItem('streak-notified'); // 🔄 Reset if streak continues
+  }
+}
+sendStreakLossNotification(): void {
+  const studentId = this.studentProfile?.student_id;
+  if (!studentId) return;
+
+  this.userService.notifyStreakLoss(studentId).subscribe({
+    next: () => console.log("📩 Streak loss email triggered."),
+    error: (err) => console.error("❌ Error sending streak loss notification", err),
+  });
+}
+checkStreakLossAtEvening(): void {
+  const now = new Date();
+  const currentHour = now.getHours();
+  if (currentHour >= 17 && !localStorage.getItem('streakChecked')) {
+    this.checkStreakLoss(this.attendanceStreak);
+    localStorage.setItem('streakChecked', new Date().toDateString()); // optional
+  }
+}
+
+
 
 
 prepareChartData(): void {

@@ -1,83 +1,147 @@
-.low-subject-attendance {
-    background-color: #ffe0e0;
-    color: #b30000;
-    font-weight: bold;
-  }
-  
-  .low-attendance-warning {
-    background-color: #fff3cd;
-    color: #856404;
-    font-weight: bold;
-  }
-  
-  .low-attendance-danger {
-    background-color: #f8d7da;
-    color: #721c24;
-    font-weight: bold;
-  }
-  
-    
-  .filter-container {
-    margin-bottom: 1rem;
-    display: flex;
-    gap: 1rem;
-    align-items: center;
-  }
-  .low-attendance-warning {
-    background-color: #fff3cdc5;
-  }
-  .low-attendance-danger {
-    background-color: #f8d7dabb;
-  }
-  .low-subject-attendance {
-    background-color: rgba(255, 221, 221, 0.664);
-  }
-  .dark-green-bg {
-    background-color: #2e7d32; /* Dark Green */
-    color: white;
-  }
-  .light-green-bg {
-    background-color: #81c784; /* Light Green */
-    color: black;
-  }
-  .yellow-bg {
-    background-color: #fff176; /* Yellow */
-    color: black;
-  }
-  .red-bg {
-    background-color: #ef5350; /* Red */
-    color: white;
-  }
-  
+.report-container {
+  padding: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Professional font */
+}
 
-  .visual-summary {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-    font-weight: bold;
-  }
-  
-  .badge {
-    padding: 6px 12px;
-    border-radius: 4px;
-    color: #fff;
-  }
-  
-  .badge.green {
-    background-color: #2e7d32;
-  }
-  
-  .badge.light-green {
-    background-color: #66bb6a;
-  }
-  
-  .badge.yellow {
-    background-color: #ffca28;
-    color: #000;
-  }
-  
-  .badge.red {
-    background-color: #ef5350;
-  }
-  
-  
+.filter-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  background-color: #f8f9fa; /* Light background */
+  padding: 15px;
+  border-radius: 8px;
+}
+
+.filter-input,
+.filter-dropdown {
+  flex: 1;
+  margin-right: 10px;
+}
+
+.filter-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.summary-badges {
+  margin-bottom: 20px;
+  background-color: #e9ecef; /* Lighter background */
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.badge {
+  padding: 8px 12px;
+  margin-right: 8px;
+  border-radius: 4px;
+  color: white;
+  font-weight: 500;
+}
+
+.green { background-color: #28a745; }
+.light-green { background-color: #a2e0a5; color: #333; } /* Darker text */
+.yellow { background-color: #ffc107; color: #333; } /* Darker text */
+.red { background-color: #dc3545; }
+
+.table-caption {
+  text-align: left;
+  margin-bottom: 20px;
+}
+
+.date-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  background-color: #f8f9fa; /* Light background */
+  padding: 15px;
+  border-radius: 8px;
+}
+
+.date-filter,
+.date-button,
+.email-button {
+  flex: 1;
+  min-width: 200px;
+}
+
+th, td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #dee2e6; /* Softer border */
+}
+
+th {
+  background-color: #e9ecef; /* Light gray header */
+  font-weight: 600;
+}
+
+.low-subject-attendance {
+  color: #dc3545; /* Red for low attendance */
+}
+
+.red-bg {
+  background-color: rgba(220, 53, 69, 0.1); /* Lighter red */
+}
+
+.low-attendance-warning {
+  background-color: rgba(255, 193, 7, 0.1); /* Lighter yellow */
+}
+
+.low-attendance-danger {
+  background-color: rgba(220, 53, 69, 0.1); /* Lighter red */
+}
+
+.dark-green-bg {
+  background-color: rgba(40, 167, 69, 0.1); /* Lighter green */
+}
+
+.light-green-bg {
+  background-color: rgba(162, 224, 165, 0.1); /* Lighter green */
+}
+
+.yellow-bg {
+  background-color: rgba(255, 193, 7, 0.1); /* Lighter yellow */
+}
+
+/* Button Styles */
+.p-button {
+  padding: 8px 15px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.p-button-secondary {
+  background-color: #6c757d;
+  border-color: #6c757d;
+  color: white;
+}
+
+.p-button-danger {
+  background-color: #dc3545;
+  border-color: #dc3545;
+  color: white;
+}
+
+.p-button-warning {
+  background-color: #ffc107;
+  border-color: #ffc107;
+  color: #333;
+}
+
+.p-button-success {
+  background-color: #28a745;
+  border-color: #28a745;
+  color: white;
+}
+
+/* Dialog Styles */
+p-dialog {
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+p-confirmDialog {
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}

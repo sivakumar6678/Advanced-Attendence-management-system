@@ -1,4 +1,5 @@
-  <div class="dashboard-container">
+
+<div class="dashboard-container">
       <!-- Header -->
       <div class="header text-center">
           <div class="card profile" *ngIf="studentProfile">
@@ -90,19 +91,9 @@
             <!-- <canvas #pieCanvas></canvas> -->
             <canvas #pieChartCanvas></canvas>
           </div>
-          
-        
           <p>Overall: <span class="percentage">{{ attendancePercentage }}%</span></p>
-      
-         
-          
         </div>
-      </div>
-      
-    
-    
-    
-  
+      </div>      
       <div *ngIf="activeSection === 'timetable'">
         <div class="public-timetable-container">
             <h2>Public Timetable</h2>

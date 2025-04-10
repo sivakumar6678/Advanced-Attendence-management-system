@@ -569,6 +569,11 @@
 }
 
 /* Mobile Responsive Styles for Bottom Navigation */
+@media(min-width: 768px) {
+  .dashboard-container {
+    display: none;
+  }
+}
 @media (max-width: 768px) {
   .bottom-nav {
     padding: 12px 8px;
@@ -740,3 +745,4 @@
   color: #888;
   font-style: italic;
 }
+

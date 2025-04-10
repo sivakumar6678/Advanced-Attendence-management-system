@@ -5,6 +5,8 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import * as FileSaver from 'file-saver';
+import { MessageService } from 'primeng/api';
+import { ConfirmationService } from 'primeng/api';
 
 @Component({
   selector: 'app-students-report',
@@ -51,7 +53,10 @@ export class StudentsReportComponent implements OnInit {
     this.isVisualized = !this.isVisualized;
   }
   
-  constructor(private userService: UserService) {}
+  constructor(private userService: UserService,
+              private messageService: MessageService ,
+              private confirmationService: ConfirmationService
+  ) {}
 
   ngOnInit(): void {
     this.crcProfile = this.userService.getCRCDetails();
@@ -172,48 +177,59 @@ export class StudentsReportComponent implements OnInit {
   showVisualization(student: any): void {
     const labels: string[] = [];
     const data: number[] = [];
-
+  
     for (const subject of this.subjects) {
-      const att = this.getSubjectAttendance(student.attendance, subject);
+      const attendance = this.getSubjectAttendance(student.attendance, subject);
       labels.push(subject);
-      data.push(att.percentage || 0);
+      data.push(attendance.percentage || 0);
     }
-
+  
     this.chartData = {
       labels: labels,
       datasets: [
         {
           label: 'Attendance %',
-          data: data,
-          backgroundColor: data.map(val =>
-            val < 40 ? '#f44336' : val < 75 ? '#ff9800' : '#4caf50'
-          )
+          backgroundColor: '#42A5F5',
+          data: data
         }
       ]
     };
-
+  
     this.chartOptions = {
       responsive: true,
       plugins: {
         legend: {
-          display: false
+          position: 'top'
         },
         tooltip: {
           callbacks: {
-            label: (ctx) => `${ctx.parsed.y}%`
+            label: function (context: any) {
+              return `${context.dataset.label}: ${context.parsed.y}%`;
+            }
           }
         }
       },
       scales: {
         y: {
           beginAtZero: true,
-          max: 100
+          max: 100,
+          title: {
+            display: true,
+            text: 'Percentage'
+          }
+        },
+        x: {
+          title: {
+            display: true,
+            text: 'Subjects'
+          }
         }
       }
     };
-
+  
     this.showDialog = true;
   }
+  
 
   getVisualizationSummary() {
     const summary = {
@@ -358,6 +374,49 @@ export class StudentsReportComponent implements OnInit {
     const data: Blob = new Blob([buffer], { type: 'application/octet-stream' });
     FileSaver.saveAs(data, fileName + '_export_' + new Date().getTime() + '.xlsx');
   }
+  
+  confirmAndSendEmails() {
+    this.confirmationService.confirm({
+      message: 'Are you sure you want to send warning emails to students with low attendance?',
+      header: 'Confirm Email Sending',
+      icon: 'fas fa-info-circle',
+      accept: () => {
+        this.sendLowAttendanceEmails();
+      }
+    });
+  }
+  
+ 
+  sendLowAttendanceEmails() {
+    const payload = {
+      branch: this.crcProfile.branch_id,     // Replace with your actual binding
+      year: this.crcProfile.year,
+      semester: this.crcProfile.semester,
+      from_date: this.fromDate,
+      to_date: this.toDate,
+    };
+  
+    this.userService.sendLowAttendanceEmail(payload).subscribe({
+      next: (res) => {
+        this.messageService.add({
+          key:'main-toast',
+          severity: 'success',
+          summary: 'Emails Sent',
+          detail: res.message,
+        });
+      },
+      error: (err) => {
+        this.messageService.add({
+          key:'main-toast',
+          severity: 'error',
+          summary: 'Failed',
+          detail: 'Something went wrong while sending emails.',
+        });
+      }
+    });
+  }
+  
+  
   
 
 }
