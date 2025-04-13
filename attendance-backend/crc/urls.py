@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import RegisterCRC, LoginCRC, FetchFacultyDetails, CRCDashboardView, GetFaculty, SubjectListCreateView, SubjectDeleteView,   FinalizeTimetableView, TimetableView, PublicTimetableView , TimetableConfigView, GetSubjectById  , CRCClassAttendanceReportView ,SendLowAttendanceEmailView, ApproveDeviceRequestView, PendingDeviceRequestsView,PendingSubjectCompletions,ApproveSubjectCompletion
+from .views import RegisterCRC, LoginCRC, FetchFacultyDetails, CRCDashboardView, GetFaculty, SubjectListCreateView, SubjectDeleteView,   FinalizeTimetableView, TimetableView, PublicTimetableView , TimetableConfigView, GetSubjectById  , CRCClassAttendanceReportView ,SendLowAttendanceEmailView, ApproveDeviceRequestView, PendingDeviceRequestsView,PendingSubjectCompletions,ApproveSubjectCompletion, StudentUpgradeView
 
 urlpatterns = [
     path('register/', RegisterCRC.as_view(), name='register-crc'),
@@ -30,5 +30,6 @@ urlpatterns = [
     path('class-attendance-report/', CRCClassAttendanceReportView.as_view(), name="class-attendance-report"),
     path('send-low-attendance-email/', SendLowAttendanceEmailView.as_view(), name="send-low-attendance-email"),
 
+    path('upgrade-students/', StudentUpgradeView.as_view(), name='upgrade-students'),
 
 ]

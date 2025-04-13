@@ -527,3 +527,48 @@ class ApproveSubjectCompletion(APIView):
             return Response({'message': 'Subject marked as completed successfully.'})
         except Subject.DoesNotExist:
             return Response({'error': 'Subject not found or already completed.'}, status=404)
+
+class StudentUpgradeView(APIView):
+    def post(self, request):
+        # Extract the academic year string (e.g., '2021-2025') from the request
+        academic_year_str = request.data.get('academic_year', None)
+
+        # Check if academic year string is provided
+        if academic_year_str:
+            try:
+                # Split the string '2021-2025' into start_year and end_year
+                start_year, end_year = map(int, academic_year_str.split('-'))
+                
+                # Try to fetch the AcademicYear instance
+                academic_year = AcademicYear.objects.get(start_year=start_year, end_year=end_year)
+            except AcademicYear.DoesNotExist:
+                return Response({'error': 'Academic year not found'}, status=status.HTTP_400_BAD_REQUEST)
+            except ValueError:
+                return Response({'error': 'Invalid academic year format'}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'error': 'Academic year is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Process other fields (e.g., branch_id, year, semester) from the request
+        branch_id = request.data.get('branch_id')
+        year = request.data.get('year')
+        semester = request.data.get('semester')
+
+        # Now proceed with upgrading students for the specified academic year
+        students_to_upgrade = Student.objects.filter(
+            branch_id=branch_id,
+            year=year,
+            semester=semester,
+            academic_year=academic_year
+        )
+
+        if not students_to_upgrade:
+            return Response({'error': 'No students found to upgrade'}, status=status.HTTP_404_NOT_FOUND)
+
+        # Upgrade students logic goes here, e.g., changing their year, semester, etc.
+        for student in students_to_upgrade:
+            # Upgrade logic (example)
+            student.year += 1  # Move to the next year
+            student.semester += 1  # Move to the next semester (you can modify this logic)
+            student.save()
+
+        return Response({'message': 'Students upgraded successfully'}, status=status.HTTP_200_OK)
