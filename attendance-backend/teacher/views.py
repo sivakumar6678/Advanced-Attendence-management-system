@@ -409,3 +409,24 @@ class AttendanceMatrixView(APIView):
                 )
 
         return Response({"message": "Attendance updated successfully!"}, status=status.HTTP_200_OK)
+
+
+# views.py (Teacher View)
+
+class RequestSubjectCompletion(APIView):
+    def post(self, request, subject_id):
+        # Fetch the subject allocation
+        try:
+            subject = Subject.objects.get(id=subject_id)
+        except Subject.DoesNotExist:
+            return Response({"error": "Subject not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        # Check if the subject is already completed
+        if subject.status == 'completed':
+            return Response({"error": "Subject is already completed"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Update status to "completion_requested"
+        subject.status = 'completion_requested'
+        subject.save()
+
+        return Response({"message": "Subject completion requested"}, status=status.HTTP_200_OK)

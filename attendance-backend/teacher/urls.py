@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import FacultyRegisterView, FacultyLoginView, FacultyDashboardView, FacultyAssignedSubjectsView, StartAttendanceSessionView, EndAttendanceSessionView, GetActiveAttendanceSessionView, SubjectAttendanceView, AttendanceMatrixView
+from .views import FacultyRegisterView, FacultyLoginView, FacultyDashboardView, FacultyAssignedSubjectsView, StartAttendanceSessionView, EndAttendanceSessionView, GetActiveAttendanceSessionView, SubjectAttendanceView, AttendanceMatrixView,RequestSubjectCompletion
 
 urlpatterns = [
     path('register/', FacultyRegisterView.as_view(), name='faculty-register'),
@@ -11,5 +11,6 @@ urlpatterns = [
     path('<int:faculty_id>/active-session/', GetActiveAttendanceSessionView.as_view(), name='active-session'),
     path('subject-attendance/', SubjectAttendanceView.as_view(), name='subject-attendance'),
     path('attendance/matrix/', AttendanceMatrixView.as_view(), name='attendance-matrix'),    
+    path('request-completion/<subject_id>/', RequestSubjectCompletion.as_view(), name='request-completion'),
 
 ]

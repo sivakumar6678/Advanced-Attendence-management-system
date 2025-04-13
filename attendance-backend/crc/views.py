@@ -492,3 +492,38 @@ Self Attendance Management System
 
         return Response({"message": f"{sent_count} warning emails sent to students"}, status=200)
 
+
+# views.py (CRC)
+class PendingSubjectCompletions(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        crc = CRCProfile.objects.get(email=request.user.email)
+        
+        pending_subjects = Subject.objects.filter(
+            crc=crc,
+            status='completion_requested'
+        )
+        print("CRC:", crc)
+        print("Subjects found:", pending_subjects.count())
+
+
+        data = [{
+            'id': s.id,
+            'subject_name': s.name,
+        } for s in pending_subjects]
+
+        return Response(data)
+
+
+class ApproveSubjectCompletion(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, pk):  # Accept 'pk'
+        try:
+            subject = Subject.objects.get(pk=pk, status='completion_requested')
+            subject.status = 'completed'
+            subject.save()
+            return Response({'message': 'Subject marked as completed successfully.'})
+        except Subject.DoesNotExist:
+            return Response({'error': 'Subject not found or already completed.'}, status=404)

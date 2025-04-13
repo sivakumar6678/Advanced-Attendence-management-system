@@ -55,6 +55,9 @@ class AttendanceSession(models.Model):
 
         if self.has_expired():
             self.is_active = False  # 🔥 Auto deactivate expired session
+        
+        if self.subject.status == 'completed':
+            raise ValueError("Attendance cannot be updated for a completed subject.")
 
         super().save(*args, **kwargs)
 

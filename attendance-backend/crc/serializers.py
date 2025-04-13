@@ -36,7 +36,7 @@ class CRCToken(Token):
 class SubjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Subject
-        fields = ['id', 'name', 'crc']
+        fields = ['id', 'name', 'crc','status']
 
     def create(self, validated_data):
         crc = validated_data['crc']
