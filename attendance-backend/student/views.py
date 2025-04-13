@@ -20,7 +20,13 @@ from .frs_utils import verify_face
 from django.core.mail import send_mail
 import os
 import requests
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 
+from django.shortcuts import render
+from django.http import JsonResponse
+import random , time
+otp_storage = {}
 
 class RegisterStudent(APIView):
     def post(self, request, *args, **kwargs):
@@ -123,17 +129,64 @@ class LoginStudent(APIView):
         return Response({"error": "Student not found"}, status=status.HTTP_404_NOT_FOUND)
 
 
-# students/views.py
+@method_decorator(csrf_exempt, name='dispatch')  # Disables CSRF for this view
+class SendOtpToEmailView(APIView):
+    def post(self, request):
+        email = request.data.get('email')
+
+        if not email:
+            return Response({'status': 'error', 'message': 'Email is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        otp = str(random.randint(100000, 999999))
+        otp_storage[email] = {'otp': otp, 'expires_at': time.time() + 300}  # 5 mins expiry
+
+        try:
+            send_mail(
+                'Your OTP for Device Re-registration',
+                f'Your OTP is: {otp}',
+                'admin@yourapp.com',
+                [email],
+                fail_silently=False,
+            )
+        except Exception as e:
+            return Response({'status': 'error', 'message': f'Failed to send OTP: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response({'status': 'success', 'message': 'OTP sent to email.'})
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class VerifyOtpView(APIView):
+    def post(self, request):
+        email = request.data.get('email')
+        entered_otp = request.data.get('otp')
+
+        if not email or not entered_otp:
+            return Response({'status': 'error', 'message': 'Email and OTP are required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        otp_data = otp_storage.get(email)
+
+        if otp_data and otp_data['otp'] == entered_otp and time.time() < otp_data['expires_at']:
+            del otp_storage[email]
+            return Response({'status': 'success', 'message': 'OTP verified. Device re-registered.'})
+        
+        return Response({'status': 'error', 'message': 'Invalid OTP or OTP expired.'}, status=status.HTTP_400_BAD_REQUEST)
+
 
 class RequestDeviceReRegistrationView(APIView):
-    permission_classes = [IsAuthenticated]
-
+    
     def post(self, request):
+        # Get the email from the request data (as the student will be logged in via email verification)
+        email = request.data.get("email")  # Expecting the email in the body of the request
+        
+        if not email:
+            return Response({"detail": "Email is required."}, status=400)
+        
         try:
-            student = Student.objects.get(email=request.user.email)
+            student = Student.objects.get(email=email)
         except Student.DoesNotExist:
             return Response({"detail": "Student not found."}, status=404)
 
+        # Check if pending request already exists
         if DeviceReRegistrationRequest.objects.filter(student=student, status='pending').exists():
             return Response({"detail": "Pending request already exists."}, status=400)
 
@@ -143,13 +196,16 @@ class RequestDeviceReRegistrationView(APIView):
         if not reason or not device_info:
             return Response({"detail": "Reason and device_info are required."}, status=400)
 
+        # Create the re-registration request
         req = DeviceReRegistrationRequest.objects.create(
             student=student,
             reason=reason,
-            new_device_info=device_info
+            new_device_info=device_info,
+            status="pending"  # Ensure status is set as pending initially
         )
 
         return Response({"detail": "Request submitted."}, status=201)
+
 
 class StudentDashboardView(APIView):
     authentication_classes = [JWTAuthentication]  # Ensure JWT authentication is used

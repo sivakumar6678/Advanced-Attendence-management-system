@@ -87,6 +87,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'attendance_system.wsgi.application'
 
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:4200',  # Add your frontend domain here
+]
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
