@@ -5,7 +5,7 @@ from rest_framework import status
 from django.db import IntegrityError
 from django.contrib.auth.hashers import make_password, check_password
 from rest_framework_simplejwt.tokens import RefreshToken
-from .models import Student, Device, StudentAttendance
+from .models import Student, Device, StudentAttendance, DeviceReRegistrationRequest
 from core.models import Branch, AcademicYear
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
@@ -20,6 +20,7 @@ from .frs_utils import verify_face
 from django.core.mail import send_mail
 import os
 import requests
+
 
 class RegisterStudent(APIView):
     def post(self, request, *args, **kwargs):
@@ -121,7 +122,35 @@ class LoginStudent(APIView):
 
         return Response({"error": "Student not found"}, status=status.HTTP_404_NOT_FOUND)
 
-        
+
+# students/views.py
+
+class RequestDeviceReRegistrationView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            student = Student.objects.get(email=request.user.email)
+        except Student.DoesNotExist:
+            return Response({"detail": "Student not found."}, status=404)
+
+        if DeviceReRegistrationRequest.objects.filter(student=student, status='pending').exists():
+            return Response({"detail": "Pending request already exists."}, status=400)
+
+        reason = request.data.get("reason")
+        device_info = request.data.get("device_info")
+
+        if not reason or not device_info:
+            return Response({"detail": "Reason and device_info are required."}, status=400)
+
+        req = DeviceReRegistrationRequest.objects.create(
+            student=student,
+            reason=reason,
+            new_device_info=device_info
+        )
+
+        return Response({"detail": "Request submitted."}, status=201)
+
 class StudentDashboardView(APIView):
     authentication_classes = [JWTAuthentication]  # Ensure JWT authentication is used
     permission_classes = [IsAuthenticated]  # Only logged-in users can access

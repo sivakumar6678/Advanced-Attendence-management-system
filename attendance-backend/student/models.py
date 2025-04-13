@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 from django.core.validators import RegexValidator
 from core.models import Branch, AcademicYear,User
 from teacher.models import AttendanceSession
+from crc.models import CRCProfile
 
 class Student(User):  # Inherit from User
     name = models.CharField(max_length=100)
@@ -40,6 +41,21 @@ class Device(models.Model):
     def __str__(self):
         return f"{self.student.name} - {self.device_name}"
     
+class DeviceReRegistrationRequest(models.Model):
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    reason = models.TextField()
+    new_device_info = models.JSONField()  # temp store new device data
+    status = models.CharField(
+        max_length=20,
+        choices=[('pending', 'Pending'), ('approved', 'Approved'), ('rejected', 'Rejected')],
+        default='pending'
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+    reviewed_by = models.ForeignKey(CRCProfile, on_delete=models.SET_NULL, null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.student.name} - {self.status}"
 
 class StudentAttendance(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
@@ -53,4 +69,5 @@ class StudentAttendance(models.Model):
 
     def __str__(self):
         return f"{self.student.name} - {self.session.subject.name} - {self.status}"
+
 

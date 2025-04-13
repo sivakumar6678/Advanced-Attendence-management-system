@@ -1,4 +1,4 @@
-from datetime import datetime
+from django.utils import timezone
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404
 from .models import CRCProfile
 from core.models import Branch,AcademicYear
 from teacher.models import AttendanceSession, Faculty
-from student.models import Student, StudentAttendance
+from student.models import Student, StudentAttendance, Device, DeviceReRegistrationRequest
 from django.db.models import Q
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
@@ -120,6 +120,38 @@ class CRCDashboardView(APIView):
 
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+# crc/views.py
+
+class ApproveDeviceRequestView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request, pk):
+        crc = CRCProfile.objects.get(email=request.user.email)
+        req = DeviceReRegistrationRequest.objects.get(id=pk, status='pending')
+
+        action = request.data.get("action")  # 'approved' or 'rejected'
+        if action not in ['approved', 'rejected']:
+            return Response({"detail": "Invalid action"}, status=400)
+
+        req.status = action
+        req.reviewed_at = timezone.now()
+        req.reviewed_by = crc
+        req.save()
+
+        if action == 'approved':
+            device_data = req.new_device_info
+            Device.objects.update_or_create(
+                student=req.student,
+                defaults=device_data
+            )
+            # Optionally update `student.device_id` too if needed
+            req.student.device_id = device_data.get('device_id')
+            req.student.save()
+
+        return Response({"detail": f"Request {action}."})
+
 
 class FetchFacultyDetails(APIView):
 
