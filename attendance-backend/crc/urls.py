@@ -1,12 +1,12 @@
 from django.urls import path
-from .views import RegisterCRC, LoginCRC, FetchFacultyDetails, CRCDashboardView, GetFaculty, SubjectListCreateView, SubjectDeleteView,   FinalizeTimetableView, TimetableView, PublicTimetableView , TimetableConfigView, GetSubjectById  , CRCClassAttendanceReportView ,SendLowAttendanceEmailView, ApproveDeviceRequestView
+from .views import RegisterCRC, LoginCRC, FetchFacultyDetails, CRCDashboardView, GetFaculty, SubjectListCreateView, SubjectDeleteView,   FinalizeTimetableView, TimetableView, PublicTimetableView , TimetableConfigView, GetSubjectById  , CRCClassAttendanceReportView ,SendLowAttendanceEmailView, ApproveDeviceRequestView, PendingDeviceRequestsView
 
 urlpatterns = [
     path('register/', RegisterCRC.as_view(), name='register-crc'),
     path('login/', LoginCRC.as_view(), name='login-crc'),
     path('faculty-details/', FetchFacultyDetails.as_view(), name='fetch-faculty-details'),
     path('dashboard/', CRCDashboardView.as_view(), name='crc-dashboard'),
-
+    path('device-requests/', PendingDeviceRequestsView.as_view(), name='pending-device-requests'),
     path('device-approve/<int:pk>/', ApproveDeviceRequestView.as_view(), name='device-re-registration'),
 
 

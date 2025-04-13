@@ -13,7 +13,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateAPIView
 from .models import Timetable, TimetableEntry, Subject
-from .serializers import TimetableSerializer, SubjectSerializer
+from .serializers import TimetableSerializer, SubjectSerializer, DeviceReRegistrationRequestSerializer
 from rest_framework import generics
 from django.core.mail import send_mail
 class RegisterCRC(APIView):
@@ -122,8 +122,13 @@ class CRCDashboardView(APIView):
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-# crc/views.py
+class PendingDeviceRequestsView(APIView):
+    permission_classes = [IsAuthenticated]
 
+    def get(self, request):
+        pending_requests = DeviceReRegistrationRequest.objects.filter(status='pending')
+        serializer = DeviceReRegistrationRequestSerializer(pending_requests, many=True)
+        return Response(serializer.data)
 class ApproveDeviceRequestView(APIView):
     permission_classes = [IsAuthenticated]
 

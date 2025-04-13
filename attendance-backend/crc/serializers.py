@@ -5,6 +5,7 @@ from rest_framework import serializers
 from core.models import User
 from teacher.models import Faculty
 from .models import Subject, Timetable, TimetableEntry
+from student.models import DeviceReRegistrationRequest
 class CRCTokenObtainPairSerializer(TokenObtainPairSerializer):
     """Custom JWT Serializer for CRC"""
     
@@ -77,3 +78,10 @@ class TimetableSerializer(serializers.ModelSerializer):
             timetable.entries.add(entry)
 
         return timetable
+class DeviceReRegistrationRequestSerializer(serializers.ModelSerializer):
+    student_name = serializers.CharField(source='student.name', read_only=True)
+    student_email = serializers.EmailField(source='student.email', read_only=True)
+
+    class Meta:
+        model = DeviceReRegistrationRequest
+        fields = ['id', 'student_name', 'student_email', 'reason', 'new_device_info', 'status', 'created_at']
