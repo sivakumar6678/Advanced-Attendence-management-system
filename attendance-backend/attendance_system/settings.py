@@ -98,12 +98,20 @@ CSRF_TRUSTED_ORIGINS = [
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.mysql',
+    #     'NAME': 'attendance_system_db',
+    #     'USER' : 'root',
+    #     'PASSWORD' : 'CSKsiva@66',
+    #     'HOST' : 'localhost',
+    #     'PORT' : '3306'
+    # }
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'attendance_system_db',
+        'NAME': 'railway',
         'USER' : 'root',
-        'PASSWORD' : 'CSKsiva@66',
-        'HOST' : 'localhost',
+        'PASSWORD' : 'yajsocYrrqsYQrDgKEGjgwefcKAJeRuY',
+        'HOST' : 'mysql.railway.internal',
         'PORT' : '3306'
     }
 }

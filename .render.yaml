@@ -5,7 +5,8 @@ services:
     buildCommand: pip install -r requirements.txt
     startCommand: ./start.sh
     envVars:
-      - key: DATABASE_URL
+      - key: mysql://root:yajsocYrrqsYQrDgKEGjgwefcKAJeRuY@shortline.proxy.rlwy.net:27301/railway
         fromDatabase:
-          name: your-mysql-db-name
+          name: railway
+          type: mysql
           property: connectionString
