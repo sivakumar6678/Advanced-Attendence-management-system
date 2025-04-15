@@ -17,6 +17,8 @@ class Student(User):  # Inherit from User
     is_lateral_entry = models.BooleanField(default=False)
     face_descriptor = models.JSONField()
     device_id = models.CharField(max_length=255, unique=True, null=True, blank=True)
+    is_graduated = models.BooleanField(default=False)
+
 
     USERNAME_FIELD = 'email'  # ✅ Set email as the username
     REQUIRED_FIELDS = ['student_id', 'name', 'year', 'semester']
