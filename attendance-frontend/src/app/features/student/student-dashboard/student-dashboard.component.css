@@ -1,54 +1,15 @@
-.badge-container {
-  margin-top: 1rem;
-  display: flex;
-  justify-content: center;
+/* Base Styles */
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: hsl(210, 17%, 98%);
+  margin: 0; /* Consider if this should be here or in dashboard-container */
 }
 
-.badge-display {
-  padding: 10px 20px;
-  border-radius: 10px;
-  color: #fff;
-  font-weight: bold;
-  font-size: 1.2rem;
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  box-shadow: 0 2px 10px rgba(197, 194, 194, 0.2);
-}
-
-.badge-label {
-  font-size: 1rem;
-}
-
-.streak-container {
-  display: flex;
-  align-items: center;
-  background-color: #fff3cd;
-  padding: 8px 12px;
-  border-radius: 8px;
-  color: #856404;
-  font-weight: 600;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  margin-top: 10px;
-}
-
-.streak-icon {
-  font-size: 1.5rem;
-  margin-right: 8px;
-  color: #ff5722;
-}
-
-.streak-text {
-  font-size: 1rem;
-}
-
-
+/* Dashboard Container */
 .dashboard-container {
   max-width: 1200px;
   margin: 0 auto;
-  font-family: 'Segoe UI', Arial, sans-serif;
-  background: hsl(210, 17%, 98%);
-  padding:10px;
+  padding: 10px;
   min-height: 100vh;
   padding-bottom: 100px;
 }
@@ -80,14 +41,41 @@
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 }
 
+/* Card Styling */
+.card {
+  background: white; /* Default card background, overridden in profile */
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.12);
+}
 
 /* Profile Card */
 .profile {
-  background: var(--primary-color);
+  background: linear-gradient(135deg, #6200ea, #3700b3);
   color: white;
-  border-radius: 18px;
   margin-bottom: 18px;
   box-shadow: 0 8px 20px rgba(66, 133, 244, 0.15);
+  padding: 10px;
+  position: relative;
+}
+
+.profile::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, rgba(255,255,255,0.1) 25%, transparent 25%),
+              linear-gradient(-45deg, rgba(255,255,255,0.1) 25%, transparent 25%);
+  background-size: 60px 60px;
+  opacity: 0.1;
+  border-radius: 18px; /* Match profile border-radius */
 }
 
 .profile-header {
@@ -119,7 +107,7 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Trip Selection */
+/* Trip Selection (Consider if this is still relevant, based on HTML it seems like student info) */
 .trip-selection {
   margin: 12px 0 0 0;
 }
@@ -131,46 +119,7 @@
   color: white;
 }
 
-.trip-options {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 16px;
-  width: 100%;
-}
-
-.trip-btn {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 10px 16px;
-  border: none;
-  border-radius: 24px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
-  min-width: 0;
-  /* white-space: nowrap; */
-}
-
-.trip-btn.active {
-  background: #ffd700;
-  color: #333;
-}
-
-.trip-btn:hover:not(.active) {
-  background: rgba(255, 255, 255, 0.3);
-}
-
-.trip-icon {
-  font-size: 1rem;
-}
-
-/* Button Layout */
+/* Button Row */
 .button-row {
   display: flex;
   justify-content: space-between;
@@ -179,6 +128,7 @@
   width: 100%;
 }
 
+/* Navigation Buttons */
 .nav-button {
   flex: 1;
   display: flex;
@@ -186,7 +136,6 @@
   justify-content: center;
   gap: 4px;
   padding: 6px 10px;
-  background: rgba(245, 14, 14, 0.2);
   border: none;
   border-radius: 12px;
   color: white;
@@ -203,9 +152,6 @@
 }
 
 .nav-button .btn-text {
-  /* white-space: nowrap; */
-  /* overflow: hidden; */
-  /* text-overflow: ellipsis; */
   max-width: 100%;
 }
 
@@ -214,12 +160,8 @@
   color: #333;
 }
 
-
-
 .nav-button.logout {
-  cursor: pointer;
   background: rgba(255, 64, 129, 0.2);
-  z-index: 1;
 }
 
 .nav-button.logout:hover {
@@ -238,54 +180,11 @@
   opacity: 0.9;
 }
 
-
-/* Card Styling */
-
-
-.card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.12);
+/* Attendance Section */
+.attendance {
+  padding: 15px;
 }
 
-
-/* Profile Section */
-.profile {
-  text-align: center;
-  background: linear-gradient(135deg, #6200ea, #3700b3);
-  color: white;
-  width: 100%;
-  padding: 10px;
-  position: relative;
-  /* overflow: hidden; */
-}
-
-.profile::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(45deg, rgba(255,255,255,0.1) 25%, transparent 25%),
-              linear-gradient(-45deg, rgba(255,255,255,0.1) 25%, transparent 25%);
-  background-size: 60px 60px;
-  opacity: 0.1;
-}
-
-.profile-details {
-  margin-bottom: 20px;
-  position: relative;
-  z-index: 0;
-}
-
-.profile-details p {
-  margin: 12px 0;
-  font-size: 1.1rem;
-  line-height: 1.6;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
-}
-
-/* Attendance */
 .status {
   font-weight: bold;
   color: #4caf50;
@@ -302,6 +201,52 @@
   background: rgba(33, 150, 243, 0.1);
   border-radius: 20px;
   display: inline-block;
+}
+
+/* Badge */
+.badge-container {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: center;
+}
+
+.badge-display {
+  padding: 10px 20px;
+  border-radius: 10px;
+  color: #fff;
+  font-weight: bold;
+  font-size: 1.2rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 2px 10px rgba(197, 194, 194, 0.2);
+}
+
+.badge-label {
+  font-size: 1rem;
+}
+
+/* Streak */
+.streak-container {
+  display: flex;
+  align-items: center;
+  background-color: #fff3cd;
+  padding: 8px 12px;
+  border-radius: 8px;
+  color: #856404;
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-top: 10px;
+}
+
+.streak-icon {
+  font-size: 1.5rem;
+  margin-right: 8px;
+  color: #ff5722;
+}
+
+.streak-text {
+  font-size: 1rem;
 }
 
 /* Timetable Container */
@@ -329,7 +274,7 @@
   -webkit-overflow-scrolling: touch;
 }
 
-.timetable-table {
+.timetable-table, .attendance-table {
   width: 100%;
   border-collapse: collapse;
   margin: 0;
@@ -338,12 +283,12 @@
   overflow: hidden;
 }
 
-.timetable-table thead {
+.timetable-table thead, .attendance-table thead {
   background: linear-gradient(135deg, #6200ea, #3700b3);
   color: white;
 }
 
-.timetable-table th {
+.timetable-table th, .attendance-table th {
   padding: 15px;
   text-align: left;
   font-weight: 600;
@@ -351,27 +296,27 @@
   white-space: nowrap;
 }
 
-.timetable-table tbody tr {
+.timetable-table tbody tr, .attendance-table tbody tr {
   border-bottom: 1px solid #e0e0e0;
   transition: background-color 0.3s ease;
 }
 
-.timetable-table tbody tr:last-child {
+.timetable-table tbody tr:last-child, .attendance-table tbody tr:last-child {
   border-bottom: none;
 }
 
-.timetable-table tbody tr:hover {
+.timetable-table tbody tr:hover, .attendance-table tbody tr:hover {
   background-color: #f8f9fa;
 }
 
-.timetable-table td {
+.timetable-table td, .attendance-table td {
   padding: 12px 15px;
   color: #555;
   font-size: 0.95rem;
   vertical-align: middle;
 }
 
-.timetable-table tr:nth-child(even) {
+.timetable-table tr:nth-child(even), .attendance-table tr:nth-child(even) {
   background-color: #f8f9fa;
 }
 
@@ -383,7 +328,7 @@
   font-size: 1rem;
 }
 
-/* Mobile Responsive Styles */
+/* Mobile Responsive Styles for Tables */
 @media (max-width: 768px) {
   .public-timetable-container {
     padding: 10px;
@@ -394,20 +339,20 @@
     margin-bottom: 15px;
   }
 
-  .timetable-table {
+  .timetable-table, .attendance-table {
     display: block;
   }
 
-  .timetable-table thead {
+  .timetable-table thead, .attendance-table thead {
     display: none;
   }
 
-  .timetable-table tbody {
+  .timetable-table tbody, .attendance-table tbody {
     display: block;
     width: 100%;
   }
 
-  .timetable-table tr {
+  .timetable-table tr, .attendance-table tr {
     display: block;
     margin-bottom: 15px;
     border: 1px solid #e0e0e0;
@@ -416,7 +361,7 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   }
 
-  .timetable-table td {
+  .timetable-table td, .attendance-table td {
     display: block;
     text-align: right;
     padding: 10px 15px;
@@ -424,7 +369,7 @@
     padding-left: 50%;
   }
 
-  .timetable-table td::before {
+  .timetable-table td::before, .attendance-table td::before {
     content: attr(data-label);
     position: absolute;
     left: 15px;
@@ -434,7 +379,7 @@
     color: #6200ea;
   }
 
-  .timetable-table td:not(:last-child) {
+  .timetable-table td:not(:last-child), .attendance-table td:not(:last-child) {
     border-bottom: 1px solid #e0e0e0;
   }
 }
@@ -449,12 +394,12 @@
     margin-bottom: 12px;
   }
 
-  .timetable-table td {
+  .timetable-table td, .attendance-table td {
     padding: 8px 15px;
     font-size: 0.9rem;
   }
 
-  .timetable-table td::before {
+  .timetable-table td::before, .attendance-table td::before {
     font-size: 0.85rem;
   }
 
@@ -488,7 +433,7 @@
 .timetable-table tbody tr:nth-child(4) { animation-delay: 0.4s; }
 .timetable-table tbody tr:nth-child(5) { animation-delay: 0.5s; }
 
-/* Reports */
+/* Reports Section */
 .report-list {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -571,9 +516,10 @@
 /* Mobile Responsive Styles for Bottom Navigation */
 @media(min-width: 768px) {
   .dashboard-container {
-    display: none;
+    display: none; /* Consider if this is the desired behavior */
   }
 }
+
 @media (max-width: 768px) {
   .bottom-nav {
     padding: 12px 8px;
@@ -624,21 +570,12 @@
   animation: fadeIn 0.5s ease-out forwards;
 }
 
-/* Animation for timetable items */
+/* Animation for timetable items (Note: .timetable-item is not in the HTML provided) */
+/* If there are elements with this class, the styles will apply */
+/* Consider removing if not used */
 .timetable-item {
   animation: slideIn 0.5s ease-out forwards;
   opacity: 0;
-}
-
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 /* Add delay for each timetable item */
@@ -647,15 +584,9 @@
 .timetable-item:nth-child(3) { animation-delay: 0.3s; }
 .timetable-item:nth-child(4) { animation-delay: 0.4s; }
 .timetable-item:nth-child(5) { animation-delay: 0.5s; }
-.timetable-item:nth-child(5) { animation-delay: 0.5s; }
 
 
-.attendance-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
-}
-
+/* Attendance Table Specific Styles */
 .attendance-table th, .attendance-table td {
   border: 1px solid #ddd;
   padding: 8px;
@@ -676,17 +607,7 @@
   font-weight: bold;
 }
 
-.table-responsive {
-  overflow-x: auto;
-}
-
-.no-data {
-  text-align: center;
-  color: gray;
-  margin-top: 10px;
-}
-
-/* 📌 Progress Bar */
+/* Progress Bar */
 .progress-container {
   width: 100%;
   background-color: #e0e0e0;
@@ -701,22 +622,7 @@
   transition: width 0.5s ease-in-out;
 }
 
-/* 🔥 Attendance Streak */
-.streak-container {
-  background: #fffae6;
-  border-left: 5px solid #ff9800;
-  padding: 10px;
-  margin: 10px 0;
-  border-radius: 5px;
-}
-
-/* ⏳ Countdown Timer */
-.countdown {
-  font-weight: bold;
-  color: #ff0000;
-}
-
-/* 📌 Ongoing Session Styling */
+/* Ongoing Session Styling */
 .ongoing-session {
   background: #f0f8ff;
   padding: 10px;
@@ -725,7 +631,7 @@
   margin: 10px 0;
 }
 
-/* ✅ Mark Attendance Button */
+/* Mark Attendance Button */
 .mark-attendance-btn {
   background-color: #28a745;
   color: white;
@@ -740,9 +646,16 @@
   background-color: #218838;
 }
 
-/* 🚫 No Active Session */
+/* No Active Session */
 .no-session {
   color: #888;
   font-style: italic;
 }
 
+/* 🔥 Attendance Streak (Moved earlier with other streak styles) */
+/* ⏳ Countdown Timer (Not used in the provided HTML) */
+/* Consider adding if there's a timer element with this class */
+.countdown {
+  font-weight: bold;
+  color: #ff0000;
+}

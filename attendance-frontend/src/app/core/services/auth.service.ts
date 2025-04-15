@@ -206,5 +206,47 @@ export class AuthService {
   sendDeviceRequest(data: any): Observable<any> {
     return this.http.post(`${this.baseUrl}/students/device-re-registration/`, data);
 }
- 
+
+loginSuperAdmin(email: string, password: string): Observable<any> {
+  return this.http.post(`${this.baseUrl}/core/superadmin/login/`, { email, password });
+}
+getFacultyList(): Observable<any[]> {
+  return this.http.get<any[]>(`${this.baseUrl}/core/superadmin/faculty-list/`);
+}
+addFaculty(faculty: any): Observable<any> {
+  return this.http.post(`${this.baseUrl}/core/superadmin/add-faculty/`, faculty);
+}
+getBranches(): Observable<any[]> {
+  return this.http.get<any[]>(`${this.baseUrl}/core/branches/`);
+}
+
+addBranch(branch: any): Observable<any> {
+  return this.http.post(`${this.baseUrl}/core/branches/`, branch);
+}
+
+updateBranch(id: number, branch: any): Observable<any> {
+  return this.http.put(`${this.baseUrl}/core/branches/${id}/`, branch);
+}
+
+deleteBranch(id: number): Observable<any> {
+  return this.http.delete(`${this.baseUrl}/core/branches/${id}/`);
+}
+getAcademicYears(): Observable<any[]> {
+  return this.http.get<any[]>(`${this.baseUrl}/core/academic-years/`);
+}
+
+addAcademicYear(year: any): Observable<any> {
+  return this.http.post(`${this.baseUrl}/core/academic-years/`, year);
+}
+loadAcademicYear(id: number): Observable<any> {
+  return this.http.get(`${this.baseUrl}/core/academic-years/${id}/`);
+}
+updateAcademicYear(id: number, year: any): Observable<any> {
+  return this.http.put(`${this.baseUrl}/core/academic-years/${id}/`, year);
+}
+
+deleteAcademicYear(id: number): Observable<any> {
+  return this.http.delete(`${this.baseUrl}/core/academic-years/${id}/`);
+}
+
 }

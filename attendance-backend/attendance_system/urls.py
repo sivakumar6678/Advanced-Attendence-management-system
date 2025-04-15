@@ -16,9 +16,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path,include
+from django.views.generic import TemplateView
+from attendance_system.views import IndexView
 
 
 urlpatterns = [
+    path("", IndexView.as_view(), name="home"),
     path('admin/', admin.site.urls),
     path('api/students/', include('student.urls')),  # Include student app URLs
     path('api/core/', include('core.urls')),  # Include core app URLs

@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ConfirmationService } from 'primeng/api'; // Assuming you're using PrimeNG for confirmation dialogs
 import { MessageService } from 'primeng/api'; // Assuming you're using PrimeNG for messages
-
+import { AuthService } from '../../core/services/auth.service';
 @Component({
   selector: 'app-superadmin',
   templateUrl: './superadmin.component.html',
@@ -34,6 +34,7 @@ export class SuperadminComponent implements OnInit {
   showYearSection = false;
 
   constructor(private http: HttpClient,
+              private authService: AuthService, // Assuming AuthService is imported from your core services
               private messageService: MessageService, // Assuming MessageService is imported from 'primeng/api'
               private confirmationService: ConfirmationService // Assuming ConfirmationService is imported from 'primeng/api'
   ) {}
@@ -52,22 +53,21 @@ export class SuperadminComponent implements OnInit {
   }
 
   login() {
-    this.http.post('http://127.0.0.1:8000/api/core/superadmin/login/', { email: this.email, password: this.password })
-      .subscribe(
-        (res: any) => {
-          this.isLoggedIn = true;
-          localStorage.setItem('superadmin', this.email);
-          this.getFacultyList();
-        },
-        err => {
-          this.errorMessage = err.error.error || 'Login failed';
-        }
-      );
+    this.authService.loginSuperAdmin(this.email, this.password).subscribe(
+      (res) => {
+        this.isLoggedIn = true;
+        localStorage.setItem('superadmin', this.email);
+        this.getFacultyList();
+      },
+      (err) => {
+        this.errorMessage = err.error.error || 'Login failed';
+      }
+    );
+    
   }
 
   getFacultyList() {
-    this.http.get('http://127.0.0.1:8000/api/core/superadmin/faculty-list/')
-      .subscribe(
+    this.authService.getFacultyList().subscribe(
         (res: any) => {
           this.facultyList = res;
         },
@@ -78,8 +78,7 @@ export class SuperadminComponent implements OnInit {
   }
 
   addFaculty() {
-    this.http.post('http://127.0.0.1:8000/api/core/superadmin/add-faculty/', this.newFaculty)
-      .subscribe(
+    this.authService.addFaculty(this.newFaculty).subscribe(
         res => {
           this.getFacultyList();
           this.newFaculty = { name: '', email: '', employee_id: '' };
@@ -97,8 +96,7 @@ export class SuperadminComponent implements OnInit {
   }
 
   addBranch() {
-    this.http.post('http://127.0.0.1:8000/api/core/branches/', this.branch).subscribe({
-      next: () => {
+    this.authService.addBranch(this.branch).subscribe({      next: () => {
         this.messageService.add({key:'main-toast', severity: 'success', summary: 'Success', detail: 'Branch added' });
         this.branch = { name: '', head_of_department: '', description: '' };
       },
@@ -107,8 +105,8 @@ export class SuperadminComponent implements OnInit {
   }
   
   addAcademicYear() {
-    this.http.post('http://127.0.0.1:8000/api/core/academic-years/', this.year).subscribe({
-      next: () => {
+    this.authService.addAcademicYear(this.year).subscribe({
+     next: () => {
         this.messageService.add({ key:'main-toast', severity: 'success', summary: 'Success', detail: 'Academic Year added' });
         this.year = { start_year: null, end_year: null };
       },
@@ -117,8 +115,8 @@ export class SuperadminComponent implements OnInit {
   }
 
   getBranches() {
-    this.http.get<any[]>('http://127.0.0.1:8000/api/core/branches/').subscribe({
-      next: (res: any) => {
+    this.authService.getBranches().subscribe({
+    next: (res: any) => {
         this.branches = res;
       },
       error: (err: any) => {
@@ -129,7 +127,7 @@ export class SuperadminComponent implements OnInit {
   }
 
   getAcademicYears() {
-    this.http.get<any[]>('http://127.0.0.1:8000/api/core/academic-years/').subscribe({
+    this.authService.getAcademicYears().subscribe({
       next: (res: any) => {
         this.academicYears = res;
 
@@ -147,7 +145,7 @@ export class SuperadminComponent implements OnInit {
   }
   
   updateBranch() {
-    this.http.put(`http://127.0.0.1:8000/api/core/branches/${this.selectedBranch.id}/`, this.selectedBranch).subscribe({
+    this.authService.updateBranch(this.selectedBranch.id, this.selectedBranch).subscribe({
       next: () => {
         this.getBranches();
         this.editBranchDialog = false;
@@ -166,7 +164,7 @@ export class SuperadminComponent implements OnInit {
   }
   
   deleteBranch(branchId: number) {
-    this.http.delete(`http://127.0.0.1:8000/api/core/branches/${branchId}/`).subscribe({
+    this.authService.deleteBranch(branchId).subscribe({
       next: () => {
         this.getBranches();
         this.messageService.add({ key: 'main-toast', severity: 'success', summary: 'Success', detail: 'Branch deleted' });
@@ -180,7 +178,7 @@ export class SuperadminComponent implements OnInit {
   }
 
   loadAcademicYears() {
-    this.http.get<any[]>('http://127.0.0.1:8000/api/core/academic-years/').subscribe(res => {
+    this.authService.getAcademicYears().subscribe((res: any) => {
       this.academicYears = res;
     });
   }
@@ -192,8 +190,7 @@ openEditYear(year: any) {
 
 updateAcademicYear() {
   if (!this.selectedYear?.id) return;
-  this.http.put(`http://127.0.0.1:8000/api/core/academic-years/${this.selectedYear.id}/`, this.selectedYear).subscribe(() => {
-    this.messageService.add({key:'main-toast', severity: 'success', summary: 'Updated', detail: 'Academic Year updated' });
+  this.authService.updateAcademicYear(this.selectedYear.id, this.selectedYear).subscribe(() => {    this.messageService.add({key:'main-toast', severity: 'success', summary: 'Updated', detail: 'Academic Year updated' });
     this.editYearDialog = false;
     this.loadAcademicYears();
   });
