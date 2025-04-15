@@ -270,6 +270,8 @@
             <p-button (onClick)="prevCallback.emit()" label="Back" severity="secondary" icon="pi pi-arrow-left" />
               <p-button (onClick)="nextCallback.emit()" label="Next" icon="pi pi-arrow-right" iconPos="right" />
           </div>
+
+          
       </ng-template>
       </p-stepperPanel>
       <p-stepperPanel>
@@ -308,7 +310,68 @@
     <a p-button (click)="toggleForm()">{{ isLogin ? 
                                           'Already have an account? Login ' : ' Dont have an Account Register' 
                                           }}
-    </a>
+    </a> <br>
+    <!-- Forgot Device Link -->
+    <a p-button (click)="openForgotDeviceDialog()">Forgot Device? Re-register</a>
+    
+
+    <!-- Re-registration Modal -->
+    <p-dialog [(visible)]="forgotDeviceDialogVisible" header="Re-register Device" [modal]="true">
+      <div class="forgot-device-content">
+        <p>Enter your registered email to receive an OTP.</p>
+        <input pInputText [(ngModel)]="emailForReRegistration" placeholder="Enter your email">
+        <p-button [style]="{'margin' : '1rem'}" id="otp-sent-btn " label="Send OTP" (click)="sendOtpToEmail()"></p-button>
+      </div>
+
+      <!-- OTP Verification Step -->
+      <div *ngIf="otpSent" class="otp-verification-content">
+        <p>Enter the OTP sent to your email:</p>
+        <input pInputText [(ngModel)]="enteredOtp" placeholder="Enter OTP">
+        <p-button [style]="{'margin' : '1rem'}" id="otp-sent-btn " label="Verify OTP" (click)="verifyOtp()"></p-button>
+      </div>
+    </p-dialog>
+
+    <!-- OTP Verification -->
+<div *ngIf="otpVerified">
+  <form *ngIf="!deviceDetailsFetched">
+    <div class="p-field p-grid">
+      <div class="p-col-12 p-md-10">
+        <p-button class="submitbutton" type="button" (click)="fetchDeviceDetails()">Get Device Details</p-button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<!-- Device Details -->
+<p-dialog [(visible)]="otpVerified" header="Device Details" [modal]="true">
+  <form *ngIf="!deviceDetailsFetched">
+    <div class="p-field p-grid">
+      <div class="p-col-12 p-md-10">
+        <p-button class="submitbutton" type="button" (click)="fetchDeviceDetails()">Get Device Details</p-button>
+      </div>
+    </div>
+  </form>
+  <div *ngIf="deviceDetailsFetched" class="p-card p-3 mt-3">
+    <div class="text-lg font-semibold text-blue-600">📋 Device Information</div>
+    <div class="text-sm text-gray-600 mt-2">
+        <p><strong>📱 Device Name:</strong> {{ deviceName }}</p>
+        <p><strong>📂 Device Type:</strong> {{ deviceType }}</p>
+        <p><strong>🖥 Platform:</strong> {{ platform }}</p>
+        <p><strong>🌐 Browser:</strong> {{ browser }}</p>
+        <p><strong>💻 OS Version:</strong> {{ osVersion }}</p>
+        <p><strong>🔲 Screen Resolution:</strong> {{ screenResolution }}</p>
+        <p><strong>🌎 IP Address:</strong> {{ ipAddress }}</p>
+    </div>
+    <p-button type="button" class="submitbutton" (click)="confirmdeviceReRegistration()">Confirm Registration</p-button>
+    <div *ngIf="deviceRegistered" class="p-card p-3 mt-3">
+      <div class="text-lg font-semibold text-green-600">✅ Device Registration Request successfully sent</div>
+    </div>
+  </div>
+</p-dialog>
+
+    
+
+
 
   </div>
 </div>

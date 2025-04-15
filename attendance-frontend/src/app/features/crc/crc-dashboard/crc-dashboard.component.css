@@ -164,3 +164,33 @@
     max-width: 100%;
   }
 }
+
+/* crc-dashboard.component.css */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+button {
+  padding: 5px 10px;
+  margin-right: 5px;
+}
+
+button.btn-success {
+  background-color: #28a745;
+  color: white;
+  border: none;
+}
+
+button.btn-danger {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+}

@@ -60,11 +60,14 @@
       <!-- Section Toggle -->
       <div class="section-toggle">
         <p-button 
-          [label]="activeSection === 'add' ? 'Add Faculty' : 'View Faculty'" 
+          [label]="activeSection === 'add' ? 'View Faculty' : 'Add Faculty'" 
           (click)="toggleSection()" 
           [styleClass]="'toggle-button ' + (activeSection === 'add' ? 'p-button-primary' : 'p-button-secondary')"
-          [icon]="activeSection === 'add' ? 'fas fa-plus' : 'fas fa-list'">
+          [icon]="activeSection === 'add' ? 'fas fa-list' : 'fas fa-plus'">
         </p-button>
+      </div>
+      <div class="section-toggle">
+        <p-button></p-button>
       </div>
 
       <!-- Add Faculty Section -->
@@ -139,6 +142,146 @@
           </p-table>
         </div>
       </div>
+      <!-- Branch Creation -->
+      <div class="p-card p-mb-4">
+        <h3>Add Branch</h3>
+        <form (ngSubmit)="addBranch()">
+          <div class="p-fluid p-formgrid p-grid">
+            <div class="p-field p-col-12 p-md-4">
+              <label>Branch Name</label>
+              <input pInputText [(ngModel)]="branch.name" name="name" required />
+            </div>
+            <div class="p-field p-col-12 p-md-4">
+              <label>HOD (optional)</label>
+              <input pInputText [(ngModel)]="branch.head_of_department" name="hod" />
+            </div>
+            <div class="p-field p-col-12 p-md-4">
+              <label>Description</label>
+              <textarea pInputTextarea [(ngModel)]="branch.description" name="desc"></textarea>
+            </div>
+          </div>
+          <button pButton label="Add Branch" class="p-button-success"></button>
+        </form>
+      </div>
+
+      <!-- Academic Year Creation -->
+      <div class="p-card p-mb-4">
+        <h3>Add Academic Year</h3>
+        <form (ngSubmit)="addAcademicYear()">
+          <div class="p-fluid p-formgrid p-grid">
+            <div class="p-field p-col-12 p-md-6">
+              <label>Start Year</label>
+              <input type="number" pInputText [(ngModel)]="year.start_year" name="start_year" required />
+            </div>
+            <div class="p-field p-col-12 p-md-6">
+              <label>End Year</label>
+              <input type="number" pInputText [(ngModel)]="year.end_year" name="end_year" required />
+            </div>
+          </div>
+          <button pButton label="Add Academic Year" class="p-button-info"></button>
+        </form>
+      </div>
+
+     <!-- BRANCHES LIST -->
+    <p-confirmDialog></p-confirmDialog>
+
+    <p-dialog
+      [(visible)]="editBranchDialog"
+      header="Edit Branch"
+      [style]="{ width: '400px' }"
+      [modal]="true"
+      *ngIf="selectedBranch"
+    >
+      <div class="p-fluid">
+        <label>Name</label>
+        <input pInputText [(ngModel)]="selectedBranch.name" />
+
+        <label>HOD</label>
+        <input pInputText [(ngModel)]="selectedBranch.head_of_department" />
+
+        <label>Description</label>
+        <textarea pInputTextarea rows="3" [(ngModel)]="selectedBranch.description"></textarea>
+      </div>
+      <ng-template pTemplate="footer">
+        <button pButton label="Cancel" class="p-button-secondary" (click)="editBranchDialog = false"></button>
+        <button pButton label="Update" class="p-button-success" (click)="updateBranch()"></button>
+      </ng-template>
+    </p-dialog>
+
+
+<div class="p-card p-mb-4">
+  <h3>All Branches</h3>
+  <p-table [value]="branches" [paginator]="true" [rows]="5">
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Name</th>
+        <th>HOD</th>
+        <th>Description</th>
+        <th>Actions</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-branch>
+      <tr>
+        <td>{{ branch.name }}</td>
+        <td>{{ branch.head_of_department || 'N/A' }}</td>
+        <td>{{ branch.description || '-' }}</td>
+        <td>
+          <button pButton label="Cancel" class="p-button-secondary" (click)="editBranchDialog = false; selectedBranch = null"></button>
+          <button pButton icon="fas fa-pencil" class="p-button-text p-mr-2" (click)="openEditBranch(branch)"></button>
+          <button pButton icon="fas fa-trash" class="p-button-text p-button-danger" (click)="confirmDeleteBranch(branch)"></button>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+
+      <!-- ACADEMIC YEARS LIST -->
+
+      <p-confirmDialog></p-confirmDialog>
+      <p-dialog
+        [(visible)]="editYearDialog"
+        header="Edit Academic Year"
+        [style]="{ width: '400px' }"
+        [modal]="true"
+        *ngIf="selectedYear"
+      >
+        <div class="p-fluid">
+          <label>Start Year</label>
+          <input type="number" pInputText [(ngModel)]="selectedYear.start_year" />
+
+          <label>End Year</label>
+          <input type="number" pInputText [(ngModel)]="selectedYear.end_year" />
+        </div>
+        <ng-template pTemplate="footer">
+          <button pButton label="Cancel" class="p-button-secondary" (click)="editYearDialog = false"></button>
+          <button pButton label="Update" class="p-button-success" (click)="updateAcademicYear()"></button>
+        </ng-template>
+      </p-dialog>
+      <div class="p-card p-mb-4">
+        <h3>All Academic Years</h3>
+        <p-table [value]="academicYears" [paginator]="true" [rows]="5">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Start Year</th>
+              <th>End Year</th>
+              <th>Actions</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-year>
+            <tr>
+              <td>{{ year.start_year }}</td>
+              <td>{{ year.end_year }}</td>
+              <td>
+                <button pButton icon="fas fa-pencil" class="p-button-text p-mr-2" (click)="openEditYear(year)"></button>
+                <button pButton icon="fas fa-trash" class="p-button-text p-button-danger" (click)="confirmDeleteYear(year)"></button>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+      
+
 
       <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
     </div>

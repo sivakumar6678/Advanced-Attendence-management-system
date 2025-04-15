@@ -63,9 +63,73 @@
     <div *ngIf="activePage === 'notifications'">
       <p-card>
         <h3>Notifications</h3>
-        <p>View important updates and messages.</p>
+        <!-- crc-dashboard.component.html -->
+
+      <div class="pending-requests">
+        <h2>Pending Device Re-Registration Requests</h2>
+
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Student Name</th>
+              <th>Reason</th>
+              <th>Device</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let request of pendingRequests">
+              <td>{{ request.student_name }}</td>
+              <td>{{ request.reason }}</td>
+              <td>{{ request.new_device_info.device_name }}</td>
+              <td>
+                <button (click)="handleDeviceRequest(request.id, 'approved')" class="btn btn-success">
+                  Approve
+                </button>
+                <button (click)="handleDeviceRequest(request.id, 'rejected')" class="btn btn-danger">
+                  Reject
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+            <p-badge 
+        [value]="pendingCompletions.length" 
+        severity="info" 
+        *ngIf="pendingCompletions.length > 0"
+        >
+      </p-badge>
+
+      <!-- or inside a card -->
+
+      <p-card header="Pending Completion Requests" [ngStyle]="{'margin-top': '1rem', 'padding': '1rem', 'border': '1px solid var(--primary-color)', 'border-radius': '8px'}">
+        <p *ngIf="pendingCompletions.length === 0" style="text-align: center; color: var(--text-secondary-color); font-style: italic;">
+          No pending requests.
+        </p>
+
+        <ul *ngIf="pendingCompletions.length > 0" style="list-style-type: none; padding: 0;">
+          <li *ngFor="let req of pendingCompletions" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; padding: 0.5rem; border: 1px solid var(--secondary-color); border-radius: 4px;">
+            <span style="font-weight: bold; color: var(--text-primary-color);">
+              {{ req.subject_name }} - {{ req.faculty_name }}
+            </span>
+            <button pButton label="Approve" class="p-button-success" (click)="approveSubject(req.id)" style="margin-left: 1rem;"></button>
+          </li>
+        </ul>
       </p-card>
+
+      
+
+              </p-card>
     </div>
+
+    <div *ngIf="activePage === 'Upgrade'">
+      <button (click)="upgradeStudents()" [disabled]="isUpgrading" class="btn btn-success">
+        Upgrade My Students
+      </button>
+      
+      
+  </div>
 
     <!-- ✅ Logout Confirmation -->
     

@@ -58,71 +58,141 @@
               <p>Analyze attendance trends for your classes.</p>
             </p-card>
           </div>
+
+          
         </div>
   
         <!-- ✅ Timetable Section -->
         <div *ngIf="activePage === 'timetable'">
           <p-card>
-            <h3>Assigned Subjects</h3>
-            <p *ngIf="assignedSubjects.length === 0">No subjects assigned.</p>          
-            <div *ngFor="let batchKey of groupedSubjects | keyvalue">
-              <h3>{{ batchKey.key }}</h3> <!-- ✅ Display batch title --> 
-              <p-table [value]="groupedSubjects[batchKey.key]">
+            <h3>Assigned Subjects (Active / Pending)</h3> <p *ngIf="assignedSubjects.length === 0 && subjectsMap.size > 0">No subjects assigned to you.</p>
+            <div *ngIf="subjectsMap.size === 0 && assignedSubjects.length > 0" class="text-center my-3"> <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i> Loading subject details...
+            </div>
+        
+            <div *ngFor="let batchKey of activeGroupedSubjects | keyvalue">
+              <h4>{{ batchKey.key }}</h4>
+        
+              <p-table [value]="batchKey.value || []" responsiveLayout="scroll">
                 <ng-template pTemplate="header">
                   <tr>
                     <th>Subject Name</th>
                     <th>Timetable</th>
-                  </tr>
+                    <th>Action / Status</th> </tr>
                 </ng-template>
+        
                 <ng-template pTemplate="body" let-subject>
                   <tr>
-                    <td>{{ subject.subject_name }}</td>
+                    <td>{{ getSubjectName(subject.subject_id) }}</td>
                     <td>
-                      <button 
-                        pButton 
-                        [label]="activeBatch === batchKey.key ? 'Close Timetable' : 'View Timetable'" 
-                        class="p-button-info" 
+                      <button
+                        pButton type="button"
+                        [label]="activeBatch === batchKey.key ? 'Close Timetable' : 'View Timetable'"
+                        class="p-button-info p-button-sm"
                         (click)="loadPublicTimetable(subject)">
                       </button>
-                    </td>   
-                  </tr>
-                </ng-template>
-              </p-table>
-          
-              <div *ngIf="activeBatch === batchKey.key">
-                <h4>Timetable for {{ batchKey.key }}</h4>
-                
-                <p-table *ngIf="subjectTimetable?.[batchKey.key]?.length ?? 0 > 0" [value]="days">
-                  <ng-template pTemplate="header">
-                    <tr>
-                      <th>Day</th>
-                      <th *ngFor="let slot of timeSlots">{{ slot.time }}</th>
-                    </tr>
-                  </ng-template>
-                  
-                  <ng-template pTemplate="body" let-day>
-                    <tr>
-                      <td>{{ day }}</td>
-                      <td *ngFor="let slot of timeSlots; let i = index;">
-                        <ng-container *ngIf="hasTimetableEntry(batchKey.key, day, slot.time); else emptySlot">
-                          <div *ngFor="let entry of getTimetableEntries(batchKey.key, day, slot.time)">
-                            <span [ngClass]="{'highlight-subject': entry.faculty_id === teacherProfile.id}">
-                              {{ getSubjectName(entry.subject_id) }}
-                            </span>
-                            <br>
-                            <small>{{ getFacultyName(entry.faculty_id) }}</small>
+                    </td>
+                    <td>
+                      <ng-container [ngSwitch]="getSubjectStatusById(subject.subject_id)">
+        
+                        <ng-container *ngSwitchCase="'completion_requested'">
+                          <div class="text-warning status-badge">
+                             <i class="pi pi-spin pi-spinner mr-1"></i> Pending Approval
                           </div>
                         </ng-container>
-                        <ng-template #emptySlot>—</ng-template>
-                      </td>
+        
+                        <ng-container *ngSwitchDefault>
+                          <button
+                            pButton type="button"
+                            [label]="completionRequestedSubjects.has(subject.subject_id) ? 'Processing...' : 'Request Completion'"
+                            icon="fas fa-check"
+                            class="p-button-success p-button-sm"
+                            [loading]="completionRequestedSubjects.has(subject.subject_id)"
+                            (click)="confirmRequestCompletion(subject.subject_id, getSubjectName(subject.subject_id))"
+                            [disabled]="completionRequestedSubjects.has(subject.subject_id)">
+                          </button>
+                        </ng-container>
+        
+                      </ng-container> </td>
+                  </tr>
+                </ng-template>
+                <ng-template pTemplate="emptymessage">
+                    <tr>
+                        <td colspan="3">No active or pending subjects found for this batch.</td>
                     </tr>
-                  </ng-template>
-                </p-table>
-              </div>                          
+                </ng-template>
+              </p-table>
+        
+              <div *ngIf="activeBatch === batchKey.key" class="mt-3">
+                 </div>
+        
+            </div> <div *ngIf="(activeGroupedSubjects | keyvalue)?.length === 0 && subjectsMap.size > 0 && assignedSubjects.length > 0" class="mt-3 alert alert-info">
+                <p class="mb-0">All assigned subjects are completed. See history below.</p>
             </div>
+        
+        
+            <div class="card mt-4">
+              <div class="card-header bg-light">
+                <h5 class="mb-0">Completed Subjects History</h5>
+              </div>
+              <div class="card-body p-0"> <div *ngIf="completedSubjects.length > 0; else noCompleted">
+            
+                  <p-table [value]="completedSubjects" responsiveLayout="scroll" styleClass="p-datatable-sm">
+                    <ng-template pTemplate="header">
+                      <tr>
+                        <th>Subject Name</th>
+                        <th>Status</th>
+                      </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-subject>
+                      <tr >
+                        <td>{{ subject.name }}</td>
+                        <td>
+                          <span class="badge bg-success rounded-pill">
+                             <i class="fas fa-check-circle mr-1"></i> Completed
+                          </span>
+                        </td>
+                      </tr>
+                    </ng-template>
+                     <ng-template pTemplate="emptymessage"> <tr>
+                             <td colspan="3">No completed subjects found.</td>
+                         </tr>
+                     </ng-template>
+                  </p-table>
+            
+                </div>
+                <ng-template #noCompleted>
+                  <div class="p-3 text-muted">
+                      No subjects marked as completed yet.
+                  </div>
+                </ng-template>
+              </div>
+            </div>
+            <p-confirmDialog></p-confirmDialog>
+
           </p-card>
         </div>
-  
+
+<style>
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25em 0.6em;
+    font-size: 0.85em;
+    font-weight: 600;
+    border-radius: 0.25rem;
+  }
+  .status-badge .pi {
+    margin-right: 0.3em;
+  }
+  .text-success { color: var(--green-600); }
+  .text-warning { color: var(--yellow-600); }
+  /* Add styles for highlight-subject if not already defined */
+  .highlight-subject {
+      font-weight: bold;
+      color: var(--primary-color, blue); /* Use PrimeNG variable or default */
+  }
+
+</style>
         <!-- ✅ Attendance Section -->
         <div *ngIf="activePage === 'attendance'">
           <p-card>
@@ -351,7 +421,6 @@
             </p-card>
           </div>
   </div>
-
         
 
       </div>

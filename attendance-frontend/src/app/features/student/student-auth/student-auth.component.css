@@ -281,3 +281,9 @@ button {
   animation: slideOut 0.5s ease-in-out;
 }
 
+#otp-sent-btn{
+  background: none;
+  font-weight: bold;
+  margin:1rem;
+
+}

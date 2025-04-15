@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient,HttpHeaders } from '@angular/common/http';
 import * as FingerprintJS from '@fingerprintjs/fingerprintjs';
 @Injectable({
   providedIn: 'root'
@@ -148,6 +148,63 @@ export class AuthService {
     localStorage.removeItem('refresh_token');
   }
   
-
+  getPendingDeviceRequests(headers: HttpHeaders): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/crc/device-requests/`, { headers }); 
+  }
+  approveOrRejectDeviceRequest(requestId: number, action: 'approved' | 'rejected'): Observable<any> {
+    const url = `${this.baseUrl}/crc/device-approve/${requestId}/`;
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}`
+    });
   
+    const body = {
+      action: action // ✅ Send as object with correct key
+    };
+    console.log("body",body);
+    
+    return this.http.patch<any>(url, body, { headers });
+  }
+  
+  sendOtpToEmail(email: string): Observable<any> {
+    const csrfToken = this.getCSRFToken() || '';
+    const headers = new HttpHeaders({
+      'X-CSRFToken': csrfToken,
+      'Content-Type': 'application/json',
+    });
+
+    const body = { email: email };
+
+    return this.http.post('http://127.0.0.1:8000/api/students/send-otp-to-email/', body, { headers });
+  }
+
+  private getCSRFToken(): string | null {
+    const csrfToken = document.cookie.split(';').find(cookie => cookie.trim().startsWith('csrftoken='));
+    return csrfToken ? csrfToken.split('=')[1] : null;
+  }
+  
+
+  // Verify OTP entered by the user
+  verifyOtp(email: string, otp: string): Observable<any> {
+    const csrfToken = this.getCookie('csrftoken');
+
+    const headers = new HttpHeaders({
+      'X-CSRFToken': csrfToken || ''
+    });
+
+    return this.http.post<any>(`${this.baseUrl}/students/verify-otp/`, { email, otp }, { headers });
+  }
+
+  // Utility function to get a cookie by name (for CSRF token)
+  private getCookie(name: string): string | null {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
+    return null;
+  }
+
+  sendDeviceRequest(data: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/students/device-re-registration/`, data);
+}
+ 
 }

@@ -41,7 +41,6 @@ export class HomeComponent implements OnInit{
     { icon: 'gps_fixed', title: 'GPS Attendance', description: 'Mark attendance using GPS.' },
     { icon: 'face', title: 'Face Recognition', description: 'Secure with facial authentication.' },
     { icon: 'schedule', title: 'Timetable Management', description: 'Adjust timetables effortlessly.' },
-    { icon: 'security', title: 'Blockchain Secure', description: 'Data integrity via blockchain.' },
   ];
 
   roles = [

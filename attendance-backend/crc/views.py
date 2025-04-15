@@ -519,15 +519,16 @@ class PendingSubjectCompletions(APIView):
 class ApproveSubjectCompletion(APIView):
     permission_classes = [IsAuthenticated]
 
-    def post(self, request, pk):  # Accept 'pk'
+    def post(self, request, pk):
         try:
-            subject = Subject.objects.get(pk=pk, status='completion_requested')
+            subject = Subject.objects.get(pk=pk)
+            if subject.status == 'completed':
+                return Response({'error': 'Subject already completed.'}, status=status.HTTP_409_CONFLICT)
             subject.status = 'completed'
             subject.save()
-            return Response({'message': 'Subject marked as completed successfully.'})
+            return Response({'message': 'Subject marked as completed successfully.'}, status=status.HTTP_200_OK)
         except Subject.DoesNotExist:
-            return Response({'error': 'Subject not found or already completed.'}, status=404)
-
+            return Response({'error': 'Subject not found.'}, status=status.HTTP_404_NOT_FOUND)
 class StudentUpgradeView(APIView):
     def post(self, request):
         # Extract the academic year string (e.g., '2021-2025') from the request

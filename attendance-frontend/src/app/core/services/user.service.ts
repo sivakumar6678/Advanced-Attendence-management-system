@@ -178,8 +178,20 @@ export class UserService {
     return this.http.post(`${this.baseUrl}/crc/send-low-attendance-email/`, payload);
   }
   
+  requestSubjectCompletion(subjectId: number, headers: HttpHeaders): Observable<any> {
+    return this.http.post(`${this.baseUrl}/faculty/request-completion/${subjectId}/`, {}, { headers });
+  }
   
+  getPendingCompletions(headers: HttpHeaders): Observable<any[]> {  
+    return this.http.get<any[]>(`${this.baseUrl}/crc/pending-completion-subjects/`, { headers });
+  }
   
+  approveSubjectCompletion(allocationId: number, headers: HttpHeaders): Observable<any> {
+    return this.http.post(`${this.baseUrl}/crc/approve-completion-subject/${allocationId}/`, {}, { headers });
+  }
   
+  upgradeStudents(payload: any, headers: HttpHeaders) {
+    return this.http.post(`${this.baseUrl}/crc/upgrade-students/`, payload, { headers });
+  }
   
 }

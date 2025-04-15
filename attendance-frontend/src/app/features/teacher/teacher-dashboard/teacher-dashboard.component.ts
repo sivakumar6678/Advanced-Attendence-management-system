@@ -79,6 +79,19 @@ timetable: any;
   filteredStudents: any[] = [];
   originalStudents: any[] = [];
 
+  subjects: any[] = [];
+
+  submittingSubjects: Set<number> = new Set();
+  subject_status : any;
+
+
+  activeSubjects: any[] = [];
+  completionRequestedSubjects: Set<number> = new Set(); 
+  completedSubjects: any[] = [];
+  activeGroupedSubjects: { [key: string]: any[] } = {};
+  subjectsMap: Map<number, any> = new Map();
+
+
 
   constructor(
     private teacherDashboardService: UserService,
@@ -94,8 +107,10 @@ timetable: any;
     this.updateTime();
     this.fetchMatrix();
     setInterval(() => this.updateTime(), 60000);
+    // this.getstubjectStatus();
   }
-
+ 
+  
   menuItems = [
     { label: 'Home', icon: 'fas fa-home', command: () => this.setActivePage('home') },
     { label: 'Timetable', icon: 'fas fa-calendar', command: () => this.setActivePage('timetable') },
@@ -150,19 +165,19 @@ timetable: any;
   }
 
   loadAssignedSubjects(facultyId: number): void {
-    this.teacherDashboardService.getAssignedSubjects(facultyId).subscribe(
-      (data) => {
-        console.log("Assigned Subjects (Before Removing Duplicates):", data);
+    this.teacherDashboardService.getAssignedSubjects(facultyId).subscribe({
+      next: (data) => {
+        console.log("Assigned Subjects (Raw):", data);
+        let foundCrcId = null;
         if (data.length > 0 && data[0].crc_id !== undefined) {
-          this.crcId = data[0].crc_id;
-          console.log("crc id", this.crcId);
-          // Call loadSubjectsAndFaculties after setting crcId
-          this.loadSubjectsAndFaculties(this.crcId);
+          foundCrcId = data[0].crc_id;
         } else {
-          console.error("crc_id not found in the response data");
+          console.error("crc_id not found in assigned subjects response data. Cannot load full subject list.");
+           // Handle this case - maybe show an error, or try loading subjects differently?
         }
 
-        const uniqueSubjectsMap = new Map();  
+        // Process assigned subjects (removing duplicates for display grouping)
+        const uniqueSubjectsMap = new Map();
         data.forEach((subject: any) => {
           const key = `${subject.subject_id}-${subject.year}-${subject.semester}-${subject.branch}-${subject.academic_year}`;
           if (!uniqueSubjectsMap.has(key)) {
@@ -171,58 +186,114 @@ timetable: any;
         });
 
         this.assignedSubjects = Array.from(uniqueSubjectsMap.values());
-        console.log("Unique Assigned Subjects:", this.assignedSubjects);
-        this.groupSubjectsByBatch();
+        console.log("Unique Assigned Subjects (for grouping):", this.assignedSubjects);
+        this.groupSubjectsByBatch(); // Group ALL subjects first
+
+        // Now load the full subjects list if CRC ID was found
+         if(foundCrcId !== null) {
+             this.crcId = foundCrcId; // Set the component property
+             console.log("CRC ID set:", this.crcId);
+             this.loadSubjectsAndFaculties(this.crcId);
+         }
       },
-      (error) => {
+      error: (error) => {
         console.error("Error fetching assigned subjects:", error);
+        // Display error to user?
       }
-    );
-  }
-
-loadSubjectsAndFaculties(crcId: number | null): void {
-    if (crcId === null) {
-      console.error("crcId is null, cannot load subjects.");
-      return; // Early return if crcId is null
-    }
-
-    // ✅ Fetch subjects list
-    this.teacherDashboardService.getSubjects(crcId).subscribe(
-      (data) => {
-        this.subjectsList = data;
-        console.log("Subjects List:", this.subjectsList);
-      },
-      (error) => {
-        console.error("Error fetching subjects list:", error);
-      }
-    );
-
-    // ✅ Fetch faculty list
-    this.teacherDashboardService.getFaculties().subscribe(
-      (data) => {
-        this.facultyList = data;
-        console.log("Faculty List:", this.facultyList);
-      },
-      (error) => {
-        console.error("Error fetching faculty list:", error);
-      }
-    );
-  }
-
-  groupSubjectsByBatch() {
-    this.groupedSubjects = {};
-    this.assignedSubjects.forEach(subject => {
-      const batchKey = `${subject.year} Year - Sem ${subject.semester} (${subject.branch}, ${subject.academic_year})`;
-      
-      if (!this.groupedSubjects[batchKey]) {
-        this.groupedSubjects[batchKey] = [];
-      }
-      this.groupedSubjects[batchKey].push(subject);
     });
+  }
+  loadSubjectsAndFaculties(crcId: number | null): void {
+    if (crcId === null) {
+        console.error("crcId is null, cannot load subjects and faculties.");
+        return;
+    }
+    console.log("Loading subjects and faculties for CRC ID:", crcId);
 
-    console.log("Grouped Subjects by Batch:", this.groupedSubjects);
+    // Fetch the complete list of subjects for this CRC (includes status)
+    this.teacherDashboardService.getSubjects(crcId).subscribe({
+      next: (data) => {
+          this.subjectsList = data; // Keep original list if needed
+          // *** Create/Update Map for O(1) status lookups ***
+          this.subjectsMap.clear();
+          this.subjectsList.forEach(s => this.subjectsMap.set(s.id, s));
+          console.log("Subjects List fetched and Map created:", this.subjectsMap.size, "entries");
+          // This function will now also call updateActiveGroupedSubjects
+          this.getSubjectStatus(); // Categorize based on the new list/map
+      },
+      error: (error) => {
+          console.error("Error fetching subjects list:", error);
+          this.subjectsMap.clear(); // Clear map on error
+          this.getSubjectStatus(); // Update view based on empty data
+      }
+  });
+
+    // Fetch faculty list (as before)
+    this.teacherDashboardService.getFaculties().subscribe({
+        next: (data) => {
+            this.facultyList = data;
+            console.log("Faculty List:", this.facultyList);
+        },
+        error: (error) => {
+            console.error("Error fetching faculty list:", error);
+        }
+    });
   }
 
+
+// getstubjectStatus() {
+//   console.log("Fetching subject statuses...", this.subjectsList);
+//   this.subject_status = this.subjectsList.map(subject => ({
+//     id: subject.id,
+//     name: subject.name,
+//     status: subject.status || 'Unknown' // Default to 'Unknown' if status is not available
+//   }));
+//   // Organize subjects by status
+//   this.activeSubjects = this.subject_status.filter((subject: { status: string }) => subject.status === 'active');
+//   this.completedSubjects = this.subject_status.filter((subject: { status: string }) => subject.status === 'completed');
+//   console.log("Active Subjects:", this.activeSubjects);
+//   console.log("Completed Subjects:", this.completedSubjects);
+// }
+
+groupSubjectsByBatch() {
+  this.groupedSubjects = {};
+  this.assignedSubjects.forEach(subject => { // Iterate the unique assigned subjects
+    const batchKey = `${subject.year} Year - Sem ${subject.semester} (${subject.branch}, ${subject.academic_year})`;
+    if (!this.groupedSubjects[batchKey]) {
+      this.groupedSubjects[batchKey] = [];
+    }
+    this.groupedSubjects[batchKey].push(subject); // Push the assigned subject object
+  });
+  console.log("Grouped Subjects by Batch:", this.groupedSubjects);
+}
+
+// Renamed from getstubjectStatus for clarity
+getSubjectStatus() {
+  this.activeSubjects = []; // Reset categorized lists
+  this.completedSubjects = [];
+
+  if (this.subjectsMap.size === 0) { // Check the map now
+      console.warn("subjectsMap is empty, cannot categorize.");
+      this.updateActiveGroupedSubjects(); // Ensure active groups are cleared
+      return;
+  }
+  console.log("Categorizing subject statuses from subjectsMap...");
+
+  // Iterate the map for categorization
+  this.subjectsMap.forEach((subject: any, subjectId: number) => {
+      const status = subject.status || 'Unknown';
+      if (status === 'active' || status === 'completion_requested') {
+          this.activeSubjects.push(subject);
+      } else if (status === 'completed') {
+          this.completedSubjects.push(subject);
+      }
+  });
+
+  console.log('Categorized Active/Pending Subjects Count:', this.activeSubjects.length);
+  console.log('Categorized Completed Subjects (for History):', this.completedSubjects);
+
+  // *** Crucial: Update the filtered grouped list AFTER statuses are known ***
+  this.updateActiveGroupedSubjects();
+}
   loadPublicTimetable(subject: any, callback?: () => void): void {
     console.log("Fetching timetable for:", subject);
     
@@ -268,6 +339,99 @@ loadSubjectsAndFaculties(crcId: number | null): void {
   toggleTimetable(batchKey: string): void {
     this.activeBatch = this.activeBatch === batchKey ? null : batchKey;
   }
+  getSubjectStatusById(subjectId: number): string {
+    const subject = this.subjectsMap.get(subjectId); // O(1) lookup
+    return subject ? (subject.status || 'Unknown') : 'Unknown';
+}
+updateActiveGroupedSubjects() {
+  const newActiveGroupedSubjects: { [key: string]: any[] } = {}; // Create temporary object
+  console.log("Updating active grouped subjects view...");
+
+  if (!this.groupedSubjects || Object.keys(this.groupedSubjects).length === 0 || this.subjectsMap.size === 0) {
+      console.log("Skipping updateActiveGroupedSubjects - data not ready.");
+      this.activeGroupedSubjects = newActiveGroupedSubjects; // Ensure it's reset
+      return;
+  }
+
+  for (const batchKey in this.groupedSubjects) {
+    if (this.groupedSubjects.hasOwnProperty(batchKey)) {
+      // Filter subjects in this batch: Keep only non-completed ones
+      const activeSubjectsInBatch = this.groupedSubjects[batchKey].filter(subject => {
+        const status = this.getSubjectStatusById(subject.subject_id); // Use helper
+        return status !== 'completed'; // The filter condition
+      });
+
+      // Only add the batch key if there are active/pending subjects
+      if (activeSubjectsInBatch.length > 0) {
+        newActiveGroupedSubjects[batchKey] = activeSubjectsInBatch;
+      }
+    }
+  }
+  // Assign the newly created object to trigger change detection if needed
+  this.activeGroupedSubjects = newActiveGroupedSubjects;
+  console.log("Active Grouped Subjects (View Filtered):", this.activeGroupedSubjects);
+}
+// Renamed from handleMarkAsCompleted for clarity
+requestCompletion(subjectId: number): void {
+  if (!subjectId || this.completionRequestedSubjects.has(subjectId)) return;
+
+  console.log(`Requesting completion for subject ID: ${subjectId}`);
+  this.completionRequestedSubjects.add(subjectId);
+
+  const headers = new HttpHeaders().set('Authorization', `Bearer ${localStorage.getItem('access_token')}`);
+
+  this.teacherDashboardService.requestSubjectCompletion(subjectId, headers).subscribe({
+    next: (response) => {
+      console.log('Subject completion requested successfully:', response);
+      this.messageService.add({ key: 'main-toast', severity: 'success', summary: 'Request Sent', detail: 'Subject completion request sent successfully!', life: 3000 });
+
+
+      // --- Update local state ---
+      // 1. Update status in the Map (this is the source for getSubjectStatusById)
+      const subjectInMap = this.subjectsMap.get(subjectId);
+      if (subjectInMap) {
+        subjectInMap.status = 'completion_requested';
+        console.log(`Updated status for subject ${subjectId} to 'completion_requested' in subjectsMap.`);
+      }
+
+      // 2. Re-run categorization AND update the active grouped view
+      this.getSubjectStatus(); // This correctly updates completedSubjects AND activeGroupedSubjects
+
+      // Optional: remove from processing set if button should re-enable immediately
+      this.completionRequestedSubjects.delete(subjectId);
+
+    },
+    error: (error) => {
+      console.error('Failed to request subject completion:', error);
+      this.messageService.add({ /* ... error message ... */ });
+      this.completionRequestedSubjects.delete(subjectId); // Must remove on error
+    }
+  });
+}
+
+
+// *** ADDED: Confirmation method ***
+// Add console.log inside confirmRequestCompletion
+confirmRequestCompletion(subjectId: number, subjectName: string) {
+  // *** DEBUG: Log the received ID ***
+  console.log('[confirmRequestCompletion] Received Subject ID:', subjectId, 'Name:', subjectName);
+
+  if (this.completionRequestedSubjects.has(subjectId)) { return; }
+      this.confirmationService.confirm({
+        message: `Are you sure you want to request completion for subject "${subjectName}"?`,
+        header: 'Confirm Request',
+        icon: 'pi pi-question-circle',
+        acceptLabel: 'Yes, Request',
+        rejectLabel: 'No',
+        accept: () => {
+            this.requestCompletion(subjectId);
+        },
+      reject: () => {
+        // Optional: Show toast or console message
+        console.log("Changes not saved.");
+      }
+    });
+}
 
   getSubjectName(subjectId: number | null): string {
     if (!subjectId) return 'Unknown'; // Return 'Unknown' if ID is null
@@ -411,7 +575,7 @@ filterByDateRange() {
     this.confirmationService.confirm({
       message: 'Are you sure you want to save the changes?',
       header: 'Confirm Save',
-      icon: 'pi pi-exclamation-triangle',
+      icon: 'fas fa-exclamation-triangle',
       acceptLabel: 'Yes',
       rejectLabel: 'No',
       accept: () => {
@@ -473,5 +637,80 @@ filterByDateRange() {
   getEventValue(event: Event): string {
     return (event.target as HTMLInputElement).value;
   }
+  
+
+  getstubjectStatus() {
+    this.activeSubjects = [];
+    this.completedSubjects = [];
+  
+    this.subject_status = this.subjectsList.map((subject: any) => {
+      const status = subject.status || 'Unknown';
+      const subjectName = subject.name || 'Unknown';
+      const facultyName = subject.faculty?.user?.full_name || 'N/A';
+  
+      // Group active and completed subjects separately
+      if (status === 'active' || status === 'completion_requested') {
+        this.activeSubjects.push(subject);
+      } else if (status === 'completed') {
+        this.completedSubjects.push(subject);
+      }
+  
+      return {
+        subject: subjectName,
+        faculty: facultyName,
+        status: status,
+      };
+    });
+  
+    console.log('Subject Status:', this.subject_status);
+    console.log('Completed Subjects:', this.completedSubjects);
+  }
+
+  
+  markSubjectAsCompleted(subjectId: number): void {
+    if (!subjectId || this.completionRequestedSubjects.has(subjectId)) return;
+    console.log(`Requesting completion for subject ID: ${subjectId}`);
+    this.completionRequestedSubjects.add(subjectId);
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${localStorage.getItem('access_token')}`);
+    this.teacherDashboardService.requestSubjectCompletion(subjectId, headers).subscribe(
+      (response) => {
+        console.log('Subject completion requested:', response);
+        this.messageService.add({
+          key: 'main-toast',
+          severity: 'success',
+          summary: 'Request Sent',
+          detail: 'Subject completion request sent successfully!',
+          life: 3000
+        });
+        const subjectIndex = this.activeSubjects.findIndex(subject => subject.id === subjectId);
+        if (subjectIndex !== -1) {
+          this.activeSubjects[subjectIndex].status = 'completed'; // Update status
+          this.completedSubjects.push(this.activeSubjects[subjectIndex]); // Move to completed subjects
+          this.activeSubjects.splice(subjectIndex, 1); // Remove from active subjects
+        }
+        this.completionRequestedSubjects.delete(subjectId);
+      },
+      (error) => {
+        console.error('Failed to request subject completion:', error);
+        this.messageService.add({
+          key: 'main-toast',
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to send subject completion request.',
+          life: 3000
+        });
+        this.completionRequestedSubjects.delete(subjectId);
+      }
+    );
+  }
+  handleMarkAsCompleted(subjectId: number): void {
+    console.log(`Button clicked for subject ID: ${subjectId}`);
+    this.markSubjectAsCompleted(subjectId);
+  }
+
+  
+
+  
+ 
 }
  

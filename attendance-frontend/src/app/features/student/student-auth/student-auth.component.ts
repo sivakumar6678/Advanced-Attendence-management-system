@@ -87,6 +87,16 @@ export class StudentAuthComponent implements OnInit {
   isSupportedDevice: boolean = false;
   registrationError: string = '';
 
+  forgotDeviceDialogVisible: boolean = false;
+  emailForReRegistration: string = '';
+  otpSent: boolean = false;
+  enteredOtp: string = '';
+  otp: string = ''; // We'll get this from the backend
+  message: string = '';
+  isOtpSent: boolean = false;
+  otpVerified: boolean = false;
+
+  
   constructor(private authService: AuthService,
               private userService: UserService,
               private router: Router,
@@ -407,5 +417,109 @@ onRegisterSubmit() {
     this.hide = !this.hide;
   }
 
+  openForgotDeviceDialog() {
+    this.forgotDeviceDialogVisible = true;
+  }
+
+  sendOtpToEmail() {
+    if (this.emailForReRegistration) {
+      // Call the AuthService to send OTP
+      this.authService.sendOtpToEmail(this.emailForReRegistration).subscribe(
+        response => {
+          // Handle the response (OTP sent successfully)
+          if (response.status === 'success') {
+            this.otpSent = true;
+            this.messageService.add({ key: 'main-toast', severity: 'info', summary: 'OTP Sent', detail: 'OTP has been sent to your email.' });
+          }
+        },
+        error => {
+          // Handle error (e.g., email not found, server issues)
+          this.messageService.add({ key: 'main-toast', severity: 'error', summary: 'Error', detail: 'Failed to send OTP. Please try again.' });
+        }
+      );
+    } else {
+      this.messageService.add({ key: 'main-toast', severity: 'error', summary: 'Error', detail: 'Please enter a valid email.' });
+    }
+  }
+  
+  
+
+  // Verify OTP entered by the user
+  verifyOtp() {
+    if (this.emailForReRegistration && this.enteredOtp) {
+      this.authService.verifyOtp(this.emailForReRegistration, this.enteredOtp).subscribe(
+        response => {
+          if (response.status === 'success') {
+            this.messageService.add({ key: 'main-toast', severity: 'success', summary: 'Success', detail: 'Device re-registered.' });
+            this.forgotDeviceDialogVisible = false;
+            this.otpVerified = true; // ✅ show device registration step
+          } else {
+            this.messageService.add({ key: 'main-toast', severity: 'error', summary: 'Error', detail: response.message });
+          }
+        },
+        error => {
+          this.messageService.add({ key: 'main-toast', severity: 'error', summary: 'Error', detail: 'OTP verification failed. Please try again.' });
+        }
+      );
+    } else {
+      this.messageService.add({ key: 'main-toast', severity: 'warn', summary: 'Input Required', detail: 'Please enter your OTP.' });
+    }
+  }
+  
+
+  // Proceed with device re-registration after OTP verification
+  reRegisterDevice() {
+    // Call the AuthService to verify OTP
+    this.authService.verifyOtp(this.emailForReRegistration, this.enteredOtp).subscribe(
+      response => {
+        // Handle successful re-registration
+        if (response.status === 'success') {
+          this.messageService.add({ key: 'main-toast', severity: 'success', summary: 'Device Registered', detail: 'Your device has been successfully registered.' });
+          this.forgotDeviceDialogVisible = false;
+        }
+      },
+      error => {
+        // Handle error (invalid OTP, server issues)
+        this.messageService.add({ key: 'main-toast', severity: 'error', summary: 'Error', detail: 'Device re-registration failed. Please try again.' });
+      }
+    );
+  }
+
+  
+
+  confirmdeviceReRegistration() {
+    const data = {
+      email: this.emailForReRegistration,
+      reason: "Lost phone, need to re-register new device",
+      device_info: {
+        device_id: this.deviceId,
+        device_name: this.deviceName,
+        device_type: this.deviceType,
+        platform: this.platform,
+        browser: this.browser,
+        os_version: this.osVersion,
+        screen_resolution: this.screenResolution,
+        ip_address: this.ipAddress,
+      }
+    };
+  
+    this.authService.sendDeviceRequest(data).subscribe(
+      (res) => {
+        console.log('Device request sent successfully:', res);
+        this.messageService.add({ key: 'main-toast', severity: 'success', summary: 'Success', detail: 'Device request sent successfully!' });
+        this.deviceRegistered = true;
+        setTimeout(() => {
+          this.toggleForm();
+          this.otpVerified = false; // Reset OTP verification status
+          this.forgotDeviceDialogVisible = false; // Close the dialog
+        }, 1000);
+      },
+      (err) => {
+        console.error('Error sending device request:', err);
+        this.messageService.add({ key: 'main-toast', severity: 'error', summary: 'Error', detail: 'Failed to send device request. Please try again.' });
+      }
+    );
+  }
+  
 
 }
