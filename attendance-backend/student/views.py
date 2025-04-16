@@ -46,7 +46,15 @@ class RegisterStudent(APIView):
                 return Response({"error": "Device ID is required"}, status=status.HTTP_400_BAD_REQUEST)
 
             # ✅ Step 1: Ensure device is valid before proceeding
-            allowed_platforms = ["Windows", "Android", "iOS","Linux x86_64"]
+            allowed_platforms = [
+                "Windows",
+                "Android",
+                "iOS",
+                "Linux x86_64",
+                "Linux armv81",
+                "Linux armv8l",
+                "Linux aarch64"
+            ]
             allowed_browsers = ["Chrome", "Firefox", "Safari"]
 
             if platform.lower().startswith("linux"):
