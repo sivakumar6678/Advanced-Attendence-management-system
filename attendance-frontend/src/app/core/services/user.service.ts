@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient , HttpHeaders,HttpParams} from '@angular/common/http';
 import { Observable } from 'rxjs';
-
+import { environment } from '../../../environments/environment.prod';
 @Injectable({
   providedIn: 'root',
 })
 export class UserService {
 
-  private baseUrl = 'http://127.0.0.1:8000/api'; // Adjust if needed
+  // private baseUrl = 'http://127.0.0.1:8000/api'; // Adjust if needed
+  private baseUrl = environment.apiUrl;  // Accessing the API URL dynamically from environment file
   private crcDetails: any = null; // Store CRC details here
 
   constructor(private http: HttpClient) {}
