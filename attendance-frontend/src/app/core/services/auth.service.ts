@@ -29,8 +29,18 @@ export class AuthService {
 
   // Get Platform (OS)
   async getPlatform(): Promise<string> {
-      return navigator.platform || "Unknown";
+    const platform = navigator.platform.toLowerCase();
+    const userAgent = navigator.userAgent.toLowerCase();
+  
+    if (platform.includes("win")) return "Windows";
+    if (platform.includes("mac")) return "MacOS";
+    if (platform.includes("linux arm") || userAgent.includes("android")) return "Android";
+    if (userAgent.includes("iphone") || userAgent.includes("ipad") || userAgent.includes("ipod")) return "iOS";
+    if (platform.includes("linux")) return "Linux";
+  
+    return "Unknown";
   }
+  
   // Get Browser Info
   async getBrowserInfo() {
       const userAgent = navigator.userAgent;

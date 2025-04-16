@@ -55,7 +55,7 @@
     </button>
     
       <button *ngIf="!semesterFinalized" pButton label="Save Timetable" class="p-button-warning" (click)="finalizeTimetable()"></button>
-      <button *ngIf="semesterFinalized && showSaveToBackendButton" pButton label="Edit TimeTable" class="p-button-info" (click)="semesterFinalized = false"  ></button>
+      <!-- <button *ngIf="semesterFinalized && showSaveToBackendButton" pButton label="Edit TimeTable" class="p-button-info" (click)="semesterFinalized = false"  ></button> -->
       <button *ngIf=" semesterFinalized && showSaveToBackendButton" pButton label="Finalize Timetable" class="p-button-success" (click)="saveTimetableToBackend()"></button>
     </p-tabPanel>
     <p-tabPanel header="Manage Subjects">

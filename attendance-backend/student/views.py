@@ -49,6 +49,12 @@ class RegisterStudent(APIView):
             allowed_platforms = ["Windows", "Android", "iOS","Linux x86_64"]
             allowed_browsers = ["Chrome", "Firefox", "Safari"]
 
+            if platform.lower().startswith("linux"):
+                if "android" in browser.lower() or "mobile" in browser.lower():
+                    platform = "Android"
+                else:
+                    platform = "Linux"
+
             if platform not in allowed_platforms:
                 return Response({"error": f"Platform {platform} is not supported."}, status=status.HTTP_400_BAD_REQUEST)
 
