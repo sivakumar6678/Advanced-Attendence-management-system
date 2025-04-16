@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "attendecne": {
+    "attendance": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -13,7 +13,8 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-          "outputPath": "dist/attendance",
+          "outputPath": "dist/attendance"
+,
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
@@ -81,10 +82,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "attendecne:build:production"
+              "buildTarget": "attendance:build:production"
             },
             "development": {
-              "buildTarget": "attendecne:build:development"
+              "buildTarget": "attendance:build:development"
             }
           },
           "defaultConfiguration": "development"
