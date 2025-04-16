@@ -91,7 +91,11 @@ TEMPLATES = [
 WSGI_APPLICATION = 'attendance_system.wsgi.application'
 
 CSRF_TRUSTED_ORIGINS = [
-    'http://localhost:4200',  # Add your frontend domain here
+    'http://localhost:4200',  
+    'https://advanced-attendence-management-system.vercel.app/',
+    'https://advanced-attendence-ma-git-221bea-siva-kumars-projects-59923583.vercel.app/',
+    'https://advanced-attendence-management-system-ndggcas9k.vercel.app/'
+
 ]
 
 # Database
@@ -106,14 +110,14 @@ DATABASES = {
     #     'HOST' : 'localhost',
     #     'PORT' : '3306'
     # }
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.getenv('DB_NAME'),
-        'USER': os.getenv('DB_USER'),
-        'PASSWORD': os.getenv('DB_PASSWORD'),
-        'HOST': os.getenv('DB_HOST'),
-        'PORT': os.getenv('DB_PORT', '3306'),
-    }
+#  'default': {
+#     #     'ENGINE': 'django.db.backends.mysql',
+#     #     'NAME': os.getenv('DB_NAME'),
+#     #     'USER': os.getenv('DB_USER'),
+#     #     'PASSWORD': os.getenv('DB_PASSWORD'),
+#     #     'HOST': os.getenv('DB_HOST'),
+#     #     'PORT': os.getenv('DB_PORT', '3306'),
+#     # }   # 
 }
 
 
