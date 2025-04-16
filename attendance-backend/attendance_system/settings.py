@@ -63,9 +63,9 @@ MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:4200",  
-    'https://advanced-attendence-management-system.vercel.app/',
-    'https://advanced-attendence-ma-git-221bea-siva-kumars-projects-59923583.vercel.app/',
-    'https://advanced-attendence-management-system-ndggcas9k.vercel.app/'
+    "https://advanced-attendence-management-system.vercel.app",
+    "https://advanced-attendence-ma-git-221bea-siva-kumars-projects-59923583.vercel.app",
+    "https://advanced-attendence-management-system-ndggcas9k.vercel.app",
     
 ]
 REST_FRAMEWORK = {
