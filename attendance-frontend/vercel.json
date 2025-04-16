@@ -2,5 +2,19 @@
     "rewrites": [
       { "source": "/(.*)", "destination": "/index.html" }
     ]
+ ,
+    "version": 2,
+    "builds": [
+      {
+        "src": "frontend/package.json",
+        "use": "@vercel/angular"
+      }
+    ],
+    "routes": [
+      {
+        "src": "/api/(.*)",
+        "dest": "https://advanced-attendence-management-system.onrender.com/api/$1"
+      }
+    ]
   }
   
