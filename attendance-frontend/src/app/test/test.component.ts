@@ -134,9 +134,14 @@ export class TestComponent implements OnInit {
         // Log explicitly for debugging
         console.log('Admin Latitude:', position.coords.latitude);
         console.log('Admin Longitude:', position.coords.longitude);
+        console.log("📍 Accuracy (meters):", position.coords.accuracy);
       },
       (error) => console.error('Error fetching admin location', error),
-      { enableHighAccuracy: true }
+      {
+        enableHighAccuracy: true, // 👈 This is the magic line
+        timeout: 10000,
+        maximumAge: 0,
+      }
     );
   }
 
@@ -155,7 +160,11 @@ export class TestComponent implements OnInit {
         console.error('Error fetching student location', error);
         alert('Unable to fetch student location. Please check permissions or enable high-accuracy mode.');
       },
-      { enableHighAccuracy: true }
-    );
+      {
+        enableHighAccuracy: true, // 👈 This is the magic line
+        timeout: 10000,
+        maximumAge: 0,
+      }
+        );
   }
 }

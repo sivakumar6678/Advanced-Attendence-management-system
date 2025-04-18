@@ -215,11 +215,17 @@ export class StudentAttendanceComponent implements OnInit, OnDestroy {
     return new Promise((resolve) => {
       navigator.geolocation.getCurrentPosition(
         (position) => {
+          console.log("📍 Accuracy (meters):", position.coords.accuracy);
           resolve({ latitude: position.coords.latitude, longitude: position.coords.longitude });
         },
         (error) => {
           console.error("❌ GPS Error:", error);
           resolve(null);
+        },
+        {
+          enableHighAccuracy: true, // 👈 This is the magic line
+          timeout: 10000,
+          maximumAge: 0,
         }
       );
     });

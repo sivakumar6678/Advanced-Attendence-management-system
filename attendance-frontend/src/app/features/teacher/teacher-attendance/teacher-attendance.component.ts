@@ -199,12 +199,18 @@ export class TeacherAttendanceComponent implements OnInit {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
                 (position) => {
+                  console.log("📍 Accuracy (meters):", position.coords.accuracy);
                     console.log("✅ Faculty GPS Location:", position.coords.latitude, position.coords.longitude);
                     this.sendSessionToBackend(finalDay, finalPeriods, position.coords.latitude, position.coords.longitude);
                 },
                 (error) => {
                     console.error("❌ GPS access denied or unavailable:", error);
                     alert("⚠️ GPS is required for location-based attendance. Please enable it.");
+                },
+                {
+                  enableHighAccuracy: true, // 👈 This is the magic line
+                  timeout: 10000,
+                  maximumAge: 0,
                 }
             );
         } else {
