@@ -105,22 +105,22 @@ CSRF_TRUSTED_ORIGINS = [
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
 DATABASES = {
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.mysql',
-    #     'NAME': 'attendance_system_db',
-    #     'USER' : 'root',
-    #     'PASSWORD' : 'CSKsiva@66',
-    #     'HOST' : 'localhost',
-    #     'PORT' : '3306'
-    # }
- 'default': {
+    'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.getenv('DB_NAME'),
-        'USER': os.getenv('DB_USER'),
-        'PASSWORD': os.getenv('DB_PASSWORD'),
-        'HOST': os.getenv('DB_HOST'),
-        'PORT': os.getenv('DB_PORT', '3306'),
-     }   
+        'NAME': 'attendance_system_db',
+        'USER' : 'root',
+        'PASSWORD' : 'CSKsiva@66',
+        'HOST' : 'localhost',
+        'PORT' : '3306'
+    }
+#  'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': os.getenv('DB_NAME'),
+#         'USER': os.getenv('DB_USER'),
+#         'PASSWORD': os.getenv('DB_PASSWORD'),
+#         'HOST': os.getenv('DB_HOST'),
+#         'PORT': os.getenv('DB_PORT', '3306'),
+#      }   
 }
 
 
