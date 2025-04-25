@@ -107,8 +107,7 @@ CSRF_TRUSTED_ORIGINS = [
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
 DATABASES = {
-    
- 'default': {
+    'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': os.getenv('DB_NAME'),
         'USER': os.getenv('DB_USER'),
