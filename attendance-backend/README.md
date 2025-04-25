@@ -89,6 +89,32 @@ DB_PORT=3306
     ```bash
     python manage.py createsuperuser
     ```
+    Create a superuser: Create an admin account to access the Django admin panel:
+
+    ```bash 
+    python manage.py createsuperuser```
+    
+5.  **Initial Superadmin Setup**
+
+        After creating the superuser, follow these steps to add the actual Superadmin for the system:
+
+        1. Open your browser and go to the Django Admin Panel:  
+            [http://127.0.0.1:8000/admin/](http://127.0.0.1:8000/admin/)
+
+        2. Log in using the superuser credentials you just created.
+
+        3. In the admin dashboard, scroll down to the **Core** section and click on **Superadmin**.
+
+        4. Click the **"Add"** button in the top right.
+
+        5. Fill in the following details:  
+            - **Name**  
+            - **Email**  
+            - **Password**
+
+        6. Click **Save**.
+
+        ✅ This will register the actual root-level Superadmin required to manage the system.
 
 5. **Start the Development Server:**  
     Run the following command to start the Django development server:  
