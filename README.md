@@ -23,7 +23,6 @@ The **Advanced Attendance Management System** is a web-based solution designed t
   - Assignment & Chat Panel for communication with teachers.
 
 ### Additional Features
-- **Parent Notifications**: Automatic updates on student attendance.
 - **Attendance Reports & Insights**: Viewable by teachers and CRC.
 - **AI-based Attendance Suggestions**: Predicts attendance trends and alerts students if attendance drops below 70%.
 
@@ -36,11 +35,23 @@ Traditional attendance tracking methods are inefficient, prone to errors, and la
 Our system overcomes these limitations with a **secure, automated, and real-time attendance management system**.
 
 ## Technology Stack
-- **Frontend**: Angular with NG Prime 17
+- **Frontend**: Angular 18 + PrimeNG 17
 - **Backend**: Django (Django REST Framework - DRF)
 - **Database**: MySQL
-- **Security**: JWT Authentication
+- **Authentication**: JWT Authentication
+- **Additional Technologies**:
+  - FaceAPI.js for facial recognition
+  - Geolocation API for GPS-based attendance verification
 
+## Project Structure
+```bash
+Advanced-Attendance-Management/
+├── frontend/               # Angular 18 + PrimeNG app
+├── backend/                # Django REST Framework + MySQL
+├── README.md               # Main project README
+├── HomePage.png            # Home page screenshot
+├── LoginPage.png           # Login page screenshot
+```
 
 ## Installation Guide
 ### Prerequisites

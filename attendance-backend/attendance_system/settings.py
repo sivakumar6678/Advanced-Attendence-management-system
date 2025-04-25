@@ -12,7 +12,9 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import os
+from dotenv import load_dotenv
 
+load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -105,22 +107,15 @@ CSRF_TRUSTED_ORIGINS = [
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
 DATABASES = {
-    'default': {
+    
+ 'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'attendance_system_db',
-        'USER' : 'root',
-        'PASSWORD' : 'CSKsiva@66',
-        'HOST' : 'localhost',
-        'PORT' : '3306'
-    }
-#  'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': os.getenv('DB_NAME'),
-#         'USER': os.getenv('DB_USER'),
-#         'PASSWORD': os.getenv('DB_PASSWORD'),
-#         'HOST': os.getenv('DB_HOST'),
-#         'PORT': os.getenv('DB_PORT', '3306'),
-#      }   
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': os.getenv('DB_HOST'),
+        'PORT': os.getenv('DB_PORT', '3306'),
+     }   
 }
 
 
@@ -180,11 +175,12 @@ SIMPLE_JWT = {
 
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
+EMAIL_HOST = os.getenv('EMAIL_HOST')
+EMAIL_PORT = os.getenv('EMAIL_PORT')
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+SECRET_KEY = os.getenv('SECRET_KEY')
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'chandragarisivakumar@gmail.com'
-EMAIL_HOST_PASSWORD = 'kjuv ohbr kcix dsvi'
 
 
 STATIC_URL = '/static/'
