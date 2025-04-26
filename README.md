@@ -88,7 +88,15 @@ Advanced-Attendance-Management/
 ![Login](./LoginPage.png)
 
 
+## Additional Documentation
 
+For more detailed information about specific parts of the project, refer to the following README files:
+
+- **Frontend Documentation**: [frontend/README.md](./attendance-frontend/README.md)  
+  Contains setup instructions, architecture details, and guidelines for the Angular-based frontend.
+
+- **Backend Documentation**: [backend/README.md](./attendance-backend/README.md)  
+  Includes API endpoints, database schema, and configuration details for the Django backend.
 
 ## Contributing
 Contributions are welcome! Please follow these steps:
@@ -96,6 +104,7 @@ Contributions are welcome! Please follow these steps:
 2. Create a new branch (`feature-name`).
 3. Commit changes and push to the branch.
 4. Open a Pull Request for review.
+
 
 
 
